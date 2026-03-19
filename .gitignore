@@ -1,0 +1,24 @@
+# Root .gitignore
+node_modules/
+.DS_Store
+*.log
+.env
+.env.local
+
+# Backend
+backend/node_modules/
+backend/dist/
+backend/turff.sqlite
+backend/turff.sqlite-wal
+backend/turff.sqlite-shm
+
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local

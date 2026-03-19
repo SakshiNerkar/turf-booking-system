@@ -1,0 +1,14 @@
+{
+  "name": "turff",
+  "version": "1.0.0",
+  "description": "Turff – Full-Stack Sports Turf Booking System",
+  "private": true,
+  "scripts": {
+    "setup": "node setup-db.js",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "db:migrate": "cd backend && npm run db:migrate",
+    "db:seed": "cd backend && npm run db:seed",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install"
+  }
+}
