@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: turff-backend
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        value: "turff_secret_778899"
+      - key: CORS_ORIGIN
+        value: "*"
