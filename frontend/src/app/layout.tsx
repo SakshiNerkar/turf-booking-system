@@ -43,20 +43,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-gray-900 dark:bg-[#0B0F0C] dark:text-gray-100 transition-colors duration-500`}
       >
         <AuthProvider>
           <ScrollProgress />
-          <div className="min-h-dvh flex flex-col bg-white text-[color:var(--foreground)] dark:bg-[#0B0F0C]">
+          <div className="min-h-dvh flex flex-col">
             <Navbar />
-            <main className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+            <main className="flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
               <PageTransition>
                 {children}
               </PageTransition>
             </main>
             <Footer />
-            <ThemeSwitcher />
           </div>
+          <ThemeSwitcher />
           <ToasterProvider />
         </AuthProvider>
       </body>

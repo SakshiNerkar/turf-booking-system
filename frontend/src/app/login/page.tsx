@@ -78,11 +78,11 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder=" "
                 required
-                className="peer w-full px-5 py-4 pt-6 rounded-2xl border border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 outline-none focus:border-primary transition-all font-semibold"
+                className="peer w-full px-5 py-4 pt-6 rounded-2xl border border-gray-100 dark:border-gray-600 bg-gray-50 dark:bg-[#1A241D] text-gray-900 dark:text-white outline-none focus:border-primary transition-all font-semibold"
               />
               <label 
                 htmlFor="email"
-                className="absolute left-5 top-4 text-gray-400 text-sm font-bold transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-xs peer-focus:text-primary pointer-events-none"
+                className="absolute left-5 top-4 text-gray-400 dark:text-gray-500 text-sm font-bold transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-xs peer-focus:text-primary pointer-events-none"
               >
                 Email Address
               </label>
@@ -98,11 +98,11 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder=" "
                 required
-                className="peer w-full px-5 py-4 pt-6 rounded-2xl border border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 outline-none focus:border-primary transition-all font-semibold"
+                className="peer w-full px-5 py-4 pt-6 rounded-2xl border border-gray-100 dark:border-gray-600 bg-gray-50 dark:bg-[#1A241D] text-gray-900 dark:text-white outline-none focus:border-primary transition-all font-semibold"
               />
               <label 
                 htmlFor="password"
-                className="absolute left-5 top-4 text-gray-400 text-sm font-bold transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-xs peer-focus:text-primary pointer-events-none"
+                className="absolute left-5 top-4 text-gray-400 dark:text-gray-500 text-sm font-bold transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-xs peer-focus:text-primary pointer-events-none"
               >
                 Password
               </label>

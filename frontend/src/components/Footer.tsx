@@ -17,7 +17,7 @@ const SPORTS = ["Football", "Cricket", "Badminton", "Tennis"];
 
 export function Footer() {
   return (
-    <footer className="footer-glass border-none">
+    <footer className="bg-white dark:bg-[#121A14] border-t border-gray-100 dark:border-white/5 transition-colors duration-500 py-12">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 lg:gap-8">
 
@@ -27,9 +27,9 @@ export function Footer() {
               <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-green-500 to-green-600 text-lg font-black text-white shadow-lg shadow-green-500/20">
                 T
               </div>
-              <span className="text-xl font-black tracking-tight text-gray-900 dark:text-white">Turff</span>
+              <span className="text-xl font-black tracking-tight text-gray-900 dark:text-gray-100">Turff</span>
             </Link>
-            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed max-w-xs">
+            <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed max-w-xs">
               Experience the future of sports booking. Clean, fast, and reliable turf management for players and owners alike.
             </p>
             <div className="flex items-center gap-4">
@@ -41,7 +41,7 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-sm font-black uppercase tracking-widest text-gray-900 dark:text-white mb-6">
+            <h4 className="text-sm font-black uppercase tracking-widest text-gray-900 dark:text-gray-100 mb-6">
               Navigation
             </h4>
             <ul className="space-y-4">
@@ -49,7 +49,7 @@ export function Footer() {
                 <li key={l.href}>
                   <Link
                     href={l.href}
-                    className="text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors flex items-center group"
+                    className="text-sm font-bold text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors flex items-center group"
                   >
                     {l.label}
                     <ArrowUpRight className="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -61,7 +61,7 @@ export function Footer() {
 
           {/* Dashboards */}
           <div>
-            <h4 className="text-sm font-black uppercase tracking-widest text-gray-900 dark:text-white mb-6">
+            <h4 className="text-sm font-black uppercase tracking-widest text-gray-900 dark:text-gray-100 mb-6">
               Dashboards
             </h4>
             <ul className="space-y-4">
@@ -69,7 +69,7 @@ export function Footer() {
                 <li key={l.href}>
                   <Link
                     href={l.href}
-                    className="text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors flex items-center group"
+                    className="text-sm font-bold text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors flex items-center group"
                   >
                     {l.label}
                     <ArrowUpRight className="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -81,17 +81,17 @@ export function Footer() {
 
           {/* Subscribe */}
           <div>
-            <h4 className="text-sm font-black uppercase tracking-widest text-gray-900 dark:text-white mb-6">
+            <h4 className="text-sm font-black uppercase tracking-widest text-gray-900 dark:text-gray-100 mb-6">
               Newsletter
             </h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
               Get weekly updates on new turfs and special discounts.
             </p>
             <div className="flex gap-2">
               <input 
                 type="email" 
                 placeholder="email@example.com"
-                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm outline-none focus:border-primary transition-colors"
+                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm outline-none focus:border-primary transition-colors text-gray-900 dark:text-white dark:placeholder:text-gray-500"
               />
               <button className="p-2.5 rounded-xl bg-primary text-white hover:bg-primary-hover transition-colors">
                 <Mail className="w-5 h-5" />
@@ -103,13 +103,13 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="mt-20 pt-8 border-t border-gray-200 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
-          <p className="text-sm text-gray-500 dark:text-gray-500 font-medium">
+          <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
             © {new Date().getFullYear()} Turff Inc. All rights reserved. Built with Next.js 15.
           </p>
           <div className="flex items-center gap-8">
-            <Link href="#" className="text-sm font-bold text-gray-500 hover:text-gray-900 dark:text-gray-500 dark:hover:text-white transition-colors">Privacy</Link>
-            <Link href="#" className="text-sm font-bold text-gray-500 hover:text-gray-900 dark:text-gray-500 dark:hover:text-white transition-colors">Terms</Link>
-            <Link href="#" className="text-sm font-bold text-gray-500 hover:text-gray-900 dark:text-gray-500 dark:hover:text-white transition-colors">Support</Link>
+            <Link href="#" className="text-sm font-bold text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors">Privacy</Link>
+            <Link href="#" className="text-sm font-bold text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors">Terms</Link>
+            <Link href="#" className="text-sm font-bold text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors">Support</Link>
           </div>
         </div>
       </div>

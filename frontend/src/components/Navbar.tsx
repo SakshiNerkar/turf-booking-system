@@ -23,7 +23,7 @@ export function Navbar() {
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="sticky top-0 z-40 w-full"
     >
-      <div className="border-b border-black/5 bg-white/70 backdrop-blur-xl dark:border-white/5 dark:bg-[#0B0F0C]/80">
+      <div className="border-b border-black/5 bg-white/70 backdrop-blur-xl dark:border-white/5 dark:bg-[#121A14]/90 transition-colors duration-500">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           
           {/* Logo */}
@@ -35,7 +35,7 @@ export function Navbar() {
               T
             </motion.div>
             <div className="hidden sm:block">
-              <div className="text-lg font-black tracking-tight leading-none text-gray-900 dark:text-white">Turff</div>
+              <div className="text-lg font-black tracking-tight leading-none text-gray-900 dark:text-gray-100">Turff</div>
               <div className="text-[10px] font-bold text-green-600 uppercase tracking-widest leading-none mt-0.5">Premium Booking</div>
             </div>
           </Link>
@@ -69,7 +69,7 @@ export function Navbar() {
                 className="relative p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5 transition-colors"
                >
                  <Bell className="w-5 h-5" />
-                 <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-[#0B0F0C]" />
+                 <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-[#121A14]" />
                </motion.button>
             )}
 
@@ -77,7 +77,7 @@ export function Navbar() {
               <div className="flex items-center gap-3 pl-2 border-l border-gray-200 dark:border-white/10">
                 <div className="flex items-center gap-2.5">
                   <div className="text-right hidden lg:block">
-                    <div className="text-sm font-bold text-gray-900 dark:text-white leading-none">{user.name}</div>
+                    <div className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-none">{user.name}</div>
                     <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mt-1">{user.role}</div>
                   </div>
                   <motion.div 
@@ -99,12 +99,12 @@ export function Navbar() {
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Link href="/login" className="px-5 py-2.5 text-sm font-bold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors">
+                <Link href="/login" className="px-5 py-2.5 text-sm font-bold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors">
                   Login
                 </Link>
                 <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
                   <Link href="/register" className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-xl shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all">
-                    Get Started
+                    Register
                   </Link>
                 </motion.div>
               </div>
@@ -129,7 +129,7 @@ export function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="absolute top-full left-0 w-full bg-white dark:bg-[#0B0F0C] border-b border-gray-200 dark:border-white/10 overflow-hidden md:hidden shadow-2xl"
+            className="absolute top-full left-0 w-full bg-white dark:bg-[#121A14] border-b border-gray-200 dark:border-white/10 overflow-hidden md:hidden shadow-2xl transition-colors duration-500"
           >
             <div className="p-4 space-y-2">
               <MobileLink href="/turfs" active={isActive("/turfs")} onClick={() => setMenuOpen(false)}>
