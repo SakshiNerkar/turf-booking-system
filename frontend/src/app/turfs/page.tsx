@@ -3,7 +3,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { apiFetch, type ApiResponse } from "../../lib/api";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, MapPin, RefreshCw, Filter, ArrowRight, Calendar } from "lucide-react";
+import { apiFetch } from "../../lib/api";
 import { SkeletonCard } from "../../components/Skeletons";
 
 type Turf = {
@@ -15,28 +17,47 @@ type Turf = {
   description: string | null;
 };
 
-const SPORT_META: Record<string, { icon: string; bg: string; badge: string }> = {
-  football:  { icon: "⚽", bg: "from-green-200/70  to-green-300/40  dark:from-green-900/40  dark:to-green-800/20",  badge: "badge-green" },
-  cricket:   { icon: "🏏", bg: "from-amber-200/70  to-amber-300/40  dark:from-amber-900/40  dark:to-amber-800/20",  badge: "badge-amber" },
-  badminton: { icon: "🏸", bg: "from-blue-200/70   to-blue-300/40   dark:from-blue-900/40   dark:to-blue-800/20",   badge: "badge-gray"  },
-  tennis:    { icon: "🎾", bg: "from-orange-200/70 to-orange-300/40 dark:from-orange-900/40 dark:to-orange-800/20", badge: "badge-amber" },
+const SPORT_META: Record<string, { icon: string; bg: string; color: string }> = {
+  football:  { icon: "⚽", bg: "from-green-500/20 to-green-600/30", color: "text-green-500" },
+  cricket:   { icon: "🏏", bg: "from-amber-500/20 to-amber-600/30",  color: "text-amber-500" },
+  badminton: { icon: "🏸", bg: "from-blue-500/20 to-blue-600/30",   color: "text-blue-500"  },
+  tennis:    { icon: "🎾", bg: "from-orange-500/20 to-orange-600/30", color: "text-orange-500" },
 };
 
 function getSportMeta(sport: string) {
   return SPORT_META[sport?.toLowerCase()] ?? {
     icon: "🏟️",
-    bg: "from-gray-200/60 to-gray-300/30 dark:from-gray-800/40 dark:to-gray-700/20",
-    badge: "badge-gray",
+    bg: "from-gray-500/20 to-gray-600/30",
+    color: "text-gray-500",
   };
 }
 
 const SPORT_OPTIONS = [
-  { value: "", label: "🏅 All Sports" },
-  { value: "football",  label: "⚽ Football" },
-  { value: "cricket",   label: "🏏 Cricket"  },
-  { value: "badminton", label: "🏸 Badminton" },
-  { value: "tennis",    label: "🎾 Tennis"   },
+  { value: "", label: "All Sports" },
+  { value: "football",  label: "Football" },
+  { value: "cricket",   label: "Cricket"  },
+  { value: "badminton", label: "Badminton" },
+  { value: "tennis",    label: "Tennis"   },
 ];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.5, ease: "circOut" }
+  },
+};
 
 export default function TurfsPage() {
   const router = useRouter();
@@ -47,7 +68,6 @@ export default function TurfsPage() {
   const [error, setError]     = useState<string | null>(null);
   const [isOffline, setIsOffline] = useState(false);
 
-  // Filter state (synced with URL)
   const [q,          setQ]          = useState(searchParams.get("q")          ?? "");
   const [location,   setLocation]   = useState(searchParams.get("location")   ?? "");
   const [sport_type, setSportType]  = useState(searchParams.get("sport_type") ?? "");
@@ -83,7 +103,6 @@ export default function TurfsPage() {
     setTurfs(res.data);
   }, [q, location, sport_type, min_price, max_price]);
 
-  // Load on mount and when URL changes
   useEffect(() => {
     const p = {
       q:          searchParams.get("q")          ?? "",
@@ -95,8 +114,7 @@ export default function TurfsPage() {
     setQ(p.q); setLocation(p.location); setSportType(p.sport_type);
     setMinPrice(p.min_price); setMaxPrice(p.max_price);
     fetchTurfs(p);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, fetchTurfs]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -115,202 +133,202 @@ export default function TurfsPage() {
   }
 
   const hasFilters = !!(q || location || sport_type || min_price || max_price);
-  const inputCls = "h-11 w-full rounded-xl border border-black/10 bg-white px-4 text-sm outline-none transition focus:ring-2 focus:ring-green-500/40 focus:border-green-500/40 dark:border-white/15 dark:bg-black/20";
 
   return (
-    <div className="grid gap-6">
-
-      {/* ── Header & Filters ── */}
-      <div className="animate-fade-in rounded-3xl border border-black/5 bg-white/80 p-5 shadow-sm backdrop-blur-lg dark:border-white/10 dark:bg-black/30">
-        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between mb-5">
+    <div className="space-y-12">
+      
+      {/* Search & Filters */}
+      <section className="relative">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
           <div>
-            <h1 className="text-xl font-black tracking-tight">🏟️ Browse Turfs</h1>
-            <p className="mt-0.5 text-sm text-black/55 dark:text-white/50">
-              {loading ? "Loading…" : `${turfs?.length ?? 0} turf${turfs?.length !== 1 ? "s" : ""} found`}
+            <h1 className="text-4xl font-black tracking-tight text-gray-900 dark:text-white">
+              Browse <span className="text-primary">Turfs</span>
+            </h1>
+            <p className="mt-2 text-gray-500 font-medium">
+              {loading ? "Discovering optimal slots..." : `${turfs?.length ?? 0} premium venues available`}
             </p>
           </div>
-          <button
-            type="button"
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => fetchTurfs()}
-            className="hidden sm:inline-flex h-9 items-center gap-1.5 rounded-xl border border-black/10 bg-white/60 px-3 text-xs font-bold text-black/60 hover:bg-black/5 dark:border-white/15 dark:bg-black/20 dark:text-white/55"
+            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gray-100 dark:bg-white/5 text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-200"
           >
-            ↻ Refresh
-          </button>
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </motion.button>
         </div>
 
-        <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-6">
-          {/* Search */}
-          <div className="sm:col-span-6 relative">
-            <div className="pointer-events-none absolute inset-y-0 left-3.5 grid place-items-center text-black/35 dark:text-white/35">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" strokeWidth="2" />
-                <path d="M16.5 16.5 21 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-card p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-2xl space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <div className="md:col-span-5 relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input 
+                value={q} 
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Name or sport..."
+                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-transparent focus:border-primary outline-none transition-all font-medium"
+              />
             </div>
-            <input name="q" value={q} onChange={(e) => setQ(e.target.value)}
-              placeholder="Search by name, location, or sport…"
-              className={inputCls + " pl-10"}
-            />
+            <div className="md:col-span-4 relative">
+              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input 
+                value={location} 
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Location..."
+                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-transparent focus:border-primary outline-none transition-all font-medium"
+              />
+            </div>
+            <div className="md:col-span-3 relative">
+              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <select 
+                value={sport_type} 
+                onChange={(e) => setSportType(e.target.value)}
+                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-transparent focus:border-primary outline-none transition-all font-bold appearance-none"
+              >
+                {SPORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
           </div>
-
-          <input name="location" value={location} onChange={(e) => setLocation(e.target.value)}
-            placeholder="📍 Location" className={inputCls + " sm:col-span-2"} />
-
-          <select name="sport_type" value={sport_type} onChange={(e) => setSportType(e.target.value)}
-            className={inputCls + " sm:col-span-2"}>
-            {SPORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-
-          <input name="min_price" value={min_price} onChange={(e) => setMinPrice(e.target.value)}
-            placeholder="₹ Min" inputMode="numeric" className={inputCls} />
-          <input name="max_price" value={max_price} onChange={(e) => setMaxPrice(e.target.value)}
-            placeholder="₹ Max" inputMode="numeric" className={inputCls} />
-
-          <button type="submit" className="sm:col-span-6 btn-primary h-11 w-full rounded-xl text-sm font-bold">
-            🔍 Apply Filters
-          </button>
-          {hasFilters && (
-            <button type="button" onClick={handleClear}
-              className="sm:col-span-6 h-9 w-full rounded-xl border border-black/10 bg-white/60 text-sm font-semibold text-black/60 transition hover:bg-black/5 dark:border-white/15 dark:bg-black/20 dark:text-white/55">
-              ✕ Clear filters
-            </button>
-          )}
-        </form>
-      </div>
-
-      {/* ── Sport quick-links ── */}
-      <div className="flex flex-wrap gap-2">
-        {SPORT_OPTIONS.slice(1).map((s) => (
-          <button key={s.value} type="button"
-            onClick={() => { setSportType(s.value); router.push(`/turfs?sport_type=${s.value}`); }}
-            className={[
-              "inline-flex h-8 items-center gap-1.5 rounded-full px-3.5 text-xs font-bold transition-all",
-              sport_type === s.value
-                ? "bg-green-600/15 text-green-700 dark:text-green-300 border border-green-500/30"
-                : "bg-black/[0.04] text-black/65 hover:bg-black/[0.08] dark:bg-white/[0.06] dark:text-white/65 dark:hover:bg-white/10",
-            ].join(" ")}
-          >
-            {s.label}
-          </button>
-        ))}
-      </div>
-
-      {/* ── Offline / Error Banner ── */}
-      {error && !loading && (
-        <div className={`rounded-2xl border p-5 ${
-          isOffline
-            ? "border-orange-500/30 bg-orange-500/10"
-            : "border-red-500/20 bg-red-500/8"
-        }`}>
-          <div className="flex items-start gap-3">
-            <span className="text-2xl shrink-0">{isOffline ? "🔌" : "⚠️"}</span>
-            <div className="flex-1">
-              <div className={`font-black text-sm mb-1 ${isOffline ? "text-orange-800 dark:text-orange-200" : "text-red-700 dark:text-red-300"}`}>
-                {isOffline ? "Backend server not running" : "API Error"}
-              </div>
-              <div className={`text-sm ${isOffline ? "text-orange-700/85 dark:text-orange-300/80" : "text-red-600/80"}`}>
-                {error}
-              </div>
-              {isOffline && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <code className="inline-flex items-center gap-1.5 rounded-xl bg-orange-600/12 px-3 py-1.5 font-mono text-xs text-orange-800 dark:text-orange-200">
-                    cd backend &amp;&amp; npm run dev
-                  </code>
-                  <button type="button" onClick={() => fetchTurfs()}
-                    className="inline-flex h-8 items-center rounded-xl bg-orange-600 px-3 text-xs font-bold text-white transition hover:bg-orange-700">
-                    Retry ↻
-                  </button>
-                </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1 flex gap-2">
+              <input 
+                value={min_price} 
+                onChange={(e) => setMinPrice(e.target.value)}
+                placeholder="₹ Min price"
+                className="flex-1 px-4 py-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-transparent focus:border-primary outline-none transition-all text-sm font-medium"
+              />
+              <input 
+                value={max_price} 
+                onChange={(e) => setMaxPrice(e.target.value)}
+                placeholder="₹ Max price"
+                className="flex-1 px-4 py-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-transparent focus:border-primary outline-none transition-all text-sm font-medium"
+              />
+            </div>
+            <div className="flex gap-2">
+              {hasFilters && (
+                <button type="button" onClick={handleClear} className="px-6 py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
+                  Reset
+                </button>
               )}
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit" 
+                className="px-8 py-3 bg-primary text-white font-black rounded-xl shadow-lg shadow-green-500/25 flex items-center gap-2"
+              >
+                Find Slots
+                <ArrowRight className="w-4 h-4" />
+              </motion.button>
             </div>
           </div>
-        </div>
-      )}
+        </form>
+      </section>
 
-      {/* ── Skeleton loading ── */}
-      {loading && (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3, 4, 5, 6].map((i) => <SkeletonCard key={i} />)}
-        </div>
-      )}
-
-      {/* ── Empty state (no results, not loading, no error) ── */}
-      {!loading && !error && turfs?.length === 0 && (
-        <div className="flex flex-col items-center gap-4 rounded-3xl border border-black/5 bg-white/70 p-16 text-center shadow-sm dark:border-white/10 dark:bg-black/30">
-          <div className="text-5xl">🏟️</div>
-          <p className="text-base font-bold text-black/65 dark:text-white/60">
-            No turfs found matching your filters.
-          </p>
-          {hasFilters && (
-            <button type="button" onClick={handleClear} className="btn-primary rounded-xl px-6 py-2.5 text-sm">
-              Clear filters
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* ── Turf Cards ── */}
-      {!loading && turfs && turfs.length > 0 && (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {turfs.map((t, i) => {
+      {/* Grid */}
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3"
+      >
+        <AnimatePresence mode="popLayout">
+          {loading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={`skeleton-${i}`}>
+                <SkeletonCard />
+              </div>
+            ))
+          ) : turfs?.map((t) => {
             const meta = getSportMeta(t.sport_type);
             return (
-              <div
+              <motion.div
+                layout
                 key={t.id}
-                className={`group animate-fade-in stagger-${Math.min(i + 1, 6)} overflow-hidden rounded-3xl border border-black/5 bg-white shadow-sm backdrop-blur-lg transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg dark:border-white/10 dark:bg-black/30`}
+                variants={cardVariants}
+                whileHover={{ y: -8 }}
+                className="card-premium group"
               >
-                {/* Image area */}
-                <div className={`relative h-40 w-full bg-gradient-to-br ${meta.bg} overflow-hidden`}>
-                  <div className="absolute inset-0 flex items-center justify-center text-5xl opacity-25 transition-all duration-300 group-hover:opacity-40 group-hover:scale-110">
-                    {meta.icon}
+                {/* Image / Header */}
+                <div className={`relative h-56 w-full bg-gradient-to-br ${meta.bg} flex items-center justify-center p-8`}>
+                  <div className="text-7xl group-hover:scale-120 transition-transform duration-500 ease-out">{meta.icon}</div>
+                  <div className="absolute inset-0 turf-image-overlay opacity-60" />
+                  
+                  <div className="absolute top-4 left-4 flex gap-2">
+                    <span className="px-3 py-1 bg-white/90 dark:bg-black/80 backdrop-blur-md rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                      Available
+                    </span>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                  <span className={`badge ${meta.badge} absolute left-3 top-3`}>
-                    {meta.icon} {t.sport_type}
-                  </span>
-                  <div className="absolute right-3 top-3 rounded-xl bg-white/90 px-3 py-1.5 text-sm font-black text-green-700 shadow-sm dark:bg-black/70 dark:text-green-300">
+
+                  <div className="absolute top-4 right-4 px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-black shadow-lg">
                     ₹{Number(t.price_per_slot).toFixed(0)}
-                    <span className="ml-1 text-[10px] font-semibold opacity-60">/slot</span>
                   </div>
                 </div>
 
-                {/* Card body */}
-                <div className="p-4">
-                  <div className="font-black text-sm truncate">{t.name}</div>
-                  <div className="mt-1 flex items-center gap-1.5 text-xs text-black/55 dark:text-white/50">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" className="shrink-0">
-                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" stroke="currentColor" strokeWidth="2.2" />
-                      <circle cx="12" cy="9" r="2.5" stroke="currentColor" strokeWidth="2.2" />
-                    </svg>
-                    <span className="truncate">{t.location}</span>
+                {/* Content */}
+                <div className="p-6 space-y-4">
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-black text-gray-900 dark:text-white truncate group-hover:text-primary transition-colors">
+                      {t.name}
+                    </h3>
+                    <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 font-medium">
+                      <MapPin className="w-4 h-4 text-primary" />
+                      <span className="truncate">{t.location}</span>
+                    </div>
                   </div>
-                  {t.description ? (
-                    <p className="mt-2 line-clamp-2 text-xs text-black/55 dark:text-white/50 leading-relaxed">{t.description}</p>
-                  ) : (
-                    <p className="mt-2 text-xs text-black/40 dark:text-white/35">Premium sports turf. Click to book.</p>
-                  )}
 
-                  <div className="mt-3.5 flex items-center gap-2">
-                    <Link
-                      href={`/turfs/${t.id}`}
-                      id={`turf-${t.id}`}
-                      className="btn-primary flex-1 rounded-xl py-2.5 text-xs font-black"
-                    >
-                      View &amp; Book
-                    </Link>
-                    <Link
-                      href={`/turfs/${t.id}`}
-                      title="View calendar"
-                      className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-black/10 bg-white/80 text-base transition hover:bg-green-50 dark:border-white/15 dark:bg-black/20 dark:hover:bg-green-950/30"
-                    >
-                      📅
-                    </Link>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed h-10">
+                    {t.description || "Premium sports facility with specialized lighting and amenities."}
+                  </p>
+
+                  <div className="flex items-center justify-between pt-2">
+                    <div className={`text-xs font-black uppercase tracking-wider ${meta.color} flex items-center gap-1.5`}>
+                      <span className="w-2 h-2 rounded-full border-2 border-current" />
+                      {t.sport_type}
+                    </div>
+                    
+                    <div className="flex gap-2">
+                       <Link 
+                        href={`/turfs/${t.id}`}
+                        className="p-3 rounded-xl bg-gray-50 dark:bg-white/5 text-gray-500 hover:text-primary transition-colors border border-gray-100 dark:border-white/5"
+                      >
+                        <Calendar className="w-5 h-5" />
+                      </Link>
+                      <Link 
+                        href={`/turfs/${t.id}`}
+                        className="px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl text-xs font-black flex items-center gap-2 group/btn"
+                      >
+                        Book Now
+                        <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
+
+                {/* Glow Effect */}
+                <div className="absolute inset-0 rounded-[inherit] border-2 border-primary/0 group-hover:border-primary/20 transition-all pointer-events-none" />
+              </motion.div>
             );
           })}
-        </div>
+        </AnimatePresence>
+      </motion.div>
+
+      {/* Empty State */}
+      {!loading && turfs?.length === 0 && (
+         <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col items-center justify-center py-20 px-8 text-center bg-gray-50 dark:bg-white/5 rounded-[3rem] border-2 border-dashed border-gray-200 dark:border-white/10"
+         >
+          <div className="w-20 h-20 bg-gray-100 dark:bg-white/10 rounded-full flex items-center justify-center text-4xl mb-6">🏜️</div>
+          <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2">No turfs match your search</h2>
+          <p className="text-gray-500 mb-8 max-w-sm">Try adjusting your filters or search terms to find available slots.</p>
+          <button onClick={handleClear} className="px-8 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black rounded-xl">
+            Clear All Filters
+          </button>
+         </motion.div>
       )}
     </div>
   );

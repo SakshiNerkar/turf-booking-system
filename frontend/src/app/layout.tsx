@@ -31,6 +31,10 @@ export const metadata: Metadata = {
   },
 };
 
+import ThemeSwitcher from "../components/ThemeSwitcher";
+import ScrollProgress from "../components/ScrollProgress";
+import PageTransition from "../components/PageTransition";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -42,12 +46,16 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          <div className="min-h-dvh bg-gradient-to-br from-green-50 via-white to-green-100 text-[color:var(--foreground)] dark:from-[#041007] dark:via-[#050b07] dark:to-[#06150a]">
+          <ScrollProgress />
+          <div className="min-h-dvh flex flex-col bg-white text-[color:var(--foreground)] dark:bg-[#0B0F0C]">
             <Navbar />
-            <main className="mx-auto w-full max-w-6xl px-4 py-8">
-              {children}
+            <main className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+              <PageTransition>
+                {children}
+              </PageTransition>
             </main>
             <Footer />
+            <ThemeSwitcher />
           </div>
           <ToasterProvider />
         </AuthProvider>

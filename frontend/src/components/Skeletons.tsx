@@ -1,17 +1,22 @@
 "use client";
 
+import { motion } from "framer-motion";
+
 export function Skeleton({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-xl bg-black/[0.06] dark:bg-white/[0.07] ${className}`}
+      className={`relative overflow-hidden rounded-xl bg-gray-200 dark:bg-white/5 ${className}`}
     >
-      <div
-        className="absolute inset-0 -translate-x-full"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)",
-          animation: "skeletonShimmer 1.4s ease-in-out infinite",
+      <motion.div
+        animate={{
+          x: ["-100%", "100%"],
         }}
+        transition={{
+          repeat: Infinity,
+          duration: 1.5,
+          ease: "linear",
+        }}
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 dark:via-white/5 to-transparent shadow-2xl"
       />
     </div>
   );
@@ -19,16 +24,16 @@ export function Skeleton({ className = "" }: { className?: string }) {
 
 export function SkeletonCard() {
   return (
-    <div className="card overflow-hidden">
-      <Skeleton className="h-40 rounded-none" />
-      <div className="p-4 grid gap-3">
-        <Skeleton className="h-5 w-3/4" />
+    <div className="bg-white dark:bg-card border border-gray-100 dark:border-white/5 rounded-3xl overflow-hidden shadow-sm">
+      <Skeleton className="h-48 rounded-none" />
+      <div className="p-5 space-y-4">
+        <Skeleton className="h-6 w-3/4" />
         <Skeleton className="h-4 w-1/2" />
-        <div className="flex gap-2 pt-1">
-          <Skeleton className="h-6 w-16 rounded-full" />
-          <Skeleton className="h-6 w-20 rounded-full" />
+        <div className="flex gap-2">
+          <Skeleton className="h-7 w-20 rounded-full" />
+          <Skeleton className="h-7 w-24 rounded-full" />
         </div>
-        <Skeleton className="h-10 mt-2" />
+        <Skeleton className="h-11 w-full rounded-xl mt-2" />
       </div>
     </div>
   );
@@ -36,32 +41,32 @@ export function SkeletonCard() {
 
 export function SkeletonStat() {
   return (
-    <div className="card p-5">
-      <Skeleton className="h-10 w-10 rounded-xl mb-3" />
-      <Skeleton className="h-7 w-2/3 mb-1.5" />
-      <Skeleton className="h-4 w-1/2" />
+    <div className="bg-white dark:bg-card p-6 rounded-3xl border border-gray-100 dark:border-white/5">
+      <Skeleton className="h-10 w-10 rounded-xl mb-4" />
+      <Skeleton className="h-8 w-1/2 mb-2" />
+      <Skeleton className="h-4 w-1/3" />
     </div>
   );
 }
 
 export function SkeletonRow() {
   return (
-    <div className="flex items-center gap-3 p-3 border-b border-black/5 dark:border-white/8">
-      <Skeleton className="h-9 w-9 rounded-xl shrink-0" />
-      <div className="flex-1 grid gap-2">
+    <div className="flex items-center gap-4 p-4 border-b border-gray-50 dark:border-white/5">
+      <Skeleton className="h-12 w-12 rounded-xl shrink-0" />
+      <div className="flex-1 space-y-2">
         <Skeleton className="h-4 w-2/3" />
         <Skeleton className="h-3 w-1/3" />
       </div>
-      <Skeleton className="h-6 w-16 rounded-full shrink-0" />
+      <Skeleton className="h-7 w-16 rounded-full shrink-0" />
     </div>
   );
 }
 
 export function SkeletonText({ lines = 3 }: { lines?: number }) {
   return (
-    <div className="grid gap-2">
+    <div className="space-y-3">
       {Array.from({ length: lines }).map((_, i) => (
-        <div key={i} style={{ width: `${85 - i * 12}%` }}>
+        <div key={i} style={{ width: `${90 - i * 15}%` }}>
           <Skeleton className="h-4 w-full" />
         </div>
       ))}
@@ -73,15 +78,26 @@ export function SkeletonText({ lines = 3 }: { lines?: number }) {
 export function LoadingSpinner({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
   const sizes = { sm: "h-4 w-4", md: "h-8 w-8", lg: "h-12 w-12" };
   return (
-    <div className={`${sizes[size]} animate-spin rounded-full border-[3px] border-black/10 border-t-[color:var(--primary)] dark:border-white/15 dark:border-t-[color:var(--accent)]`} />
+    <motion.div 
+      animate={{ rotate: 360 }}
+      transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+      className={`${sizes[size]} rounded-full border-[3px] border-black/5 border-t-primary dark:border-white/10 dark:border-t-primary shadow-sm`}
+    />
   );
 }
 
 export function PageLoader() {
   return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4">
+    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6">
       <LoadingSpinner size="lg" />
-      <p className="text-sm font-semibold text-black/45 dark:text-white/40">Loading…</p>
+      <motion.p 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ repeat: Infinity, duration: 0.8, repeatType: "reverse" }}
+        className="text-sm font-black text-gray-500 tracking-widest uppercase"
+      >
+        Loading experience…
+      </motion.p>
     </div>
   );
 }

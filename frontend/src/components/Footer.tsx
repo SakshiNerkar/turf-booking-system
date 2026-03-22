@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Mail, Instagram, Twitter, Facebook, ArrowUpRight } from "lucide-react";
 
 const NAV_LINKS = [
   { label: "Browse Turfs", href: "/turfs" },
@@ -12,50 +13,46 @@ const ROLE_LINKS = [
   { label: "Admin Dashboard",    href: "/dashboard/admin" },
 ];
 
-const SPORTS = ["⚽ Football", "🏏 Cricket", "🏸 Badminton", "🎾 Tennis"];
+const SPORTS = ["Football", "Cricket", "Badminton", "Tennis"];
 
 export function Footer() {
   return (
-    <footer className="mt-6 border-t border-black/5 bg-white/60 backdrop-blur-xl dark:border-white/10 dark:bg-black/25">
-      <div className="mx-auto w-full max-w-6xl px-4 py-12">
-        <div className="grid gap-10 sm:grid-cols-4">
+    <footer className="footer-glass border-none">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 lg:gap-8">
 
-          {/* Brand */}
-          <div className="sm:col-span-1">
-            <Link href="/" className="inline-flex items-center gap-2.5">
-              <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-green-500 to-green-700 text-sm font-black text-white shadow-md shadow-green-500/30">
+          {/* Brand & Socials */}
+          <div className="space-y-6">
+            <Link href="/" className="inline-flex items-center gap-3">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-green-500 to-green-600 text-lg font-black text-white shadow-lg shadow-green-500/20">
                 T
               </div>
-              <span className="text-base font-bold tracking-tight">Turff</span>
+              <span className="text-xl font-black tracking-tight text-gray-900 dark:text-white">Turff</span>
             </Link>
-            <p className="mt-3 text-sm text-black/60 dark:text-white/55 leading-relaxed">
-              Book sports turfs. Play more. Stress less.
+            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed max-w-xs">
+              Experience the future of sports booking. Clean, fast, and reliable turf management for players and owners alike.
             </p>
-            <div className="mt-4 flex flex-wrap gap-1.5">
-              {SPORTS.map((s) => (
-                <span
-                  key={s}
-                  className="rounded-full bg-green-500/8 px-2.5 py-1 text-xs font-semibold text-green-700 dark:text-green-300"
-                >
-                  {s}
-                </span>
-              ))}
+            <div className="flex items-center gap-4">
+              <SocialIcon icon={<Instagram className="w-5 h-5" />} />
+              <SocialIcon icon={<Twitter className="w-5 h-5" />} />
+              <SocialIcon icon={<Facebook className="w-5 h-5" />} />
             </div>
           </div>
 
-          {/* Platform */}
+          {/* Quick Links */}
           <div>
-            <div className="text-xs font-bold uppercase tracking-widest text-black/40 dark:text-white/40 mb-3">
-              Platform
-            </div>
-            <ul className="grid gap-2">
+            <h4 className="text-sm font-black uppercase tracking-widest text-gray-900 dark:text-white mb-6">
+              Navigation
+            </h4>
+            <ul className="space-y-4">
               {NAV_LINKS.map((l) => (
                 <li key={l.href}>
                   <Link
                     href={l.href}
-                    className="text-sm font-semibold text-black/70 dark:text-white/65 transition-colors hover:text-green-600 dark:hover:text-green-400"
+                    className="text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors flex items-center group"
                   >
                     {l.label}
+                    <ArrowUpRight className="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </Link>
                 </li>
               ))}
@@ -64,56 +61,66 @@ export function Footer() {
 
           {/* Dashboards */}
           <div>
-            <div className="text-xs font-bold uppercase tracking-widest text-black/40 dark:text-white/40 mb-3">
+            <h4 className="text-sm font-black uppercase tracking-widest text-gray-900 dark:text-white mb-6">
               Dashboards
-            </div>
-            <ul className="grid gap-2">
+            </h4>
+            <ul className="space-y-4">
               {ROLE_LINKS.map((l) => (
                 <li key={l.href}>
                   <Link
                     href={l.href}
-                    className="text-sm font-semibold text-black/70 dark:text-white/65 transition-colors hover:text-green-600 dark:hover:text-green-400"
+                    className="text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors flex items-center group"
                   >
                     {l.label}
+                    <ArrowUpRight className="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Subscribe */}
           <div>
-            <div className="text-xs font-bold uppercase tracking-widest text-black/40 dark:text-white/40 mb-3">
-              Contact & Support
+            <h4 className="text-sm font-black uppercase tracking-widest text-gray-900 dark:text-white mb-6">
+              Newsletter
+            </h4>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Get weekly updates on new turfs and special discounts.
+            </p>
+            <div className="flex gap-2">
+              <input 
+                type="email" 
+                placeholder="email@example.com"
+                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm outline-none focus:border-primary transition-colors"
+              />
+              <button className="p-2.5 rounded-xl bg-primary text-white hover:bg-primary-hover transition-colors">
+                <Mail className="w-5 h-5" />
+              </button>
             </div>
-            <ul className="grid gap-2 text-sm text-black/70 dark:text-white/65">
-              <li className="font-semibold">support@turff.local</li>
-              <li>Mon–Sun • 6:00 AM – 11:00 PM</li>
-              <li className="mt-2">
-                <a
-                  href="mailto:support@turff.local"
-                  className="inline-flex h-9 items-center justify-center rounded-xl bg-[color:var(--primary)] px-4 text-xs font-bold text-white shadow-md transition-all duration-300 hover:bg-green-700 hover:shadow-xl"
-                >
-                  Contact us
-                </a>
-              </li>
-            </ul>
           </div>
 
         </div>
 
-        {/* Bottom bar */}
-        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-black/5 pt-6 dark:border-white/10 sm:flex-row">
-          <p className="text-xs text-black/45 dark:text-white/40">
-            © {new Date().getFullYear()} Turff Booking System. All rights reserved.
+        {/* Bottom Bar */}
+        <div className="mt-20 pt-8 border-t border-gray-200 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
+          <p className="text-sm text-gray-500 dark:text-gray-500 font-medium">
+            © {new Date().getFullYear()} Turff Inc. All rights reserved. Built with Next.js 15.
           </p>
-          <div className="flex items-center gap-1 text-xs text-black/40 dark:text-white/35">
-            Built with{" "}
-            <span className="text-red-500">♥</span>{" "}
-            using Next.js &amp; TypeScript
+          <div className="flex items-center gap-8">
+            <Link href="#" className="text-sm font-bold text-gray-500 hover:text-gray-900 dark:text-gray-500 dark:hover:text-white transition-colors">Privacy</Link>
+            <Link href="#" className="text-sm font-bold text-gray-500 hover:text-gray-900 dark:text-gray-500 dark:hover:text-white transition-colors">Terms</Link>
+            <Link href="#" className="text-sm font-bold text-gray-500 hover:text-gray-900 dark:text-gray-500 dark:hover:text-white transition-colors">Support</Link>
           </div>
         </div>
       </div>
     </footer>
+  );
+}
+
+function SocialIcon({ icon }: { icon: React.ReactNode }) {
+  return (
+    <button className="p-2.5 rounded-xl bg-gray-100 dark:bg-white/5 text-gray-500 hover:text-primary hover:bg-primary/10 transition-all duration-300">
+      {icon}
+    </button>
   );
 }
