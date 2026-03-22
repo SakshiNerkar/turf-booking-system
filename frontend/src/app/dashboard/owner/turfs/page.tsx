@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useAuth } from "../../../components/AuthProvider";
-import { apiFetch } from "../../../lib/api";
-import { SkeletonCard } from "../../../components/Skeletons";
+import { useAuth } from "@/components/AuthProvider";
+import { apiFetch } from "@/lib/api";
+import { SkeletonCard } from "@/components/Skeletons";
 import { Plus, MapPin, Edit3, Trash2, Calendar, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
 

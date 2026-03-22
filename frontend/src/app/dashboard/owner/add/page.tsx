@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../../../components/AuthProvider";
-import { apiFetch } from "../../../lib/api";
-import { notify } from "../../../lib/toast";
+import { useAuth } from "@/components/AuthProvider";
+import { apiFetch } from "@/lib/api";
+import { notify } from "@/lib/toast";
 import { Plus, ArrowLeft, CheckCircle2, RefreshCw, Sparkles, MapPin, MousePointer2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 

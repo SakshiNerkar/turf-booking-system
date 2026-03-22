@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "../../../components/AuthProvider";
-import { apiFetch } from "../../../lib/api";
-import { StatCard } from "../../../components/dashboard/StatCard";
+import { useAuth } from "@/components/AuthProvider";
+import { apiFetch } from "@/lib/api";
+import { StatCard } from "@/components/dashboard/StatCard";
 import { TrendingUp, CreditCard, Activity, ArrowUpRight, BarChart3, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
 

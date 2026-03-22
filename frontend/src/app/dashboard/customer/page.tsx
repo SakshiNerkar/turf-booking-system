@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useAuth } from "../../../components/AuthProvider";
-import { apiFetch } from "../../../lib/api";
-import { notify } from "../../../lib/toast";
-import { SkeletonRow } from "../../../components/Skeletons";
-import { StatCard } from "../../../components/dashboard/StatCard";
+import { useAuth } from "@/components/AuthProvider";
+import { apiFetch } from "@/lib/api";
+import { notify } from "@/lib/toast";
+import { SkeletonRow } from "@/components/Skeletons";
+import { StatCard } from "@/components/dashboard/StatCard";
 import { Calendar, CreditCard, Activity, ArrowRight, RefreshCw, History, User } from "lucide-react";
 
 type BookingListItem = {

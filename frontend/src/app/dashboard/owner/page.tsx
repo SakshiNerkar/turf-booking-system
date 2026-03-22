@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useAuth } from "../../../components/AuthProvider";
-import { apiFetch } from "../../../lib/api";
-import { notify } from "../../../lib/toast";
-import { SkeletonRow } from "../../../components/Skeletons";
-import { StatCard } from "../../../components/dashboard/StatCard";
+import { useAuth } from "@/components/AuthProvider";
+import { apiFetch } from "@/lib/api";
+import { notify } from "@/lib/toast";
+import { SkeletonRow } from "@/components/Skeletons";
+import { StatCard } from "@/components/dashboard/StatCard";
 import { motion } from "framer-motion";
 import { 
   Plus, Settings, MapPin, Calendar, CreditCard, Activity, 
@@ -215,7 +215,7 @@ export default function OwnerDashboard() {
 
           {tab === "bookings" && (
             <div className="divide-y divide-gray-100 dark:divide-white/5">
-              {bookings?.map(b => (
+            {loading ? Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />) : bookings?.map(b => (
                 <div key={b.id} className="flex items-center gap-4 py-5 group">
                   <div className="w-12 h-12 rounded-2xl bg-gray-50 dark:bg-white/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">👤</div>
                   <div className="flex-1 min-w-0">

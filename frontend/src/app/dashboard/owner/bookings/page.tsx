@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "../../../components/AuthProvider";
-import { apiFetch } from "../../../lib/api";
-import { SkeletonRow } from "../../../components/Skeletons";
+import { useAuth } from "@/components/AuthProvider";
+import { apiFetch } from "@/lib/api";
+import { SkeletonRow } from "@/components/Skeletons";
 import { Calendar, Users, CreditCard, Search, Filter } from "lucide-react";
 
 type BookingItem = {
@@ -54,7 +54,7 @@ export default function OwnerBookingsPage() {
 
       <div className="bg-white dark:bg-[#121A14] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl p-8">
         <div className="divide-y divide-gray-100 dark:divide-white/5">
-          {loading ? <SkeletonRow count={8} /> : 
+          {loading ? Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} />) : 
            !bookings?.length ? <div className="py-20 text-center text-gray-400 text-sm">No bookings found for your venues.</div> :
            bookings.map(b => (
             <div key={b.id} className="py-6 flex items-center gap-6 group">

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "../../../components/AuthProvider";
-import { apiFetch } from "../../../lib/api";
-import { SkeletonRow } from "../../../components/Skeletons";
-import { StatCard } from "../../../components/dashboard/StatCard";
+import { useAuth } from "@/components/AuthProvider";
+import { apiFetch } from "@/lib/api";
+import { SkeletonRow } from "@/components/Skeletons";
+import { StatCard } from "@/components/dashboard/StatCard";
 import { History as HistoryIcon, TrendingUp, CreditCard } from "lucide-react";
 
 type BookingListItem = {
@@ -40,7 +40,7 @@ export default function BookingHistoryPage() {
       <div className="bg-white dark:bg-[#121A14] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl p-8">
          <h2 className="text-xl font-black mb-6">Booking History</h2>
          <div className="divide-y divide-gray-100 dark:divide-white/5">
-            {loading ? <SkeletonRow count={5} /> : bookings?.map(b => (
+            {loading ? Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />) : bookings?.map(b => (
               <div key={b.id} className="py-4 flex items-center justify-between">
                 <div>
                   <div className="font-black">{b.turf_name}</div>

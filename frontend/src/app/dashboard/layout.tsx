@@ -1,7 +1,7 @@
 "use client";
 
-import { DashboardLayout } from "../../components/dashboard/DashboardLayout";
-import { RequireAuth } from "../../components/RequireAuth";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { RequireAuth } from "@/components/RequireAuth";
 
 export default function RootDashboardLayout({
   children,
