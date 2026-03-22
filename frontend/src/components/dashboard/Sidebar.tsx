@@ -12,24 +12,20 @@ import { useState, useEffect } from "react";
 
 const CUSTOMER_LINKS = [
   { label: "Browse Turfs", href: "/turfs", icon: Search },
-  { label: "My Bookings",  href: "/dashboard/customer", icon: Calendar },
-  { label: "Upcoming",     href: "/dashboard/customer?tab=upcoming", icon: LayoutDashboard },
+  { label: "My Bookings",  href: "/dashboard/customer?tab=upcoming", icon: Calendar },
   { label: "History",      href: "/dashboard/customer?tab=history", icon: History },
-  { label: "Profile",       href: "/dashboard/profile", icon: User },
-  { label: "Notifications", href: "/dashboard/notifications", icon: Bell },
-  { label: "Settings",      href: "/dashboard/settings", icon: Settings },
+  { label: "Profile",      href: "/dashboard/customer?tab=profile", icon: User },
+  { label: "Settings",     href: "/dashboard/customer?tab=settings", icon: Settings },
 ];
 
 const OWNER_LINKS = [
-  { label: "Overview",     href: "/dashboard/owner", icon: LayoutDashboard },
-  { label: "My Turfs",      href: "/dashboard/owner/turfs", icon: Map },
-  { label: "Add Turf",      href: "/dashboard/owner/add", icon: PlusCircle },
-  { label: "Bookings",     href: "/dashboard/owner/bookings", icon: Calendar },
-  { label: "Earnings",     href: "/dashboard/owner/earnings", icon: BarChart3 },
-  { label: "Calendar",     href: "/dashboard/owner/calendar", icon: History },
-  { label: "Reports",      href: "/dashboard/owner/reports", icon: PieChart },
-  { label: "Profile",       href: "/dashboard/profile", icon: User },
-  { label: "Settings",      href: "/dashboard/settings", icon: Settings },
+  { label: "Overview",     href: "/dashboard/owner?tab=overview", icon: LayoutDashboard },
+  { label: "My Turfs",      href: "/dashboard/owner?tab=turfs", icon: Map },
+  { label: "Add Turf",      href: "/dashboard/owner?tab=add", icon: PlusCircle },
+  { label: "Bookings",     href: "/dashboard/owner?tab=bookings", icon: Calendar },
+  { label: "Earnings",     href: "/dashboard/owner?tab=earnings", icon: BarChart3 },
+  { label: "Profile",      href: "/dashboard/owner?tab=profile", icon: User },
+  { label: "Settings",     href: "/dashboard/owner?tab=settings", icon: Settings },
 ];
 
 export function Sidebar() {
@@ -76,7 +72,14 @@ export function Sidebar() {
       <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
         {links.map((link) => {
           const Icon = link.icon;
-          const isActive = pathname === link.href;
+          const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+          const currentTab = searchParams?.get('tab') || 'overview';
+          
+          const isActive = pathname === link.href.split('?')[0] && (
+            link.href.includes('tab=') 
+              ? link.href.split('tab=')[1] === currentTab 
+              : currentTab === 'overview'
+          );
 
           return (
             <Link 
