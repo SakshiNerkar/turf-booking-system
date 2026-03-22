@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { RequireAuth } from "../../../components/RequireAuth";
 import { useAuth } from "../../../components/AuthProvider";
 import { apiFetch } from "../../../lib/api";
 import { notify } from "../../../lib/toast";
-import { SkeletonStat, SkeletonRow } from "../../../components/Skeletons";
+import { SkeletonRow } from "../../../components/Skeletons";
+import { StatCard } from "../../../components/dashboard/StatCard";
+import { Calendar, CreditCard, Activity, ArrowRight, RefreshCw, History, User } from "lucide-react";
 
 type BookingListItem = {
   id: string;
@@ -34,9 +35,9 @@ function fmtSlot(start: string, end: string) {
 }
 
 function PayBadge({ status }: { status: string }) {
-  if (status === "success") return <span className="badge badge-green">✓ Paid</span>;
-  if (status === "failed")  return <span className="badge badge-red">✗ Failed</span>;
-  return <span className="badge badge-amber">⏳ Pending</span>;
+  if (status === "success") return <span className="px-2.5 py-1 rounded-lg bg-green-500/10 text-green-500 text-[10px] font-black uppercase tracking-wider">✓ Paid</span>;
+  if (status === "failed")  return <span className="px-2.5 py-1 rounded-lg bg-red-500/10 text-red-500 text-[10px] font-black uppercase tracking-wider">✗ Failed</span>;
+  return <span className="px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-500 text-[10px] font-black uppercase tracking-wider">⏳ Pending</span>;
 }
 
 export default function CustomerDashboard() {
@@ -77,115 +78,118 @@ export default function CustomerDashboard() {
   const displayList = tab === "upcoming" ? upcoming : past;
 
   const TABS: { key: "upcoming" | "history"; label: string; count: number }[] = [
-    { key: "upcoming", label: "Upcoming", count: upcoming.length },
-    { key: "history",  label: "History",  count: past.length },
+    { key: "upcoming", label: "Active Bookings", count: upcoming.length },
+    { key: "history",  label: "Past Matches",  count: past.length },
   ];
 
   return (
-    <RequireAuth roles={["customer"]}>
-      <div className="grid gap-5">
+    <div className="space-y-8">
+      {/* Stats Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatCard 
+          title="Total Bookings" 
+          value={bookings?.length ?? 0} 
+          icon={Calendar} 
+          trend={{ value: "+12%", isUp: true }}
+        />
+        <StatCard 
+          title="Ongoing / Active" 
+          value={upcoming.length} 
+          icon={Activity} 
+          trend={{ value: "Live", isUp: true }}
+        />
+        <StatCard 
+          title="Total Spend" 
+          value={`₹${totalSpent.toLocaleString()}`} 
+          icon={CreditCard} 
+        />
+      </div>
 
-        {/* Banner */}
-        <div className="animate-fade-in relative overflow-hidden rounded-3xl bg-gradient-to-br from-green-600 to-green-900 p-6 text-white shadow-lg shadow-green-500/20 sm:p-8">
-          <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
-          <div className="pointer-events-none absolute -left-8 -bottom-8 h-32 w-32 rounded-full bg-white/5 blur-2xl" />
-          <div className="absolute right-6 bottom-2 text-7xl opacity-10 select-none">⚽</div>
-          <div className="relative">
-            <div className="text-xs font-black uppercase tracking-widest opacity-60 mb-1">Customer Portal</div>
-            <h1 className="text-2xl font-black sm:text-3xl">Hey, {user?.name?.split(" ")[0]} 👋</h1>
-            <p className="mt-1 text-white/65 text-sm">Your turf bookings — all in one place.</p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              <Link href="/turfs" className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-white/15 px-4 text-sm font-bold backdrop-blur-sm transition-all hover:bg-white/25">
-                🏟️ Browse Turfs
-              </Link>
-              <Link href="/bookings" className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-white/20 px-4 text-sm font-bold transition-all hover:bg-white/10">
-                📋 All Bookings
-              </Link>
-            </div>
+      {/* Main Content Area */}
+      <div className="bg-white dark:bg-[#121A14] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl shadow-black/[0.02] overflow-hidden">
+        {/* Header/Tabs */}
+        <div className="px-8 py-6 border-b border-gray-100 dark:border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50/50 dark:bg-white/[0.02]">
+          <div className="flex bg-gray-100 dark:bg-white/5 p-1 rounded-2xl w-fit">
+            {TABS.map((t) => (
+              <button
+                key={t.key}
+                onClick={() => setTab(t.key)}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-black transition-all ${
+                  tab === t.key 
+                    ? 'bg-white dark:bg-[#1A241D] text-primary shadow-sm' 
+                    : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
+                }`}
+              >
+                {t.label}
+                <span className={`px-2 py-0.5 rounded-lg text-[10px] ${tab === t.key ? 'bg-primary/10 text-primary' : 'bg-gray-200 dark:bg-white/10 text-gray-400'}`}>
+                  {t.count}
+                </span>
+              </button>
+            ))}
           </div>
+          <button 
+            onClick={loadBookings}
+            className="flex items-center gap-2 text-xs font-black text-gray-400 hover:text-primary transition-colors pr-2"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            REFRESH DATA
+          </button>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {/* Content List */}
+        <div className="p-2 sm:p-4">
           {loading ? (
-            [1, 2, 3].map((i) => <SkeletonStat key={i} />)
-          ) : (
-            <>
-              <StatCard icon="📅" label="Total Bookings" value={bookings?.length ?? 0} color="bg-blue-500/10 text-blue-600" />
-              <StatCard icon="⏰" label="Upcoming"       value={upcoming.length}       color="bg-green-500/10 text-green-700" />
-              <StatCard icon="💰" label="Total Spent"    value={`₹${totalSpent.toLocaleString()}`} color="bg-purple-500/10 text-purple-600" className="col-span-2 sm:col-span-1" />
-            </>
-          )}
-        </div>
-
-        {/* Tabs */}
-        <div className="card overflow-hidden">
-          <div className="border-b border-black/5 dark:border-white/10 flex items-center justify-between px-5 py-3 gap-3">
-            <div className="flex gap-1">
-              {TABS.map((t) => (
-                <button
-                  key={t.key}
-                  type="button"
-                  onClick={() => setTab(t.key)}
-                  className={[
-                    "inline-flex items-center gap-1.5 h-8 rounded-xl px-3.5 text-sm font-bold transition-all",
-                    tab === t.key
-                      ? "bg-green-600/12 text-green-700 dark:text-green-300"
-                      : "text-black/55 hover:bg-black/5 dark:text-white/50",
-                  ].join(" ")}
-                >
-                  {t.label}
-                  <span className="min-w-[1.25rem] rounded-full bg-black/8 dark:bg-white/10 px-1 text-[10px] font-black text-center">
-                    {t.count}
-                  </span>
-                </button>
-              ))}
+            <div className="space-y-4 p-4">
+              {[1, 2, 3].map((i) => <SkeletonRow key={i} />)}
             </div>
-            <button type="button" onClick={loadBookings} className="text-xs font-bold text-black/40 dark:text-white/35 hover:text-black dark:hover:text-white transition-colors">
-              ↻ Refresh
-            </button>
-          </div>
-
-          {/* List */}
-          {loading ? (
-            <div>{[1, 2, 3].map((i) => <SkeletonRow key={i} />)}</div>
           ) : displayList.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 py-16 text-center">
-              <div className="text-5xl">{tab === "upcoming" ? "🗓️" : "📜"}</div>
-              <div className="font-bold text-black/60 dark:text-white/55">
-                {tab === "upcoming" ? "No upcoming bookings" : "No booking history"}
+            <div className="flex flex-col items-center justify-center py-24 text-center">
+              <div className="w-20 h-20 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center mb-6">
+                 {tab === "upcoming" ? <Calendar className="w-10 h-10 text-gray-300" /> : <History className="w-10 h-10 text-gray-300" />}
               </div>
-              {tab === "upcoming" && (
-                <Link href="/turfs" className="btn-primary rounded-xl px-4 py-2 text-sm mt-1">Browse Turfs →</Link>
-              )}
+              <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">
+                {tab === "upcoming" ? "No Active Bookings" : "No Past Matches Found"}
+              </h3>
+              <p className="text-gray-500 max-w-xs mx-auto mb-8 font-medium">
+                {tab === "upcoming" 
+                  ? "You don't have any sessions scheduled right now. Time to hit the field!" 
+                  : "You haven't completed any bookings yet. Start your journey today."}
+              </p>
+              <Link href="/turfs" className="px-8 py-3 bg-primary text-white font-black rounded-2xl shadow-xl shadow-green-500/20 hover:scale-105 transition-all flex items-center gap-2">
+                Explore Arenas <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           ) : (
-            <div className="divide-y divide-black/5 dark:divide-white/8">
+            <div className="grid gap-2">
               {displayList.map((b) => {
                 const icon = SPORT_ICONS[b.sport_type?.toLowerCase()] ?? "🏟️";
                 const isFuture = new Date(b.start_time) >= now;
                 return (
-                  <div key={b.id} className="flex items-center gap-3 p-4 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group">
-                    <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-green-500/15 to-emerald-500/8 text-xl">
+                  <div key={b.id} className="group relative flex flex-col sm:flex-row sm:items-center gap-4 p-5 rounded-[2rem] hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-all border border-transparent hover:border-gray-100 dark:hover:border-white/5">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-white/10 dark:to-white/5 flex items-center justify-center text-3xl shadow-sm border border-gray-100 dark:border-white/5 group-hover:scale-110 transition-transform">
                       {icon}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-bold text-sm truncate">{b.turf_name}</div>
-                      <div className="text-xs text-black/50 dark:text-white/45 mt-0.5">{fmtSlot(b.start_time, b.end_time)}</div>
-                      <div className="text-xs text-black/40 dark:text-white/35 mt-0.5">
-                        {b.players} players · ₹{Number(b.total_price).toFixed(0)}
+                      <div className="flex items-center gap-3 mb-1">
+                        <span className="text-lg font-black text-gray-900 dark:text-white truncate">{b.turf_name}</span>
+                        <PayBadge status={b.payment_status} />
+                      </div>
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-bold text-gray-500 dark:text-gray-400">
+                        <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-primary" /> {fmtSlot(b.start_time, b.end_time)}</span>
+                        <span className="flex items-center gap-1.5"><User className="w-3.5 h-3.5 text-primary" /> {b.players} Players</span>
                       </div>
                     </div>
-                    <div className="flex flex-col items-end gap-2 shrink-0">
-                      <PayBadge status={b.payment_status} />
+                    <div className="flex items-center justify-between sm:flex-col sm:items-end gap-3 pt-4 sm:pt-0 border-t sm:border-t-0 border-gray-100 dark:border-white/5">
+                      <div className="text-xl font-black text-gray-900 dark:text-white">
+                        ₹{Number(b.total_price).toFixed(0)}
+                      </div>
                       {isFuture && b.payment_status !== "success" && (
                         <button
-                          type="button"
-                          disabled={cancelling === b.id}
                           onClick={() => handleCancel(b.id)}
-                          className="text-[11px] font-bold text-red-600/70 hover:text-red-600 dark:text-red-400/70 dark:hover:text-red-400 transition-colors disabled:opacity-40"
+                          disabled={cancelling === b.id}
+                          className="px-4 py-1.5 rounded-xl text-xs font-black text-red-500 hover:bg-red-500/10 transition-colors border border-red-500/20 disabled:opacity-40"
                         >
-                          {cancelling === b.id ? "…" : "Cancel"}
+                          {cancelling === b.id ? "PROCCESSING..." : "CANCEL SESSION"}
                         </button>
                       )}
                     </div>
@@ -195,18 +199,7 @@ export default function CustomerDashboard() {
             </div>
           )}
         </div>
-
       </div>
-    </RequireAuth>
-  );
-}
-
-function StatCard({ icon, label, value, color, className = "" }: { icon: string; label: string; value: string | number; color: string; className?: string }) {
-  return (
-    <div className={`card p-4 ${className}`}>
-      <div className={`grid h-10 w-10 place-items-center rounded-2xl ${color} text-xl mb-3`}>{icon}</div>
-      <div className="text-2xl font-black">{value}</div>
-      <div className="text-xs font-semibold text-black/50 dark:text-white/45 mt-0.5">{label}</div>
     </div>
   );
 }

@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 
 import ThemeSwitcher from "../components/ThemeSwitcher";
 import ScrollProgress from "../components/ScrollProgress";
-import PageTransition from "../components/PageTransition";
+import { Shell } from "../components/layout/Shell";
 
 export default function RootLayout({
   children,
@@ -47,15 +47,9 @@ export default function RootLayout({
       >
         <AuthProvider>
           <ScrollProgress />
-          <div className="min-h-dvh flex flex-col">
-            <Navbar />
-            <main className="flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
-              <PageTransition>
-                {children}
-              </PageTransition>
-            </main>
-            <Footer />
-          </div>
+          <Shell>
+            {children}
+          </Shell>
           <ThemeSwitcher />
           <ToasterProvider />
         </AuthProvider>
