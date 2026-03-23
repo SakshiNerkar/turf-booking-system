@@ -132,9 +132,9 @@ export function CalendarBooking({ turfId, turfName, turfOwnerId, pricePerSlot, s
                        {start}
                     </div>
                     {isSelected ? <Zap className="w-4 h-4 text-white animate-pulse" /> : !isBooked && !isBlocked && <div className="text-[10px] font-black text-primary uppercase tracking-widest italic opacity-40 group-hover:opacity-100 transition-opacity">₹{pricePerSlot}</div>}
-                    {isBooked && <XCircle className="w-6 h-6 opacity-10" />}
-                 </button>
-               );
+                     {isBooked && <XCircle className="w-6 h-6 opacity-10" />}
+                  </motion.button>
+                );
             })}
          </div>
       </section>

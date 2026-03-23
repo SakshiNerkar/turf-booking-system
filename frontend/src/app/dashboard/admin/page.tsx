@@ -11,13 +11,15 @@ import { SkeletonStat, SkeletonRow } from "../../../components/Skeletons";
 import { 
   Users, Activity, Trophy, Shield, Zap, TrendingUp, CreditCard, 
   MapPin, Clock, Search, Filter, ArrowUpRight, CheckCircle2, 
-  AlertCircle, LayoutDashboard, Database, Globe
+  AlertCircle, LayoutDashboard, Database, Globe, Settings
 } from "lucide-react";
 import { ChartProtocol } from "@/components/dashboard/ChartProtocol";
 
+type AdminData = { users: any[]; turfs: any[]; bookings: any[]; revenue: number };
+
 export default function AdminDashboard() {
   const { user, token } = useAuth();
-  const [data, setData] = useState({ users: [], turfs: [], bookings: [], revenue: 0 });
+  const [data, setData] = useState<AdminData>({ users: [], turfs: [], bookings: [], revenue: 0 });
   const [loading, setLoading] = useState(true);
 
   const loadData = async () => {
@@ -94,7 +96,21 @@ export default function AdminDashboard() {
                   <span className="px-4 py-2 bg-primary/10 text-primary text-[10px] font-black rounded-lg">LIVE SYNC</span>
                </div>
             </div>
-            <div className="h-96 w-full"><ChartProtocol /></div>
+            <div className="h-96 w-full">
+               <ChartProtocol 
+                 data={[
+                   { label: 'MON', value: 4500 },
+                   { label: 'TUE', value: 5200 },
+                   { label: 'WED', value: 6100 },
+                   { label: 'THU', value: 4800 },
+                   { label: 'FRI', value: 7200 },
+                   { label: 'SAT', value: 9500 },
+                   { label: 'SUN', value: 8800 }
+                 ]} 
+                 title="Revenue Protocol" 
+                 subtitle="GLOBAL ECONOMIC FLOW" 
+               />
+            </div>
          </div>
       </section>
 

@@ -9,7 +9,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../../components/AuthProvider";
 import { apiFetch } from "../../../lib/api";
-import { SkeletonStat, SkeletonRow, EmptyState } from "../../../components/Skeletons";
+import { SkeletonStat, SkeletonRow, EmptyState, SkeletonCard } from "../../../components/Skeletons";
 import { MiniSparkline } from "../../../components/dashboard/MiniSparkline";
 import { useRouter } from "next/navigation";
 
