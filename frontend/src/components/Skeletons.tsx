@@ -1,8 +1,37 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Search, Zap, Package, Target, ArrowRight } from "lucide-react";
+import { Search, Zap, Package, Target, ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
+
+export function PageLoader() {
+  return (
+    <div className="fixed inset-0 z-[500] bg-white dark:bg-[#0B0F0C] flex flex-col items-center justify-center space-y-12">
+       <div className="relative">
+          <motion.div 
+            animate={{ rotate: 360 }} 
+            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+            className="w-40 h-40 rounded-[3.5rem] border-4 border-dashed border-primary/20 flex items-center justify-center"
+          >
+             <div className="w-24 h-24 rounded-[2.5rem] bg-primary/10 flex items-center justify-center animate-pulse border border-primary/20">
+                <Zap className="w-12 h-12 text-primary" />
+             </div>
+          </motion.div>
+          <motion.div 
+            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.5, 0.2] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="absolute -top-10 -right-10 text-primary/40"
+          >
+             <Sparkles className="w-20 h-20" />
+          </motion.div>
+       </div>
+       <div className="text-center space-y-4">
+          <h2 className="text-4xl font-black italic tracking-tighter uppercase leading-none bg-gradient-to-r from-gray-900 via-primary to-gray-900 dark:from-white dark:via-primary dark:to-white bg-clip-text text-transparent animate-gradient">Initialising Protocol</h2>
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.5em] italic opacity-40">Syncing region sector logs. Standby...</p>
+       </div>
+    </div>
+  );
+}
 
 export function SkeletonCard() {
   return (
