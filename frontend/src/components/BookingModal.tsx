@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Zap, MapPin, Clock, Users, ShieldCheck, Ticket, 
+  Trash2, ArrowRight, CheckCircle2, XCircle, Info, Sparkles 
+} from "lucide-react";
+import { notify } from "../lib/toast";
 
-type Slot = {
-  id: string;
-  start_time: string;
-  end_time: string;
-};
-
+type Slot = { id: string; start_time: string; end_time: string; };
 type Props = {
   open: boolean;
   slot: Slot | null;
@@ -16,7 +17,7 @@ type Props = {
   location: string;
   sportType: string;
   pricePerSlot: number;
-  onConfirm: (players: number) => void;
+  onConfirm: (players: number, coupon?: string) => void;
   onClose: () => void;
   loading?: boolean;
 };
@@ -25,221 +26,196 @@ const SPORT_ICONS: Record<string, string> = {
   football: "⚽", cricket: "🏏", badminton: "🏸", tennis: "🎾",
 };
 
-function fmt(dt: string) {
-  const d = new Date(dt);
-  return d.toLocaleString("en-IN", {
-    weekday: "short", day: "2-digit", month: "short",
-    hour: "2-digit", minute: "2-digit", hour12: true,
-  });
-}
-
-function fmtTime(dt: string) {
-  return new Date(dt).toLocaleTimeString("en-IN", {
-    hour: "2-digit", minute: "2-digit", hour12: true,
-  });
-}
-
-function durationMins(start: string, end: string) {
-  return Math.round((new Date(end).getTime() - new Date(start).getTime()) / 60000);
-}
-
 export function BookingModal({
   open, slot, turfName, location, sportType, pricePerSlot,
   onConfirm, onClose, loading = false,
 }: Props) {
   const [players, setPlayers] = useState(5);
+  const [coupon, setCoupon] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes lock
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  // Close on backdrop click
-  function handleBackdropClick(e: React.MouseEvent) {
-    if (e.target === overlayRef.current) onClose();
-  }
-
-  // Close on Escape key
+  // Time Lock Countdown
   useEffect(() => {
     if (!open) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [open, onClose]);
+    const timer = setInterval(() => setTimeLeft(prev => (prev > 0 ? prev - 1 : 0)), 1000);
+    return () => clearInterval(timer);
+  }, [open]);
 
-  // Prevent body scroll
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    if (open) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
   if (!open || !slot) return null;
 
+  const fmtTime = (dt: string) => new Date(dt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
   const icon = SPORT_ICONS[sportType?.toLowerCase()] ?? "🏟️";
-  const duration = durationMins(slot.start_time, slot.end_time);
-  const perPlayer = players > 0 ? (pricePerSlot / players).toFixed(0) : 0;
+  
+  // High-Fidelity Price Breakdown
+  const peakSurge = pricePerSlot * 0.15; // Simulated surge
+  const platformFee = 49;
+  const tax = (pricePerSlot + peakSurge) * 0.18;
+  const subtotal = pricePerSlot + peakSurge + platformFee + tax;
+  const discount = appliedCoupon ? subtotal * (appliedCoupon.discount / 100) : 0;
+  const total = subtotal - discount;
+
+  const handleApplyCoupon = () => {
+    if (coupon.toUpperCase() === "TURFF20") {
+      setAppliedCoupon({ code: "TURFF20", discount: 20 });
+      notify.success("Tactical Discount Applied! -20%");
+    } else {
+      notify.error("Invalid Command Code.");
+    }
+  };
 
   const modal = (
-    <div
-      ref={overlayRef}
-      className="modal-backdrop"
-      onClick={handleBackdropClick}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Booking Confirmation"
-    >
-      <div className="modal-content">
-        {/* Pull handle */}
-        <div className="modal-handle sm:hidden" />
+    <div ref={overlayRef} className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8">
+      <motion.div 
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-black/60 dark:bg-[#0B0F0C]/90 backdrop-blur-xl"
+      />
+      
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 40 }}
+        className="relative w-full max-w-[600px] bg-white dark:bg-[#121A14] rounded-[4rem] border border-gray-100 dark:border-white/10 shadow-[0_80px_160px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col max-h-[90vh]"
+      >
+         {/* 1. SECTOR HEADER */}
+         <div className="p-12 pb-8 border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.02] relative">
+            <div className="flex items-start justify-between">
+               <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 rounded-[1.75rem] bg-primary/10 text-primary flex items-center justify-center text-3xl shadow-lg border border-primary/20">{icon}</div>
+                  <div>
+                     <h3 className="text-3xl font-black text-gray-900 dark:text-white italic tracking-tighter uppercase leading-none">{turfName}</h3>
+                     <div className="flex items-center gap-3 text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2 italic">
+                        <MapPin className="w-4 h-4 text-primary" /> {location}
+                     </div>
+                  </div>
+               </div>
+               <button onClick={onClose} className="p-4 rounded-2xl bg-white dark:bg-black border border-gray-100 dark:border-white/5 text-gray-400 hover:text-red-500 transition-all shadow-sm"><XCircle className="w-6 h-6" /></button>
+            </div>
+            
+            <div className="mt-10 flex items-center gap-6">
+               <div className="flex-1 p-6 bg-white dark:bg-black rounded-3xl border border-gray-100 dark:border-white/5 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                     <Clock className="w-5 h-5 text-primary" />
+                     <div>
+                        <div className="text-[10px] font-black text-gray-900 dark:text-white uppercase italic tracking-widest">Match Time</div>
+                        <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest opacity-60 leading-none mt-1">{fmtTime(slot.start_time)} – {fmtTime(slot.end_time)}</div>
+                     </div>
+                  </div>
+                  <div className="text-right">
+                     <div className="flex items-center gap-2 text-primary text-[10px] font-black uppercase italic tracking-widest leading-none">
+                        <Zap className="w-4 h-4" /> LOCK: {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
 
-        {/* Header */}
-        <div className="flex items-start justify-between gap-3 mb-5">
-          <div className="flex items-center gap-3">
-            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-green-500/15 to-green-600/8 text-2xl">
-              {icon}
+         {/* 2. OPERATIONAL CONTENT */}
+         <div className="flex-1 overflow-y-auto p-12 space-y-10 no-scrollbar">
+            
+            {/* Player Config */}
+            <div className="space-y-6">
+               <div className="flex items-center justify-between">
+                  <h4 className="text-[11px] font-black text-gray-900 dark:text-white uppercase tracking-[0.4em] italic leading-none">Combatant Registry</h4>
+                  <span className="text-[9px] font-black text-primary uppercase tracking-widest italic">₹{(total/players).toFixed(0)} / PLAYER</span>
+               </div>
+               <div className="flex items-center gap-4">
+                  {[5, 10, 11, 22].map(n => (
+                    <button key={n} onClick={() => setPlayers(n)} className={`flex-1 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${players === n ? 'bg-primary text-white shadow-xl shadow-green-500/20' : 'bg-gray-50 dark:bg-white/5 text-gray-400 hover:bg-gray-100'}`}>
+                       {n > 10 ? n : `${n}v${n}`}
+                    </button>
+                  ))}
+                  <div className="flex-1 flex items-center gap-3 bg-gray-50 dark:bg-white/10 p-2 rounded-2xl border border-gray-100 dark:border-white/5">
+                     <button onClick={() => setPlayers(p => Math.max(1, p-1))} className="w-10 h-10 rounded-xl bg-white dark:bg-black flex items-center justify-center font-black">-</button>
+                     <span className="flex-1 text-center text-sm font-black">{players}</span>
+                     <button onClick={() => setPlayers(p => p+1)} className="w-10 h-10 rounded-xl bg-white dark:bg-black flex items-center justify-center font-black">+</button>
+                  </div>
+               </div>
             </div>
-            <div>
-              <div className="font-black text-base leading-tight">{turfName}</div>
-              <div className="text-xs text-black/55 dark:text-white/50 mt-0.5 flex items-center gap-1">
-                <span>📍</span>{location}
-              </div>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="shrink-0 grid h-8 w-8 place-items-center rounded-xl bg-black/5 text-black/60 transition-all hover:bg-black/10 hover:text-black dark:bg-white/10 dark:text-white/60 dark:hover:text-white"
-          >
-            ✕
-          </button>
-        </div>
 
-        {/* Slot info card */}
-        <div className="rounded-2xl bg-gradient-to-br from-green-500/10 via-green-500/5 to-transparent border border-green-500/15 p-4 mb-4">
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-black/40 dark:text-white/35 mb-1">Date</div>
-              <div className="text-sm font-bold">
-                {new Date(slot.start_time).toLocaleDateString("en-IN", { weekday: "short", day: "2-digit", month: "short" })}
-              </div>
+            {/* Promo Code Hub */}
+            <div className="space-y-6">
+               <h4 className="text-[11px] font-black text-gray-900 dark:text-white uppercase tracking-[0.4em] italic leading-none">Tactical Discount</h4>
+               <div className="relative group">
+                  <Ticket className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary transition-colors" />
+                  <input 
+                    value={coupon} onChange={e => setCoupon(e.target.value)}
+                    placeholder="Enter command code... (Try TURFF20)"
+                    className="w-full pl-16 pr-32 py-5 bg-gray-50 dark:bg-white/2 border border-transparent focus:border-primary/20 rounded-3xl text-[11px] font-black uppercase tracking-widest outline-none transition-all placeholder:italic"
+                  />
+                  <button onClick={handleApplyCoupon} className="absolute right-3 top-1/2 -translate-y-1/2 px-6 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[9px] font-black rounded-xl uppercase tracking-widest hover:scale-105 transition-all">VALIDATE</button>
+               </div>
+               {appliedCoupon && (
+                 <div className="mt-4 flex items-center justify-between p-4 bg-green-500/10 rounded-2xl border border-green-500/20">
+                    <div className="flex items-center gap-3 text-green-500 text-[10px] font-black uppercase italic tracking-widest">
+                       <Sparkles className="w-4 h-4" /> CODE: {appliedCoupon.code} ACTIVE
+                    </div>
+                    <button onClick={() => setAppliedCoupon(null)} className="text-green-500/60 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                 </div>
+               )}
             </div>
-            <div className="border-x border-green-500/15">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-black/40 dark:text-white/35 mb-1">Time</div>
-              <div className="text-sm font-bold">
-                {fmtTime(slot.start_time)} – {fmtTime(slot.end_time)}
-              </div>
-            </div>
-            <div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-black/40 dark:text-white/35 mb-1">Duration</div>
-              <div className="text-sm font-bold">{duration} min</div>
-            </div>
-          </div>
-        </div>
 
-        {/* Players selector */}
-        <div className="mb-4">
-          <label className="mb-2 flex items-center justify-between">
-            <span className="text-sm font-bold">Number of Players</span>
-            <span className="text-xs text-black/50 dark:text-white/40">₹{perPlayer}/player</span>
-          </label>
-          <div className="flex items-center gap-3 rounded-2xl border border-black/8 bg-black/[0.02] p-3 dark:border-white/10 dark:bg-white/[0.02]">
-            <button
-              type="button"
-              onClick={() => setPlayers(p => Math.max(1, p - 1))}
-              disabled={players <= 1}
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-black/10 bg-white text-lg font-bold shadow-sm transition-all hover:bg-green-50 hover:border-green-500/30 disabled:opacity-30 dark:bg-black/40 dark:hover:bg-green-950/30"
+            {/* Detailed Price Summary */}
+            <div className="p-10 bg-gray-900 dark:bg-black rounded-[3rem] text-white space-y-8 shadow-2xl relative overflow-hidden group">
+               <div className="space-y-4 relative z-10">
+                  <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest opacity-60 italic">
+                     <span>Base Sector Rate</span>
+                     <span>₹{pricePerSlot}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-amber-500 italic">
+                     <span className="flex items-center gap-2"><TrendingUp className="w-3.5 h-3.5" /> Peak Hour Surge (+15%)</span>
+                     <span>₹{peakSurge.toFixed(0)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest opacity-60 italic">
+                     <span>Platform Maintenance</span>
+                     <span>₹{platformFee}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest opacity-40 italic">
+                     <span>GST (18%)</span>
+                     <span>₹{tax.toFixed(0)}</span>
+                  </div>
+                  {appliedCoupon && (
+                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-primary italic">
+                       <span>Tactical Discount</span>
+                       <span>-₹{discount.toFixed(0)}</span>
+                    </div>
+                  )}
+                  <div className="h-px bg-white/10 my-6" />
+                  <div className="flex items-center justify-between">
+                     <span className="text-lg font-black italic tracking-tighter uppercase leading-none">TOTAL LOG</span>
+                     <span className="text-4xl font-black italic tracking-tighter text-primary leading-none">₹{total.toFixed(0)}</span>
+                  </div>
+               </div>
+               <div className="absolute top-0 right-0 p-10 opacity-[0.03] pointer-events-none group-hover:scale-110 duration-[4s]"><ShieldCheck className="w-48 h-48" /></div>
+            </div>
+         </div>
+
+         {/* 3. FINAL EXECUTION */}
+         <div className="p-10 bg-white dark:bg-[#121A14] border-t border-gray-100 dark:border-white/5 flex gap-6">
+            <button onClick={onClose} className="px-10 py-5 rounded-[1.75rem] text-[10px] font-black uppercase tracking-widest text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 transition-all italic underline underline-offset-4">ABORT SESSION</button>
+            <button 
+              onClick={() => onConfirm(players, appliedCoupon?.code)}
+              disabled={loading}
+              className="flex-1 bg-primary text-white py-6 rounded-[2rem] text-[11px] font-black uppercase tracking-[0.3em] italic shadow-[0_40px_80px_rgba(34,197,94,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-6"
             >
-              −
+               {loading ? "INITIALIZING SECURE LINK..." : <>EXECUTE BOOKING <ArrowRight className="w-6 h-6" /></>}
             </button>
-            <div className="flex-1 text-center">
-              <div className="text-2xl font-black text-[color:var(--primary)]">{players}</div>
-              <div className="text-xs text-black/45 dark:text-white/40">players</div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setPlayers(p => Math.min(22, p + 1))}
-              disabled={players >= 22}
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-black/10 bg-white text-lg font-bold shadow-sm transition-all hover:bg-green-50 hover:border-green-500/30 disabled:opacity-30 dark:bg-black/40 dark:hover:bg-green-950/30"
-            >
-              +
-            </button>
-          </div>
-
-          {/* Quick presets */}
-          <div className="mt-2 flex gap-2">
-            {[5, 10, 11, 22].map((n) => (
-              <button
-                key={n}
-                type="button"
-                onClick={() => setPlayers(n)}
-                className={[
-                  "flex-1 rounded-xl py-1.5 text-xs font-bold transition-all",
-                  players === n
-                    ? "bg-green-600/15 text-green-700 dark:text-green-300"
-                    : "bg-black/5 text-black/55 hover:bg-black/10 dark:bg-white/10 dark:text-white/55",
-                ].join(" ")}
-              >
-                {n}v{n > 11 ? (n === 22 ? "22" : n) : n}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Price breakdown */}
-        <div className="mb-4 overflow-hidden rounded-2xl border border-black/8 dark:border-white/10">
-          <div className="bg-black/[0.02] px-4 py-3 dark:bg-white/[0.02]">
-            <div className="text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/35 mb-2">
-              Price Summary
-            </div>
-            <div className="grid gap-1.5">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-black/65 dark:text-white/60">Slot price</span>
-                <span className="font-bold">₹{pricePerSlot}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-black/65 dark:text-white/60">Per player ({players})</span>
-                <span className="font-bold">₹{perPlayer}</span>
-              </div>
-              <div className="my-1.5 border-t border-black/5 dark:border-white/10" />
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-black">Total</span>
-                <span className="text-xl font-black text-[color:var(--primary)]">₹{pricePerSlot}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Note */}
-        <p className="mb-4 text-xs text-black/45 dark:text-white/35">
-          ℹ️ You can complete payment after booking. Slot will be reserved for 10 minutes.
-        </p>
-
-        {/* Actions */}
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="btn-ghost flex-1 rounded-2xl py-3"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={() => onConfirm(players)}
-            disabled={loading}
-            className="btn-primary flex-1 rounded-2xl py-3 text-sm font-black disabled:opacity-60"
-          >
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                Booking…
-              </span>
-            ) : "Confirm Booking 🎉"}
-          </button>
-        </div>
-      </div>
+         </div>
+      </motion.div>
     </div>
   );
 
   return createPortal(modal, document.body);
 }
+
+const TrendingUp = ({ className }: { className: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" />
+  </svg>
+);

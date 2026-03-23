@@ -20,14 +20,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Turff | Book Sports Turfs Online",
-  description:
-    "Discover, check availability, and book sports turfs instantly. Real-time calendar, role dashboards, flexible payments.",
-  keywords: ["turf booking", "sports turf", "football", "cricket", "badminton", "tennis"],
-  openGraph: {
-    title: "Turff | Book Sports Turfs Online",
-    description: "Discover, check availability, and book sports turfs instantly.",
-    type: "website",
+  title: "Turff SaaS | Elite Sports Tech Platform",
+  description: "High-performance arena booking, regional match synchronization, and operational asset management.",
+  keywords: ["turf booking", "sports tech", "SaaS", "football", "cricket"],
+  manifest: "/manifest.json",
+  themeColor: "#22C55E",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Turff SaaS",
   },
 };
 

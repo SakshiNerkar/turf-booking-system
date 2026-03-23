@@ -19,8 +19,12 @@ import {
   Trophy,
   Activity,
   Share2,
-  ChevronLeft
+  ChevronLeft,
+  TrendingUp,
+  ArrowRight,
+  Sparkles
 } from "lucide-react";
+import { ReviewSystem } from "../../../components/ReviewSystem";
 
 type Turf = {
   id: string;
@@ -76,37 +80,36 @@ export default async function TurfDetailsPage(props: { params: Promise<{ id: str
   const meta = SPORT_META[turf.sport_type?.toLowerCase()] ?? { icon: "🏟️", accent: "bg-gray-500" };
 
   return (
-    <div className="space-y-12 pb-32">
+    <div className="space-y-16 pb-32">
       
-      {/* 1. Elite Hero Showcase (Khelomore Banner Style) */}
-      <section className="relative h-[400px] sm:h-[500px] rounded-[3.5rem] overflow-hidden shadow-2xl group border border-gray-100 dark:border-white/5">
-         <div className="absolute inset-0 bg-cover bg-center transition-transform duration-[4s] group-hover:scale-105" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop')` }} />
-         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+      {/* 1. Elite Hero Showcase */}
+      <section className="relative h-[450px] sm:h-[550px] rounded-[4.5rem] overflow-hidden shadow-[0_60px_120px_rgba(0,0,0,0.1)] group border border-gray-100 dark:border-white/5">
+         <div className="absolute inset-0 bg-cover bg-center transition-transform duration-[5s] group-hover:scale-110" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop')` }} />
+         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
          
-         <Link href="/turfs" className="absolute top-10 left-10 p-5 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl text-white hover:bg-white hover:text-black transition-all shadow-xl group/back">
-            <ChevronLeft className="w-6 h-6 group-hover/back:-translate-x-1 transition-transform" />
+         <Link href="/turfs" className="absolute top-12 left-12 p-6 p-6 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[1.75rem] text-white hover:bg-white hover:text-black transition-all shadow-2xl group/back z-10">
+            <ChevronLeft className="w-6 h-6 group-hover/back:-translate-x-2 transition-transform" />
          </Link>
 
-         <div className="absolute bottom-16 left-12 right-12">
-            <div className="flex flex-wrap gap-2 mb-6">
-               <span className={`px-5 py-2 ${meta.accent} text-white text-[10px] font-black rounded-xl uppercase tracking-[0.2em] shadow-2xl`}>{meta.icon} EXCLUSIVE</span>
-               <span className="px-5 py-2 bg-white/10 backdrop-blur-xl text-white border border-white/20 text-[10px] font-black rounded-xl uppercase tracking-[0.2em] font-black">{turf.sport_type.toUpperCase()}</span>
+         <div className="absolute bottom-20 left-16 right-16">
+            <div className="flex flex-wrap gap-3 mb-8">
+               <span className={`px-6 py-2.5 ${meta.accent} text-white text-[10px] font-black rounded-xl uppercase tracking-[0.3em] shadow-2xl italic border border-white/20`}>{meta.icon} EXCLUSIVE</span>
+               <span className="px-6 py-2.5 bg-white/10 backdrop-blur-2xl text-white border border-white/20 text-[10px] font-black rounded-xl uppercase tracking-[0.3em] font-black italic">VERIFIED SECTOR</span>
             </div>
-            <h1 className="text-6xl md:text-8xl font-black text-white italic tracking-tighter leading-none mb-4">{turf.name.toUpperCase()}</h1>
-            <div className="flex items-center gap-6 text-[10px] font-black text-white/60 uppercase tracking-[0.3em]">
-               <span className="flex items-center gap-2"><MapPin className="w-5 h-5 text-primary" /> {turf.location}</span>
-               <span className="hidden sm:block w-1.5 h-1.5 rounded-full bg-white/30" />
-               <span className="flex items-center gap-2"><Star className="w-4 h-4 text-amber-500 fill-amber-500" /> 4.9 · 120+ REVIEWS</span>
+            <h1 className="text-7xl md:text-9xl font-black text-white italic tracking-tighter leading-none mb-6 uppercase">{turf.name}</h1>
+            <div className="flex items-center gap-10 text-[10px] font-black text-white/60 uppercase tracking-[0.4em] italic">
+               <span className="flex items-center gap-3"><MapPin className="w-5 h-5 text-primary" /> {turf.location}</span>
+               <span className="hidden sm:block w-2 h-2 rounded-full bg-white/30" />
+               <span className="flex items-center gap-3"><Star className="w-5 h-5 text-amber-500 fill-amber-500" /> 4.9 · {120} REVIEWS</span>
             </div>
          </div>
       </section>
 
-      {/* 2. Main Page Layout (Khelomore Architecture: Action Left, Info Right) */}
-      <div className="grid lg:grid-cols-12 gap-12 px-2">
+      {/* 2. Main Page Layout */}
+      <div className="grid lg:grid-cols-12 gap-16 px-4">
          
          {/* LEFT COLUMN: THE ACTION (60%) */}
-         <div className="lg:col-span-8 space-y-12">
-            {/* Slot Booking Engine */}
+         <div className="lg:col-span-8 space-y-20">
             <CalendarBooking
                turfId={turf.id}
                turfName={turf.name}
@@ -115,28 +118,41 @@ export default async function TurfDetailsPage(props: { params: Promise<{ id: str
                slots={slots}
                location={turf.location}
             />
+
+            {/* Intelligence Feed */}
+            <ReviewSystem turfId={turf.id} />
          </div>
 
          {/* RIGHT COLUMN: THE INFO (40%) */}
-         <div className="lg:col-span-4 space-y-10">
+         <div className="lg:col-span-4 space-y-12">
             
-            {/* Information Card */}
-            <div className="bg-white dark:bg-[#121A14] rounded-[3.5rem] p-10 border border-gray-100 dark:border-white/5 shadow-2xl space-y-10">
+            <div className="bg-white dark:bg-[#121A14] rounded-[4rem] p-12 border border-gray-100 dark:border-white/5 shadow-2xl space-y-12">
                <div>
-                  <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.4em] mb-4">Venue Intel</h4>
-                  <h3 className="text-2xl font-black text-gray-900 dark:text-white italic tracking-tighter leading-none mb-6">INSIDE {turf.name.split(' ')[0].toUpperCase()}</h3>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-loose italic underline decoration-primary/20 decoration-2 underline-offset-8">
-                     {turf.description || "Premium turf with world-class facilities and high-intensity floodlighting systems."}
+                  <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.5em] mb-6 italic">Venue Context</h4>
+                  <h3 className="text-3xl font-black text-gray-900 dark:text-white italic tracking-tighter leading-none mb-8">THE {turf.name.split(' ')[0].toUpperCase()} PROTOCOL</h3>
+                  <p className="text-sm font-bold text-gray-400 uppercase tracking-widest leading-loose italic underline decoration-primary/20 decoration-4 underline-offset-8">
+                     {turf.description || "PREMIUM SECTOR EQUIPPED WITH PRO-GRADE DRAINAGE AND HIGH-INDEX FLOODLIGHTING FOR OVERNIGHT MATCH EXECUTION."}
                   </p>
                </div>
 
-               {/* Amenities (Pills style like Khelomore) */}
-               <div className="space-y-4 pt-10 border-t border-gray-100 dark:border-white/5">
-                  <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-6">Facilities & Inclusions</div>
-                  <div className="grid grid-cols-2 gap-4">
+               {/* Dynamic Pricing Logic Indicator */}
+               <div className="p-8 bg-amber-500/5 dark:bg-amber-500/10 rounded-[2.5rem] border border-amber-500/20 space-y-4 group">
+                  <div className="flex items-center justify-between">
+                     <div className="flex items-center gap-3 text-amber-500 font-black italic text-xs tracking-tighter uppercase underline decoration-2 underline-offset-4">
+                        <TrendingUp className="w-5 h-5" /> PEAK PRICING ACTIVE
+                     </div>
+                     <span className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest">WEEKEND SURGE +15%</span>
+                  </div>
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-loose italic opacity-60">RATES ARE DYNAMICALLY ADJUSTED BASED ON SECTOR DEMAND TRENDS AND REGIONAL MATCH FREQUENCY.</p>
+               </div>
+
+               {/* Amenities */}
+               <div className="space-y-6 pt-12 border-t border-gray-100 dark:border-white/5">
+                  <div className="text-[11px] font-black text-gray-400 uppercase tracking-[0.4em] mb-8 italic">Platform Inclusions</div>
+                  <div className="grid grid-cols-2 gap-6">
                      {AMENITIES.map((a, i) => (
-                       <div key={i} className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-transparent hover:border-primary/20 transition-all group">
-                          <a.icon className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
+                       <div key={i} className="flex items-center gap-4 p-5 bg-gray-50 dark:bg-white/5 rounded-3xl border border-transparent hover:border-primary/20 transition-all group">
+                          <a.icon className="w-6 h-6 text-gray-400 group-hover:text-primary transition-colors" />
                           <span className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400">{a.label}</span>
                        </div>
                      ))}
@@ -144,49 +160,71 @@ export default async function TurfDetailsPage(props: { params: Promise<{ id: str
                </div>
 
                {/* Static Map Section */}
-               <div className="rounded-3xl overflow-hidden border border-gray-100 dark:border-white/5 shadow-inner h-[250px]">
+               <div className="rounded-[2.5rem] overflow-hidden border border-gray-100 dark:border-white/5 shadow-inner h-[300px]">
                   <TurfMap locationName={turf.location} turfName={turf.name} />
                </div>
             </div>
 
-            {/* House Rules (Senior Dev: Operational Clarity) */}
-            <div className="bg-gray-50 dark:bg-white/2 rounded-[3.5rem] p-10 border border-gray-100 dark:border-white/5 space-y-8">
-               <h4 className="text-sm font-black text-gray-900 dark:text-white italic tracking-tighter uppercase flex items-center gap-3">
-                  <Info className="w-5 h-5 text-primary" /> SITE PROTOCOLS
+            {/* House Rules */}
+            <div className="bg-gray-50 dark:bg-white/2 rounded-[4rem] p-12 border border-gray-100 dark:border-white/5 space-y-10">
+               <h4 className="text-lg font-black text-gray-900 dark:text-white italic tracking-tighter uppercase flex items-center gap-4">
+                  <Info className="w-6 h-6 text-primary" /> SITE PROTOCOLS
                </h4>
-               <ul className="space-y-6">
+               <ul className="space-y-8">
                   {[
-                    { label: "Check-in", sub: "Arrive 10m before kickoff", icon: Clock },
-                    { label: "Footwear", sub: "Studs permitted (Ag/Hg/Fg)", icon: Activity },
-                    { label: "Policy", sub: "100% Refund before 24hrs", icon: ShieldCheck },
-                    { label: "Community", sub: "Fair play mandatory", icon: Users }
+                    { label: "Sync-Up", sub: "Arrive 15m prior to kickoff", icon: Clock },
+                    { label: "Asset Policy", sub: "Refundable until 12h before", icon: ShieldCheck },
+                    { label: "Execution", sub: "Proper match gear mandatory", icon: Activity },
+                    { label: "Social Index", sub: "Positive Fair-play required", icon: Users }
                   ].map((r, i) => (
-                    <li key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-[#1A241D] border border-gray-100 dark:border-white/5 group shadow-sm">
-                       <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-white/5 flex items-center justify-center text-gray-400 group-hover:text-primary transition-colors"><r.icon className="w-5 h-5" /></div>
+                    <li key={i} className="flex items-center gap-6 p-5 rounded-3xl bg-white dark:bg-[#1A241D] border border-gray-100 dark:border-white/5 group shadow-sm">
+                       <div className="w-12 h-12 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center text-gray-400 group-hover:text-primary transition-colors"><r.icon className="w-6 h-6" /></div>
                        <div>
-                          <div className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest">{r.label}</div>
-                          <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5 opacity-60 leading-none">{r.sub}</div>
+                          <div className="text-[11px] font-black text-gray-900 dark:text-white uppercase tracking-widest italic">{r.label}</div>
+                          <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1 opacity-60 leading-none">{r.sub}</div>
                        </div>
                     </li>
                   ))}
                </ul>
             </div>
 
-            {/* Strategic Value Card (Credit/Split) */}
-            <div className="bg-primary rounded-[3.5rem] p-10 text-white relative overflow-hidden group shadow-2xl shadow-green-500/20">
-               <div className="relative z-10">
-                  <h4 className="text-xl font-black italic tracking-tighter mb-4">MATCH REWARDS</h4>
-                  <p className="text-[10px] font-black uppercase tracking-widest opacity-80 leading-loose mb-8">Score match points on every booking and split the bill instantly with friends.</p>
-                  <button className="px-8 py-3 bg-white text-primary text-[10px] font-black rounded-xl uppercase tracking-widest shadow-xl hover:scale-105 transition-all">ENABLE SPLIT PAY</button>
-               </div>
-               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-all"><Zap className="w-32 h-32" /></div>
-            </div>
-
-            <button className="w-full py-6 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-3 shadow-2xl hover:scale-105 transition-all border border-transparent">
-               <Share2 className="w-5 h-5" /> BROADCAST VENUE
+            <button className="w-full py-8 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-[3rem] font-black uppercase tracking-[0.3em] text-[11px] flex items-center justify-center gap-4 shadow-[0_40px_80px_rgba(0,0,0,0.1)] hover:scale-105 transition-all border border-transparent italic">
+               <Share2 className="w-6 h-6" /> BROADCAST SECTOR
             </button>
          </div>
       </div>
+
+      {/* 3. Recommended Pool */}
+      <section className="space-y-16 mt-32 border-t border-gray-100 dark:border-white/5 pt-32">
+         <div className="flex items-end justify-between px-6">
+            <div className="space-y-4">
+               <h3 className="text-5xl font-black text-gray-900 dark:text-white italic tracking-tighter uppercase leading-none">Similar Arenas</h3>
+               <div className="flex items-center gap-6 text-[10px] font-black text-primary uppercase tracking-[0.5em] italic leading-none">
+                  SECTORS MATCHED TO YOUR DISCOVERY INDEX
+               </div>
+            </div>
+            <Link href="/turfs" className="text-[11px] font-black text-gray-400 uppercase tracking-widest hover:text-primary transition-all flex items-center gap-4 italic group underline underline-offset-8 decoration-2">EXPLORE ALL <ArrowRight className="w-5 h-5 group-hover:translate-x-3 transition-transform" /></Link>
+         </div>
+         
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+            {[1,2,3,4].map(i => (
+              <Link key={i} href="/turfs" className="group bg-white dark:bg-[#121A14] rounded-[4.5rem] border border-gray-100 dark:border-white/5 overflow-hidden shadow-2xl hover:-translate-y-4 hover:shadow-[0_80px_160px_rgba(0,0,0,0.1)] transition-all">
+                 <div className="h-56 relative overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-[3s]" />
+                    <div className="absolute top-8 right-8 px-6 py-3 bg-white/95 dark:bg-black/95 backdrop-blur-3xl rounded-[1.25rem] font-black text-primary text-[10px] shadow-2xl transition-transform group-hover:rotate-12 border border-white/20">★ 4.9 ({120})</div>
+                    <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent" />
+                 </div>
+                 <div className="p-10 space-y-6">
+                    <h4 className="text-2xl font-black text-gray-900 dark:text-white uppercase italic tracking-tighter leading-none group-hover:text-primary transition-colors">Sector Alpha-{i} Elite</h4>
+                    <div className="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
+                       <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest italic flex items-center gap-3"><MapPin className="w-4 h-4 text-primary" /> PUNE, MH</div>
+                       <div className="text-3xl font-black text-gray-900 dark:text-white italic tracking-tighter">₹1200</div>
+                    </div>
+                 </div>
+              </Link>
+            ))}
+         </div>
+      </section>
     </div>
   );
 }

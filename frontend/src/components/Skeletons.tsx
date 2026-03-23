@@ -1,103 +1,76 @@
 "use client";
 
 import { motion } from "framer-motion";
-
-export function Skeleton({ className = "" }: { className?: string }) {
-  return (
-    <div
-      className={`relative overflow-hidden rounded-xl bg-gray-200 dark:bg-white/5 ${className}`}
-    >
-      <motion.div
-        animate={{
-          x: ["-100%", "100%"],
-        }}
-        transition={{
-          repeat: Infinity,
-          duration: 1.5,
-          ease: "linear",
-        }}
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 dark:via-white/5 to-transparent shadow-2xl"
-      />
-    </div>
-  );
-}
+import { Search, Zap, Package, Target, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export function SkeletonCard() {
   return (
-    <div className="bg-white dark:bg-card border border-gray-100 dark:border-white/5 rounded-3xl overflow-hidden shadow-sm">
-      <Skeleton className="h-48 rounded-none" />
-      <div className="p-5 space-y-4">
-        <Skeleton className="h-6 w-3/4" />
-        <Skeleton className="h-4 w-1/2" />
-        <div className="flex gap-2">
-          <Skeleton className="h-7 w-20 rounded-full" />
-          <Skeleton className="h-7 w-24 rounded-full" />
-        </div>
-        <Skeleton className="h-11 w-full rounded-xl mt-2" />
-      </div>
+    <div className="bg-white dark:bg-[#121A14] rounded-[3.5rem] border border-gray-100 dark:border-white/5 overflow-hidden shadow-2xl relative">
+       <div className="h-56 bg-gray-100 dark:bg-white/5 animate-pulse" />
+       <div className="p-10 space-y-6">
+          <div className="h-6 w-3/4 bg-gray-100 dark:bg-white/5 animate-pulse rounded-xl" />
+          <div className="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
+             <div className="h-4 w-1/3 bg-gray-100 dark:bg-white/5 animate-pulse rounded-lg" />
+             <div className="h-6 w-1/4 bg-gray-100 dark:bg-white/5 animate-pulse rounded-xl" />
+          </div>
+       </div>
+       <div className="absolute top-0 right-0 p-10 opacity-[0.02] pointer-events-none group-hover:scale-110 transition-transform duration-[4s]"><Zap className="w-48 h-48" /></div>
     </div>
   );
 }
 
 export function SkeletonStat() {
   return (
-    <div className="bg-white dark:bg-card p-6 rounded-3xl border border-gray-100 dark:border-white/5">
-      <Skeleton className="h-10 w-10 rounded-xl mb-4" />
-      <Skeleton className="h-8 w-1/2 mb-2" />
-      <Skeleton className="h-4 w-1/3" />
+    <div className="bg-white dark:bg-[#121A14] rounded-[3rem] p-10 border border-gray-100 dark:border-white/5 shadow-2xl relative flex flex-col justify-between overflow-hidden">
+       <div className="w-14 h-14 bg-gray-100 dark:bg-white/5 animate-pulse rounded-2xl mb-8" />
+       <div className="space-y-4">
+          <div className="h-4 w-1/3 bg-gray-100 dark:bg-white/5 animate-pulse rounded-lg" />
+          <div className="h-10 w-2/3 bg-gray-100 dark:bg-white/5 animate-pulse rounded-3xl" />
+       </div>
+       <div className="absolute top-0 right-0 p-10 opacity-[0.02] pointer-events-none duration-[4s]"><Target className="w-32 h-32" /></div>
     </div>
   );
 }
 
 export function SkeletonRow() {
   return (
-    <div className="flex items-center gap-4 p-4 border-b border-gray-50 dark:border-white/5">
-      <Skeleton className="h-12 w-12 rounded-xl shrink-0" />
-      <div className="flex-1 space-y-2">
-        <Skeleton className="h-4 w-2/3" />
-        <Skeleton className="h-3 w-1/3" />
-      </div>
-      <Skeleton className="h-7 w-16 rounded-full shrink-0" />
+    <div className="flex items-center justify-between p-8 bg-gray-50/50 dark:bg-white/2 rounded-[3.5rem] border border-transparent shadow-sm mb-4 animate-pulse">
+       <div className="flex items-center gap-6">
+          <div className="w-16 h-16 rounded-[1.75rem] bg-gray-100 dark:bg-white/10" />
+          <div className="space-y-3">
+             <div className="h-4 w-32 bg-gray-100 dark:bg-white/10 rounded-lg" />
+             <div className="h-2 w-48 bg-gray-100 dark:bg-white/5 rounded-md" />
+          </div>
+       </div>
+       <div className="h-10 w-24 bg-gray-100 dark:bg-white/10 rounded-2xl" />
     </div>
   );
 }
 
-export function SkeletonText({ lines = 3 }: { lines?: number }) {
-  return (
-    <div className="space-y-3">
-      {Array.from({ length: lines }).map((_, i) => (
-        <div key={i} style={{ width: `${90 - i * 15}%` }}>
-          <Skeleton className="h-4 w-full" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-
-export function LoadingSpinner({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
-  const sizes = { sm: "h-4 w-4", md: "h-8 w-8", lg: "h-12 w-12" };
+export function EmptyState({ title, sub, icon: Icon = Package, actionLabel, actionLink }: { title: string, sub: string, icon?: any, actionLabel?: string, actionLink?: string }) {
   return (
     <motion.div 
-      animate={{ rotate: 360 }}
-      transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-      className={`${sizes[size]} rounded-full border-[3px] border-black/5 border-t-primary dark:border-white/10 dark:border-t-primary shadow-sm`}
-    />
-  );
-}
+      initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
+      className="py-32 px-12 text-center flex flex-col items-center justify-center space-y-8 bg-gray-50/50 dark:bg-white/[0.02] rounded-[5rem] border-4 border-dashed border-gray-100 dark:border-white/5 shadow-inner"
+    >
+       <div className="w-32 h-32 rounded-[3.5rem] bg-white dark:bg-[#121A14] border border-gray-100 dark:border-white/10 flex items-center justify-center text-gray-200 dark:text-white/10 shadow-2xl relative group rotate-12 hover:rotate-0 transition-all duration-1000">
+          <Icon className="w-12 h-12" />
+          <div className="absolute -top-4 -right-4 w-10 h-10 rounded-3xl bg-primary/20 flex items-center justify-center text-primary animate-pulse"><Zap className="w-5 h-5" /></div>
+       </div>
+       
+       <div className="space-y-4 max-w-sm">
+          <h3 className="text-4xl font-black text-gray-900 dark:text-white italic tracking-tighter uppercase leading-none">{title}</h3>
+          <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest leading-loose italic opacity-60 underline decoration-primary/20 decoration-2 underline-offset-8">
+             {sub}
+          </p>
+       </div>
 
-export function PageLoader() {
-  return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6">
-      <LoadingSpinner size="lg" />
-      <motion.p 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ repeat: Infinity, duration: 0.8, repeatType: "reverse" }}
-        className="text-sm font-black text-gray-500 tracking-widest uppercase"
-      >
-        Loading experience…
-      </motion.p>
-    </div>
+       {actionLabel && actionLink && (
+         <Link href={actionLink} className="mt-12 px-12 py-5 bg-primary text-white text-[11px] font-black rounded-[1.5rem] uppercase tracking-widest italic shadow-[0_40px_80px_rgba(34,197,94,0.3)] hover:scale-110 active:scale-95 transition-all flex items-center gap-6">
+            {actionLabel} <ArrowRight className="w-5 h-5" />
+         </Link>
+       )}
+    </motion.div>
   );
 }

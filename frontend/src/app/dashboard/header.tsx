@@ -4,7 +4,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Bell, Menu, User, Settings, LogOut, MapPin, ChevronDown, Sparkles, Globe, Zap, History, LayoutDashboard } from "lucide-react";
 import { useAuth } from "../../components/AuthProvider";
-import { NotificationHub } from "./NotificationHub";
 import { useState, useEffect } from "react";
 
 const getTitle = (path: string) => {
@@ -88,7 +87,13 @@ export function DashboardHeader({ onMenuClick }: { onMenuClick?: () => void }) {
 
         {/* Tactical Counters */}
         <div className="hidden md:flex items-center gap-4 px-6 border-l border-gray-100 dark:border-white/5">
-           <NotificationHub />
+           <motion.button 
+             whileHover={{ scale: 1.1 }}
+             className="relative p-3.5 rounded-2xl bg-gray-50 dark:bg-white/5 text-gray-400 hover:text-primary transition-all shadow-sm border border-transparent hover:border-gray-100 dark:hover:border-white/5"
+           >
+             <Bell className="w-5 h-5 flex-shrink-0" />
+             <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-[#0B0F0C]" />
+           </motion.button>
         </div>
 
         {/* Global Identity Module */}

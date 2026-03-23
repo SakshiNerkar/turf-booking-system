@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { DashboardHeader } from "./DashboardHeader";
 import { Sidebar } from "./Sidebar";
+import { SupportChat } from "./SupportChat";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -52,6 +53,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </motion.div>
         </main>
       </div>
+      <SupportChat />
     </div>
   );
 }

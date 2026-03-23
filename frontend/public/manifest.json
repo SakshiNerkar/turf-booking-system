@@ -1,0 +1,21 @@
+{
+  "name": "Turff SaaS Platform",
+  "short_name": "Turff",
+  "description": "Premium Sports Arena Booking & Management System",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B0F0C",
+  "theme_color": "#22C55E",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
