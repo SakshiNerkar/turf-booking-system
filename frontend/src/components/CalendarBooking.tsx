@@ -21,11 +21,16 @@ type Props = {
 };
 
 export function CalendarBooking({ turfId, turfName, turfOwnerId, pricePerSlot, slots: initialSlots, location }: Props) {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date(2026, 0, 1)); // Deterministic seed
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [slots, setSlots] = useState<Slot[]>(initialSlots);
+
+  // Sync with actual real-time clock post-hydration
+  useEffect(() => {
+    setSelectedDate(new Date());
+  }, []);
 
   // Generate tactical date range (Next 7 days)
   const days = useMemo(() => {

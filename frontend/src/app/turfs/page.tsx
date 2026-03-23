@@ -10,7 +10,12 @@ import {
 import { apiFetch } from "../../lib/api";
 import { SkeletonCard, EmptyState } from "../../components/Skeletons";
 import { FilterProtocol } from "@/components/discovery/FilterProtocol";
-import { MapView } from "@/components/discovery/MapView";
+import dynamic from "next/dynamic";
+
+const MapView = dynamic(() => import("@/components/discovery/MapView").then(m => m.MapView), {
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-gray-100 animate-pulse flex items-center justify-center text-[10px] font-black uppercase tracking-widest text-gray-400 italic">Sector Map Initializing...</div>
+});
 
 type Turf = {
   id: string;

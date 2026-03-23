@@ -19,13 +19,21 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+import type { Viewport } from "next";
+
+export const viewport: Viewport = {
+  themeColor: "#22C55E",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export const metadata: Metadata = {
   title: "Turff SaaS | Elite Sports Tech Platform",
   description: "High-performance arena booking, regional match synchronization, and operational asset management.",
   keywords: ["turf booking", "sports tech", "SaaS", "football", "cricket"],
   manifest: "/manifest.json",
-  themeColor: "#22C55E",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
