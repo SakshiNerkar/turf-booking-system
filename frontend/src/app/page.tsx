@@ -1,233 +1,266 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Trophy, 
-  Calendar, 
-  MapPin, 
-  Zap, 
-  Shield, 
-  Users, 
-  ArrowRight, 
-  Star,
-  CheckCircle2,
-  ChevronRight,
-  TrendingUp,
-  Activity
+  MapPin, Search, Filter, ChevronDown, Bell, Star, 
+  Settings, HelpCircle, FileText, CreditCard, Share2, 
+  ArrowRight, Sparkles, Zap, Shield, Clock, TrendingUp, Users, LogIn
 } from "lucide-react";
+import { useAuth } from "@/components/AuthProvider";
+import { apiFetch } from "@/lib/api";
 
-const STATS = [
-  { value: "500+", label: "Verified Turfs", icon: <TrendingUp className="w-5 h-5 text-green-500" /> },
-  { value: "12K+", label: "Active Players", icon: <Users className="w-5 h-5 text-blue-500" /> },
-  { value: "4.9★", label: "App Rating", icon: <Star className="w-5 h-5 text-amber-500" /> },
-  { value: "24/7", label: "Instant Booking", icon: <Zap className="w-5 h-5 text-purple-500" /> },
-];
+type TurfItem = {
+  id: string;
+  name: string;
+  location: string;
+  sport_type: string;
+  price_per_slot: string;
+  rating?: number;
+  image?: string;
+};
 
-const FEATURES = [
-  { icon: <Calendar />, title: "Live Calendar", desc: "Real-time slot availability with instant visual feedback.", color: "from-green-500/20 to-emerald-500/5", textColor: "text-green-600" },
-  { icon: <Shield />, title: "Secure Pay", desc: "Multiple payment options with end-to-end encryption.", color: "from-blue-500/20 to-blue-600/5", textColor: "text-blue-600" },
-  { icon: <MapPin />, title: "Smart Maps", desc: "Find turfs near you with integrated geolocation.", color: "from-orange-500/20 to-amber-500/5", textColor: "text-orange-600" },
-  { icon: <Activity />, title: "Performance", desc: "Track your game history and improve your stats over time.", color: "from-purple-500/20 to-violet-500/5", textColor: "text-purple-600" },
-  { icon: <Zap />, title: "Instant Access", desc: "No more waiting for calls. Book and play in seconds.", color: "from-yellow-500/20 to-amber-400/5", textColor: "text-yellow-600" },
-  { icon: <Users />, title: "Community", desc: "Join local leagues and find players at your skill level.", color: "from-pink-500/20 to-rose-500/5", textColor: "text-pink-600" },
-];
-
+const CITIES = ["Pune", "Mumbai", "Bengaluru", "Delhi NCR", "Hyderabad", "Thane"];
 const SPORTS = [
-  { name: "Football", icon: "⚽", count: "180+ Slots", color: "bg-green-500/10 dark:bg-green-500/5 hover:bg-green-500/20" },
-  { name: "Cricket", icon: "🏏", count: "120+ Slots", color: "bg-amber-500/10 dark:bg-amber-500/5 hover:bg-amber-500/20" },
-  { name: "Badminton", icon: "🏸", count: "90+ Slots", color: "bg-blue-500/10 dark:bg-blue-500/5 hover:bg-blue-500/20" },
-  { name: "Tennis", icon: "🎾", count: "60+ Slots", color: "bg-orange-500/10 dark:bg-orange-500/5 hover:bg-orange-500/20" },
+  { name: "Football", icon: "⚽" },
+  { name: "Cricket", icon: "🏏" },
+  { name: "Badminton", icon: "🏸" },
+  { name: "Tennis", icon: "🎾" },
+  { name: "SQUASH", icon: "🎾" }
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 }
-};
+const FEATURED_BANNERS = [
+  { id: 1, title: "NEW VENUE ALERT", venue: "Padel 360 | PowerPlay Park", loc: "VINAYAK NAGAR", type: "PADEL", img: "/featured_padel_court_1774238237901.png" },
+  { id: 2, title: "POPULAR IN PUNE", venue: "City Arena Elite Turf", loc: "KOTHRUD", type: "FOOTBALL", img: "/football_turf_pune_1774238277016.png" },
+];
 
 export default function HomePage() {
+  const { user, token, logout } = useAuth();
+  const [turfs, setTurfs] = useState<TurfItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [city, setCity] = useState("Pune");
+  const [showCities, setShowCities] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [bannerIdx, setBannerIdx] = useState(0);
+
+  async function loadTurfs() {
+    setLoading(true);
+    const res = await apiFetch<TurfItem[]>("/api/turfs?limit=10");
+    setLoading(false);
+    if (res.ok) setTurfs(res.data);
+  }
+
+  useEffect(() => { loadTurfs(); }, []);
+
+  // Use the Carousel Banner Index
+  useEffect(() => {
+    const timer = setInterval(() => setBannerIdx(i => (i + 1) % FEATURED_BANNERS.length), 5000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    <div className="space-y-24 pb-20">
+    <div className="min-h-screen bg-white dark:bg-[#0B0F0C] pb-24 transition-colors duration-500">
       
-      {/* Hero Section */}
-      <section className="relative min-h-[85vh] flex flex-col items-center justify-center text-center px-4 overflow-hidden rounded-[3rem] bg-gradient-to-br from-gray-950 via-[#071a0e] to-[#0a2e16] text-white">
-        {/* Animated Background Elements */}
-        <motion.div 
-          animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
-          transition={{ duration: 20, repeat: Infinity }}
-          className="absolute -top-24 -left-24 w-96 h-96 bg-primary/20 rounded-full blur-[100px]" 
-        />
-        <motion.div 
-          animate={{ scale: [1, 1.3, 1], rotate: [0, -90, 0] }}
-          transition={{ duration: 25, repeat: Infinity, delay: 2 }}
-          className="absolute -bottom-24 -right-24 w-[30rem] h-[30rem] bg-green-500/10 rounded-full blur-[120px]" 
-        />
-        
-        {/* Hero Content */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="relative z-10 max-w-5xl"
-        >
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mb-8 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md px-6 py-2 text-sm font-black tracking-widest uppercase text-green-400"
-          >
-            <span className="flex h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-            The Future of Sports Booking
-          </motion.div>
+      {/* 1. Header Location & Profile */}
+      <div className="sticky top-0 z-40 bg-white/80 dark:bg-[#0B0F0C]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/5 px-6 py-4 flex items-center justify-between">
+         <div className="flex items-center gap-6">
+            <button onClick={() => setShowCities(!showCities)} className="flex items-center gap-2 group">
+               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-all">
+                  <MapPin className="w-5 h-5" />
+               </div>
+               <div className="text-left">
+                  <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">SELECTED CITY</div>
+                  <div className="text-sm font-black text-gray-900 dark:text-white flex items-center gap-1.5 uppercase tracking-tighter">
+                    {city} <ChevronDown className={`w-4 h-4 transition-transform ${showCities ? 'rotate-180' : ''}`} />
+                  </div>
+               </div>
+            </button>
+            
+            <div className="hidden lg:flex relative"><Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><input type="text" placeholder="Explore sports venues near you..." className="pl-12 pr-6 py-3 bg-gray-100 dark:bg-white/5 rounded-2xl text-xs font-black outline-none w-[350px] focus:w-[450px] transition-all focus:ring-2 focus:ring-primary/20" /></div>
+         </div>
 
-          <h1 className="text-6xl md:text-8xl font-black leading-[1.1] tracking-tighter mb-8">
-            Game On. <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400 italic">
-              Anytime, Anywhere.
-            </span>
-          </h1>
+         <div className="flex items-center gap-3">
+            <button className="p-3 rounded-2xl bg-gray-50 dark:bg-white/5 text-gray-500 hover:text-primary transition-all relative"><Bell className="w-5 h-5" /><span className="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-[#0B0F0C]" /></button>
+            <button onClick={() => setShowProfile(true)} className="h-12 w-12 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-white/10 dark:to-white/5 flex items-center justify-center text-xl font-black border border-gray-100 dark:border-white/5 shadow-sm hover:scale-105 transition-all">
+               {user ? user.name[0].toUpperCase() : "👤"}
+            </button>
+         </div>
+      </div>
 
-          <p className="mt-8 mx-auto max-w-2xl text-xl md:text-2xl text-white/60 font-medium leading-relaxed mb-12">
-            The premium platform for booking sports turfs. <br className="hidden md:block" />
-            Discover 500+ venues with real-time availability.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <Link href="/turfs" className="group w-full sm:w-auto h-16 px-10 bg-primary text-white font-black rounded-2xl shadow-2xl shadow-green-500/30 flex items-center justify-center gap-3 transition-all hover:scale-105 hover:shadow-green-500/50">
-              Explore Venues
-              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-            </Link>
-            <Link href="/register" className="group w-full sm:w-auto h-16 px-10 bg-white/10 backdrop-blur-md border border-white/20 text-white font-black rounded-2xl flex items-center justify-center gap-3 transition-all hover:bg-white/20">
-              Join the League
-              <ChevronRight className="w-5 h-5" />
-            </Link>
-          </div>
-        </motion.div>
-
-        {/* Floating Icons */}
-        <motion.div animate={{ y: [0, -20, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute right-[10%] top-[20%] text-6xl opacity-20 hidden md:block select-none">⚽</motion.div>
-        <motion.div animate={{ y: [0, 20, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }} className="absolute left-[15%] bottom-[20%] text-5xl opacity-20 hidden md:block select-none">🏸</motion.div>
-        <motion.div animate={{ x: [0, 15, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} className="absolute right-[15%] bottom-[15%] text-7xl opacity-10 hidden md:block select-none">🏏</motion.div>
-      </section>
-
-      {/* Stats Section */}
-      <motion.section 
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        className="grid grid-cols-2 md:grid-cols-4 gap-8"
-      >
-        {STATS.map((stat) => (
-          <motion.div 
-            key={stat.label}
-            variants={itemVariants}
-            className="group glass-effect rounded-[2.5rem] p-8 text-center border border-gray-100 dark:border-white/5 hover:border-primary/20 transition-all cursor-default"
-          >
-            <div className="w-12 h-12 bg-gray-50 dark:bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-              {stat.icon}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+         {/* 2. Hero Banner Carousel (Khelomore style) */}
+         <section className="mb-12 relative h-[280px] sm:h-[400px] rounded-[3rem] overflow-hidden group shadow-2xl">
+            <AnimatePresence mode="wait">
+               <motion.div 
+                 key={bannerIdx} initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.7 }}
+                 className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${FEATURED_BANNERS[bannerIdx].img})` }}
+               >
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <div className="absolute bottom-10 left-10 text-white space-y-3">
+                     <span className="px-4 py-1.5 bg-amber-500 text-black text-[10px] font-black rounded-lg uppercase tracking-[0.2em] flex items-center gap-2 w-fit italic shadow-xl">
+                        <Sparkles className="w-3.5 h-3.5" /> {FEATURED_BANNERS[bannerIdx].title}
+                     </span>
+                     <h2 className="text-4xl sm:text-6xl font-black tracking-tighter uppercase italic">{FEATURED_BANNERS[bannerIdx].venue}</h2>
+                     <div className="flex items-center gap-4 text-sm font-black opacity-90 uppercase tracking-[0.3em]">
+                        <span>{FEATURED_BANNERS[bannerIdx].type}</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-white/50" />
+                        <span className="text-amber-400">{FEATURED_BANNERS[bannerIdx].loc}</span>
+                     </div>
+                     <Link href="/turfs" className="inline-flex mt-6 px-10 py-4 bg-white text-black text-xs font-black rounded-2xl uppercase tracking-widest hover:scale-105 transition-all shadow-2xl">BOOK NOW</Link>
+                  </div>
+               </motion.div>
+            </AnimatePresence>
+            
+            <div className="absolute bottom-10 right-10 flex gap-2">
+               {FEATURED_BANNERS.map((_, i) => (
+                 <button key={i} onClick={() => setBannerIdx(i)} className={`h-1.5 rounded-full transition-all ${i === bannerIdx ? 'w-10 bg-white' : 'w-2 bg-white/30'}`} />
+               ))}
             </div>
-            <div className="text-4xl font-black mb-2 tracking-tight group-hover:text-primary transition-colors">{stat.value}</div>
-            <div className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">{stat.label}</div>
-          </motion.div>
-        ))}
-      </motion.section>
+         </section>
 
-      {/* Sports Categories */}
-      <section>
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-          <div>
-            <span className="text-primary font-black uppercase text-xs tracking-widest mb-2 block">Categories</span>
-            <h2 className="text-4xl font-black tracking-tight">Choice of Champions</h2>
-          </div>
-          <Link href="/turfs" className="text-primary font-black flex items-center gap-2 hover:gap-3 transition-all">
-            Browse All Sports <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {SPORTS.map((sport) => (
-            <Link key={sport.name} href={`/turfs?sport_type=${sport.name.toLowerCase()}`}>
-              <motion.div 
-                whileHover={{ y: -10 }}
-                className={`${sport.color} rounded-[2.5rem] p-10 text-center transition-all group`}
-              >
-                <div className="text-6xl mb-6 transform group-hover:scale-125 transition-transform duration-500">
-                  {sport.icon}
-                </div>
-                <div className="text-xl font-black mb-1 group-hover:text-primary transition-colors">{sport.name}</div>
-                <div className="text-sm font-bold opacity-60 uppercase tracking-widest">{sport.count}</div>
-              </motion.div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section className="bg-gray-50 dark:bg-white/[0.02] rounded-[4rem] px-8 py-24 md:p-24 overflow-hidden relative">
-        <div className="relative z-10">
-          <div className="text-center mb-16 max-w-3xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-6">Experience Premium</h2>
-            <p className="text-gray-500 font-medium text-lg">Every feature is designed to make your sporting experience seamless and professional.</p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {FEATURES.map((feature, i) => (
-              <motion.div 
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="group p-10 bg-white dark:bg-card rounded-[3rem] border border-gray-100 dark:border-white/5 hover:shadow-2xl hover:shadow-primary/5 transition-all"
-              >
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-8 ${feature.textColor}`}>
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-black mb-4 tracking-tight">{feature.title}</h3>
-                <p className="text-gray-500 font-medium leading-relaxed">{feature.desc}</p>
-              </motion.div>
+         {/* 3. Sport Selector Pills */}
+         <div className="flex gap-4 overflow-x-auto no-scrollbar pb-6 mb-10">
+            {SPORTS.map(s => (
+               <button key={s.name} className="flex-shrink-0 flex items-center gap-3 px-8 py-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-transparent hover:border-primary/20 hover:bg-primary/5 transition-all group">
+                  <span className="text-2xl group-hover:scale-125 transition-transform">{s.icon}</span>
+                  <span className="text-xs font-black uppercase tracking-widest text-gray-500 group-hover:text-primary">{s.name}</span>
+               </button>
             ))}
-          </div>
-        </div>
-      </section>
+         </div>
 
-      {/* CTA Section */}
-      <section className="px-4">
-        <motion.div 
-          whileHover={{ scale: 1.01 }}
-          className="relative overflow-hidden rounded-[4rem] bg-primary px-8 py-20 text-center text-white"
-        >
-          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
-          <motion.div 
-            animate={{ rotate: [0, 360] }}
-            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-            className="absolute -right-20 -bottom-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" 
-          />
-          
-          <div className="relative z-10 max-w-4xl mx-auto">
-            <Trophy className="w-16 h-16 mx-auto mb-8 text-white/50" />
-            <h2 className="text-5xl md:text-6xl font-black mb-8 tracking-tighter">Ready to Dominate?</h2>
-            <p className="text-white/80 text-xl font-medium mb-12 max-w-2xl mx-auto leading-relaxed">
-              Join 12,000+ athletes who book their victory on Turff. <br />
-              Free accounts available for players and venue owners.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <Link href="/register" className="w-full sm:w-auto px-12 py-5 bg-white text-primary font-black rounded-[2rem] shadow-xl transition-all hover:scale-105">
-                Create Free Account
-              </Link>
-              <Link href="/turfs" className="w-full sm:w-auto px-12 py-5 border-2 border-white text-white font-black rounded-[2rem] transition-all hover:bg-white hover:text-primary">
-                Explore Venues
-              </Link>
+         {/* 4. Filter Strip */}
+         <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+               <h3 className="text-2xl font-black tracking-tighter uppercase italic">Available Venues <span className="text-gray-400 font-medium">({turfs.length})</span></h3>
             </div>
-          </div>
-        </motion.div>
-      </section>
+            <button className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] font-black uppercase tracking-widest shadow-xl">
+               <Filter className="w-4 h-4" /> FILTERS
+            </button>
+         </div>
+
+         {/* 5. Venuediscovery List (The App View) */}
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {loading ? Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-80 bg-gray-100 dark:bg-white/5 rounded-[3rem] animate-pulse" />
+            )) : turfs.map(t => (
+              <div key={t.id} className="group relative bg-white dark:bg-[#121A14] rounded-[3rem] border border-gray-100 dark:border-white/5 overflow-hidden hover:shadow-2xl hover:shadow-primary/10 hover:border-primary/20 transition-all flex flex-col">
+                 <div className="h-56 relative overflow-hidden">
+                    <img src={`https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=800&auto=format&fit=crop`} alt={t.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                    <div className="absolute top-5 right-5 h-10 w-10 rounded-xl bg-white/90 dark:bg-black/80 backdrop-blur-md flex items-center justify-center font-black text-sm text-primary shadow-xl">5.0</div>
+                    <div className="absolute bottom-5 left-5 px-4 py-1.5 bg-primary text-white text-[10px] font-black rounded-lg uppercase tracking-widest shadow-xl">TRENDING</div>
+                 </div>
+                 <div className="p-8 flex-1 flex flex-col justify-between space-y-6">
+                    <div>
+                       <h4 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white uppercase leading-none mb-4">{t.name}</h4>
+                       <div className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest leading-none">
+                          <MapPin className="w-3.5 h-3.5 text-primary" /> {t.location}
+                       </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
+                       <div className="text-2xl font-black text-gray-900 dark:text-white tracking-widest italic">₹{Number(t.price_per_slot).toFixed(0)} <span className="text-[10px] uppercase tracking-normal font-medium text-gray-400 opacity-60">/hr</span></div>
+                       <Link href={`/turfs/${t.id}`} className="px-8 py-3 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white text-[10px] font-black rounded-xl uppercase tracking-widest hover:bg-primary hover:text-white transition-all border border-gray-100 dark:border-white/5">BOOK NOW</Link>
+                    </div>
+                 </div>
+              </div>
+            ))}
+         </div>
+      </div>
+
+      {/* 6. Sidebar / Guest Menu (Image 3 idea) */}
+      <AnimatePresence>
+        {showProfile && (
+           <>
+             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowProfile(false)} className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]" />
+             <motion.div initial={{ x: 400 }} animate={{ x: 0 }} exit={{ x: 400 }} transition={{ type: "spring", damping: 30 }} className="fixed right-0 top-0 h-full w-[400px] bg-white dark:bg-[#0B0F0C] z-[70] shadow-[-20px_0_50px_rgba(0,0,0,0.1)] p-12 overflow-y-auto no-scrollbar">
+                {/* Close Button Mobile */}
+                <button onClick={() => setShowProfile(false)} className="absolute top-10 left-10 p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 mb-10"><ChevronDown className="w-5 h-5 rotate-90" /></button>
+                
+                <div className="mt-20 space-y-12">
+                   <div className="flex items-center gap-6">
+                      <div className="w-20 h-20 rounded-[2rem] bg-gray-100 dark:bg-white/10 flex items-center justify-center text-4xl shadow-inner group relative overflow-hidden">
+                         {user ? user.name[0].toUpperCase() : "👤"}
+                         <motion.div animate={{ rotate: 360 }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }} className="absolute inset-0 border-2 border-dashed border-primary/20 rounded-[2rem] opacity-50" />
+                      </div>
+                      <div>
+                         <h3 className="text-3xl font-black text-gray-900 dark:text-white italic">{user ? user.name : "Guest Athlete"}</h3>
+                         <p className="text-gray-400 text-xs font-black uppercase tracking-widest mt-1 opacity-60">{user ? user.role : "Sign in to command center"}</p>
+                      </div>
+                   </div>
+
+                   {user ? (
+                      <div className="space-y-4">
+                         <Link href={`/dashboard/${user.role}`} className="flex items-center justify-between p-6 bg-primary text-white rounded-[2.5rem] font-black uppercase tracking-widest text-xs shadow-2xl shadow-green-500/20 hover:scale-105 transition-all">Go to Command Center <ArrowRight className="w-5 h-5" /></Link>
+                         <button onClick={logout} className="w-full flex items-center gap-4 p-6 hover:bg-red-500/5 text-red-500 rounded-[2.5rem] font-black uppercase tracking-widest text-xs transition-all border border-transparent hover:border-red-500/10"><Clock className="w-5 h-5 rotate-180" /> Logout</button>
+                      </div>
+                   ) : (
+                      <div className="space-y-4">
+                         <Link href="/login" className="flex items-center justify-between p-6 bg-primary text-white rounded-[2.5rem] font-black uppercase tracking-widest text-xs shadow-2xl shadow-green-500/20 hover:scale-[1.02] transition-all">LOGIN / SIGN UP <LogIn className="w-5 h-5" /></Link>
+                         <div className="grid grid-cols-2 gap-4">
+                            <Link href="/register" className="p-6 bg-gray-50 dark:bg-white/5 rounded-3xl text-center text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-all">REGISTER</Link>
+                            <Link href="/turfs" className="p-6 bg-gray-50 dark:bg-white/5 rounded-3xl text-center text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-all">FAQ</Link>
+                         </div>
+                      </div>
+                   )}
+
+                   <div className="pt-12 space-y-8 border-t border-gray-100 dark:border-white/5">
+                      {[
+                        { label: "Community", sub: "Join local leagues", icon: Users },
+                        { label: "Performance", sub: "Track match stats", icon: TrendingUp },
+                        { label: "Elite Support", sub: "24/7 Concierge", icon: HelpCircle },
+                        { label: "Legal & Privacy", sub: "Terms of play", icon: Shield }
+                      ].map((item, i) => (
+                        <button key={i} className="w-full flex items-center gap-6 group text-left">
+                           <div className="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center text-gray-400 group-hover:bg-primary group-hover:text-white transition-all shadow-sm"><item.icon className="w-6 h-6" /></div>
+                           <div>
+                              <div className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest group-hover:text-primary transition-colors">{item.label}</div>
+                              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 opacity-60 leading-none">{item.sub}</div>
+                           </div>
+                        </button>
+                      ))}
+                   </div>
+
+                   {/* Referral Idea from Image 3 */}
+                   <div className="bg-amber-500/5 rounded-[3rem] p-10 border border-amber-500/10 relative overflow-hidden group">
+                      <div className="relative z-10">
+                        <h4 className="text-xl font-black text-amber-600 italic">Refer & Score</h4>
+                        <p className="text-[10px] font-black text-gray-500 mt-2 uppercase tracking-widest leading-loose">Earn ₹500 credits for every friend who books their first session.</p>
+                      </div>
+                      <div className="absolute top-0 right-0 p-8 opacity-[0.05] group-hover:rotate-12 transition-transform scale-150 rotate-12 text-amber-500"><Sparkles className="w-24 h-24" /></div>
+                   </div>
+                </div>
+             </motion.div>
+           </>
+        )}
+      </AnimatePresence>
+
+      {/* 7. City Selection Modal */}
+      <AnimatePresence>
+        {showCities && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowCities(false)} className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60]" />
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 50 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 50 }} className="fixed inset-0 m-auto w-[600px] h-fit bg-white dark:bg-[#0B0F0C] z-[70] rounded-[3rem] p-12 shadow-2xl border border-gray-100 dark:border-white/5">
+                <div className="flex items-center justify-between mb-10">
+                   <h3 className="text-3xl font-black text-gray-900 dark:text-white italic">SET YOUR LOCATION</h3>
+                   <button onClick={() => setShowCities(false)} className="p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"><Search className="w-5 h-5 rotate-90" /></button>
+                </div>
+                
+                <div className="relative mb-10"><Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" /><input type="text" placeholder="Search for your locality..." className="w-full pl-16 pr-8 py-5 bg-gray-100 dark:bg-white/5 border-none rounded-[2rem] text-sm font-black outline-none focus:ring-2 focus:ring-primary/20" /></div>
+                
+                <div className="mb-6"><label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-6 px-2">Popular Service Zones</label>
+                  <div className="grid grid-cols-3 gap-6">
+                    {CITIES.map(c => (
+                      <button key={c} onClick={() => { setCity(c); setShowCities(false); }} className={`p-8 rounded-[2.5rem] flex flex-col items-center gap-4 transition-all border-2 ${city === c ? 'bg-primary/5 border-primary text-primary shadow-xl scale-105' : 'bg-gray-50 dark:bg-white/2 border-transparent hover:border-gray-200 dark:hover:border-white/10'}`}>
+                         <div className="text-3xl">🏛️</div>
+                         <div className="text-[10px] font-black uppercase tracking-widest">{c}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
     </div>
   );
