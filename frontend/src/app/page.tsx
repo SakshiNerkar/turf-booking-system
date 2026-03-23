@@ -140,7 +140,7 @@ export default function HomePage() {
                     >
                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                        <div className="absolute bottom-12 left-12 space-y-4">
-                          <span className={`px-5 py-2 ${FEATURE_BANNERS[bannerIdx].hb} text-white text-[10px] font-black rounded-full uppercase tracking-[0.3em] inline-flex items-center gap-2 italic`}>
+                          <span className={`px-5 py-2 ${FEATURED_BANNERS[bannerIdx].hb} text-white text-[10px] font-black rounded-full uppercase tracking-[0.3em] inline-flex items-center gap-2 italic`}>
                              <Sparkles className="w-4 h-4" /> {FEATURED_BANNERS[bannerIdx].title}
                           </span>
                           <h2 className="text-5xl md:text-7xl font-black text-white italic tracking-tighter leading-none">{FEATURED_BANNERS[bannerIdx].venue}</h2>

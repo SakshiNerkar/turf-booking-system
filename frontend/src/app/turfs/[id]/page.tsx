@@ -2,6 +2,23 @@ import Link from "next/link";
 import { API_BASE_URL, type ApiResponse } from "../../../lib/api";
 import { CalendarBooking } from "../../../components/CalendarBooking";
 import { TurfMap } from "../../../components/TurfMap";
+import { 
+  Wifi, 
+  Car, 
+  Droplets, 
+  ShieldCheck, 
+  Info, 
+  Clock, 
+  CreditCard, 
+  Users, 
+  Star, 
+  MapPin, 
+  ArrowLeft,
+  Zap,
+  Coffee,
+  Trophy,
+  Activity
+} from "lucide-react";
 
 type Turf = {
   id: string;
@@ -11,208 +28,183 @@ type Turf = {
   sport_type: string;
   price_per_slot: string;
   description: string | null;
+  rating?: number;
 };
 
-type Slot = {
-  id: string;
-  start_time: string;
-  end_time: string;
-  status: "available" | "booked" | "blocked";
-};
-
+type Slot = { id: string; start_time: string; end_time: string; status: "available" | "booked" | "blocked"; };
 type TurfDetails = { turf: Turf; slots: Slot[] };
 
-const SPORT_META: Record<string, { icon: string; gradient: string; textColor: string }> = {
-  football:  { icon: "⚽", gradient: "from-green-600  to-emerald-800", textColor: "text-green-100" },
-  cricket:   { icon: "🏏", gradient: "from-amber-600  to-orange-800",   textColor: "text-amber-100" },
-  badminton: { icon: "🏸", gradient: "from-blue-600   to-indigo-800",   textColor: "text-blue-100"  },
-  tennis:    { icon: "🎾", gradient: "from-orange-500 to-red-700",      textColor: "text-orange-100"},
+const SPORT_META: Record<string, { icon: string; gradient: string; accent: string }> = {
+  football:  { icon: "⚽", gradient: "from-green-600 to-emerald-900", accent: "bg-green-500" },
+  cricket:   { icon: "🏏", gradient: "from-amber-600 to-orange-900", accent: "bg-amber-500" },
+  badminton: { icon: "🏸", gradient: "from-blue-600 to-indigo-900", accent: "bg-blue-500" },
+  tennis:    { icon: "🎾", gradient: "from-orange-500 to-red-800", accent: "bg-orange-500" },
 };
 
-export default async function TurfDetailsPage(props: {
-  params: Promise<{ id: string }>;
-}) {
+const AMENITIES = [
+  { icon: Droplets, label: "Mineral Water" },
+  { icon: Car, label: "Free Parking" },
+  { icon: Wifi, label: "Guest WiFi" },
+  { icon: Coffee, label: "Snack Bar" },
+  { icon: ShieldCheck, label: "CCTV Secure" },
+  { icon: Trophy, label: "Rental Gear" }
+];
+
+export default async function TurfDetailsPage(props: { params: Promise<{ id: string }>; }) {
   const { id } = await props.params;
 
   let json: ApiResponse<TurfDetails>;
   try {
-    const res = await fetch(`${API_BASE_URL}/api/turfs/${id}`, {
-      cache: "no-store",
-      signal: AbortSignal.timeout(8000),
-    });
+    const res = await fetch(`${API_BASE_URL}/api/turfs/${id}`, { cache: "no-store", signal: AbortSignal.timeout(8000) });
     json = (await res.json()) as ApiResponse<TurfDetails>;
   } catch {
     return (
-      <div className="rounded-3xl border border-orange-500/30 bg-orange-500/10 p-8">
-        <div className="flex items-start gap-4">
-          <span className="text-4xl">🔌</span>
-          <div>
-            <div className="text-lg font-black text-orange-900 dark:text-orange-100 mb-2">
-              Backend not running
-            </div>
-            <p className="text-sm text-orange-800/80 dark:text-orange-200/75 mb-4">
-              The backend server is offline. Start it to load turf details.
-            </p>
-            <code className="inline-block rounded-xl bg-orange-600/15 px-4 py-2 font-mono text-sm text-orange-900 dark:text-orange-200 mb-4">
-              cd backend &amp;&amp; npm run dev
-            </code>
-            <div className="flex gap-2">
-              <Link href="/turfs" className="btn-primary rounded-xl px-5 py-2.5 text-sm inline-flex">
-                ← Browse Turfs
-              </Link>
-            </div>
-          </div>
-        </div>
+      <div className="max-w-4xl mx-auto py-20 text-center">
+        <div className="w-24 h-24 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-8 text-4xl">🔌</div>
+        <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-4">Connection Decoupled</h1>
+        <p className="text-gray-500 mb-10">The central intelligence server is offline. Please initialize the backend.</p>
+        <Link href="/turfs" className="px-10 py-4 bg-primary text-white font-black rounded-2xl shadow-xl shadow-green-500/20">← EXIT TO ARENAS</Link>
       </div>
     );
   }
 
-
-  if (!json.ok) {
-    return (
-      <div className="rounded-3xl border border-red-500/20 bg-red-500/10 p-6 text-sm text-red-700 dark:text-red-300">
-        ⚠️ {json.error.message}
-      </div>
-    );
-  }
+  if (!json.ok) return <div className="p-10 bg-red-500/10 text-red-500 rounded-3xl font-black">{json.error.message}</div>;
 
   const { turf, slots } = json.data;
-  const meta = SPORT_META[turf.sport_type?.toLowerCase()] ?? {
-    icon: "🏟️",
-    gradient: "from-gray-700 to-gray-900",
-    textColor: "text-gray-100",
-  };
-
-  const available = slots.filter(s => s.status === "available").length;
-  const booked    = slots.filter(s => s.status === "booked").length;
-  const blocked   = slots.filter(s => s.status === "blocked").length;
+  const meta = SPORT_META[turf.sport_type?.toLowerCase()] ?? { icon: "🏟️", gradient: "from-gray-700 to-gray-950", accent: "bg-gray-500" };
+  const availableSlots = slots.filter(s => s.status === "available").length;
 
   return (
-    <div className="grid gap-5">
+    <div className="space-y-10 pb-32">
+      {/* 1. Elite Hero Showcase */}
+      <section className="relative h-[450px] sm:h-[550px] rounded-[3.5rem] overflow-hidden shadow-2xl group">
+         <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-[2s]" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop')` }} />
+         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+         
+         <Link href="/turfs" className="absolute top-10 left-10 p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white hover:bg-white hover:text-black transition-all group/back">
+            <ArrowLeft className="w-5 h-5 group-hover/back:-translate-x-1 transition-transform" />
+         </Link>
 
-      {/* ── Hero Banner — BookMyShow style ── */}
-      <div className="animate-fade-in overflow-hidden rounded-3xl shadow-lg">
-        {/* Dark gradient hero with big sport emoji */}
-        <div className={`relative bg-gradient-to-br ${meta.gradient} overflow-hidden`} style={{ minHeight: 220 }}>
-          {/* Background pattern */}
-          <div className="absolute inset-0 opacity-10"
-            style={{ backgroundImage: "radial-gradient(circle at 25% 25%, white 1px, transparent 1px), radial-gradient(circle at 75% 75%, white 1px, transparent 1px)", backgroundSize: "32px 32px" }}
-          />
-          {/* Large icon watermark */}
-          <div className="absolute right-6 bottom-0 text-[10rem] leading-none opacity-15 select-none"
-            style={{ filter: "drop-shadow(0 0 40px rgba(255,255,255,0.3))" }}
-          >
-            {meta.icon}
-          </div>
-
-          {/* Back button */}
-          <Link
-            href="/turfs"
-            className="absolute left-4 top-4 inline-flex h-9 items-center gap-1.5 rounded-xl border border-white/20 bg-black/25 px-3 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-black/40"
-          >
-            ← Back
-          </Link>
-
-          {/* Content */}
-          <div className="relative p-6 pt-16 sm:p-8 sm:pt-16">
-            <div className={`inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-bold ${meta.textColor} mb-3 backdrop-blur-sm`}>
-              {meta.icon} {turf.sport_type}
+         <div className="absolute bottom-16 left-12 right-12 flex flex-col md:flex-row md:items-end justify-between gap-10">
+            <div className="space-y-6">
+               <div className="flex flex-wrap gap-2">
+                  <span className={`px-5 py-2 ${meta.accent} text-white text-[10px] font-black rounded-xl uppercase tracking-widest shadow-xl shadow-black/20`}>VERIFIED VENUE</span>
+                  <span className="px-5 py-2 bg-white/10 backdrop-blur-md text-white border border-white/20 text-[10px] font-black rounded-xl uppercase tracking-widest">{turf.sport_type}</span>
+               </div>
+               <h1 className="text-5xl md:text-7xl font-black text-white italic tracking-tighter leading-none uppercase">{turf.name}</h1>
+               <div className="flex items-center gap-4 text-sm font-bold text-white/70 uppercase tracking-widest">
+                  <span className="flex items-center gap-2"><MapPin className="w-5 h-5 text-primary" /> {turf.location}</span>
+                  <span className="hidden sm:block opacity-30">|</span>
+                  <span className="flex items-center gap-2"><Star className="w-4 h-4 text-amber-400 fill-amber-400" /> 4.9 (128 Reviews)</span>
+               </div>
             </div>
-            <h1 className="text-2xl font-black text-white sm:text-3xl tracking-tight leading-tight">
-              {turf.name}
-            </h1>
-            <div className="mt-2 flex items-center gap-2 text-sm text-white/75">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="shrink-0">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" stroke="currentColor" strokeWidth="2.5" />
-                <circle cx="12" cy="9" r="2.5" stroke="currentColor" strokeWidth="2.5" />
-              </svg>
-              {turf.location}
+            
+            <div className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[2.5rem] p-8 text-center min-w-[200px] shadow-2xl">
+               <div className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-2">Hourly Investment</div>
+               <div className="text-5xl font-black text-white tracking-tighter italic">₹{Number(turf.price_per_slot).toFixed(0)}</div>
+               <div className="text-[10px] text-primary font-black uppercase tracking-widest mt-2">{availableSlots} SLOTS LIVE</div>
             </div>
-          </div>
-        </div>
+         </div>
+      </section>
 
-        {/* Info strip below hero */}
-        <div className="bg-white dark:bg-[#0d1a10] border-t-0 px-6 py-5">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            {/* Description */}
-            <div className="flex-1 min-w-0">
-              {turf.description ? (
-                <p className="text-sm text-black/65 dark:text-white/60 leading-relaxed">{turf.description}</p>
-              ) : (
-                <p className="text-sm text-black/45 dark:text-white/40">Premium sports turf with bookable hourly slots.</p>
-              )}
-
-              {/* Slot stats strip */}
-              <div className="mt-3 flex flex-wrap gap-2">
-                <div className="flex items-center gap-1.5 rounded-full bg-green-500/10 px-3 py-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-xs font-bold text-green-700 dark:text-green-300">{available} Available</span>
-                </div>
-                <div className="flex items-center gap-1.5 rounded-full bg-red-500/10 px-3 py-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
-                  <span className="text-xs font-bold text-red-700 dark:text-red-300">{booked} Booked</span>
-                </div>
-                <div className="flex items-center gap-1.5 rounded-full bg-slate-400/10 px-3 py-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
-                  <span className="text-xs font-bold text-slate-600 dark:text-slate-400">{blocked} Blocked</span>
-                </div>
-              </div>
+      <div className="grid lg:grid-cols-[1fr_400px] gap-12">
+         {/* 2. Left Column: Booking & Details */}
+         <div className="space-y-12">
+            
+            {/* Booking Interface */}
+            <div className="bg-white dark:bg-[#121A14] rounded-[3.5rem] border border-gray-100 dark:border-white/5 shadow-2xl overflow-hidden p-2">
+               <CalendarBooking
+                 turfId={turf.id}
+                 turfName={turf.name}
+                 turfOwnerId={turf.owner_id}
+                 pricePerSlot={Number(turf.price_per_slot)}
+                 slots={slots}
+                 location={turf.location}
+               />
             </div>
 
-            {/* Price badge */}
-            <div className="shrink-0">
-              <div className="rounded-2xl border border-green-500/20 bg-gradient-to-br from-green-500/10 to-green-700/5 p-4 text-center min-w-[120px]">
-                <div className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/35 mb-0.5">per slot</div>
-                <div className="text-3xl font-black text-[color:var(--primary)] leading-tight">
-                  ₹{Number(turf.price_per_slot).toFixed(0)}
-                </div>
-                <div className="text-[10px] text-black/40 dark:text-white/30 mt-0.5">incl. taxes</div>
-              </div>
+            {/* In-Depth Information (The "Insides") */}
+            <div className="bg-gray-50 dark:bg-white/2 rounded-[3.5rem] p-12 border border-gray-100 dark:border-white/5">
+               <h3 className="text-3xl font-black text-gray-900 dark:text-white italic uppercase tracking-tighter mb-10 flex items-center gap-4">
+                  VENUE INTEL <span className="h-0.5 flex-1 bg-gray-200 dark:bg-white/10" />
+               </h3>
+               
+               <div className="grid sm:grid-cols-2 gap-10 mb-16">
+                  <div className="space-y-6">
+                     <h4 className="text-sm font-black text-primary uppercase tracking-widest">DESCRIPTION</h4>
+                     <p className="text-sm font-medium text-gray-500 leading-relaxed italic">
+                        {turf.description || "This premier facility features high-density monofilament artificial grass, professional floodlights, and FIA-spec boundary systems. Perfect for high-intensity matches and tactical training sessions."}
+                     </p>
+                  </div>
+                  <div className="space-y-6">
+                       <h4 className="text-sm font-black text-primary uppercase tracking-widest text-center sm:text-left">AMENITIES</h4>
+                       <div className="grid grid-cols-2 gap-4">
+                          {AMENITIES.map((a, i) => (
+                            <div key={i} className="flex items-center gap-3 p-4 bg-white dark:bg-black/20 rounded-2xl border border-gray-100 dark:border-white/5">
+                               <a.icon className="w-5 h-5 text-primary" />
+                               <span className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400">{a.label}</span>
+                            </div>
+                          ))}
+                       </div>
+                  </div>
+               </div>
+
+               {/* Points/Credits Integration (Image 3 logic) */}
+               <div className="grid md:grid-cols-2 gap-8">
+                  <div className="p-8 bg-amber-500/5 border border-amber-500/10 rounded-[2.5rem] space-y-4">
+                     <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-amber-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20"><Zap className="w-6 h-6" /></div>
+                        <h4 className="text-lg font-black text-amber-600 uppercase tracking-tighter italic">TURFF CREDITS</h4>
+                     </div>
+                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-loose">EARN 10% CREDITS BACK ON THIS VENUE. USE THEM FOR FUTURE BOOKINGS OR SHOP AT OUR STORE.</p>
+                  </div>
+                  <div className="p-8 bg-blue-500/5 border border-blue-500/10 rounded-[2.5rem] space-y-4">
+                     <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20"><CreditCard className="w-6 h-6" /></div>
+                        <h4 className="text-lg font-black text-blue-600 uppercase tracking-tighter italic">SPLIT PAYMENT</h4>
+                     </div>
+                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-loose">BRING YOUR TRIBE. SPLIT THE FARE AUTOMATICALLY DURING CHECKOUT WITH JUST A PHONE NUMBER.</p>
+                  </div>
+               </div>
             </div>
-          </div>
-        </div>
+         </div>
+
+         {/* 3. Right Column: Static Details & Rules */}
+         <div className="space-y-8">
+            {/* Map Integration */}
+            <div className="rounded-[3rem] overflow-hidden border border-gray-100 dark:border-white/5 shadow-2xl h-[300px]">
+               <TurfMap locationName={turf.location} turfName={turf.name} />
+            </div>
+
+            {/* Venue Rules (Senior approach: high visibility) */}
+            <div className="bg-gray-50 dark:bg-white/2 rounded-[3.5rem] p-10 border border-gray-100 dark:border-white/5 space-y-8">
+               <h4 className="text-xl font-black text-gray-900 dark:text-white italic uppercase tracking-tighter flex items-center gap-3">
+                  <Info className="w-5 h-5 text-primary" /> HOUSE RULES
+               </h4>
+               <ul className="space-y-6">
+                  {[
+                    { label: "Check-in", sub: "Arrive 10m before kickoff", icon: Clock },
+                    { label: "Footwear", sub: "Studs permitted (Ag/Hg)", icon: Activity },
+                    { label: "Cancellation", sub: "100% refund before 24hrs", icon: ShieldCheck },
+                    { label: "Community", sub: "Respect the referee/owner", icon: Users }
+                  ].map((r, i) => (
+                    <li key={i} className="flex items-center gap-5 group">
+                       <div className="w-12 h-12 rounded-2xl bg-white dark:bg-[#1A241D] flex items-center justify-center text-gray-400 group-hover:text-primary transition-colors shadow-sm focus:scale-110"><r.icon className="w-5 h-5" /></div>
+                       <div>
+                          <div className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest">{r.label}</div>
+                          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 opacity-60">{r.sub}</div>
+                       </div>
+                    </li>
+                  ))}
+               </ul>
+            </div>
+
+            {/* Quick Share */}
+            <button className="w-full py-6 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 shadow-xl hover:scale-105 transition-all">
+               <Share2 className="w-5 h-5" /> BROADCAST VENUE
+            </button>
+         </div>
       </div>
-
-      {/* ── Two-column layout: Calendar + Map ── */}
-      <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
-
-        {/* Calendar */}
-        <CalendarBooking
-          turfId={turf.id}
-          turfName={turf.name}
-          turfOwnerId={turf.owner_id}
-          pricePerSlot={Number(turf.price_per_slot)}
-          slots={slots}
-          location={turf.location}
-        />
-
-        {/* Right column — Map + Amenities */}
-        <div className="grid gap-4 content-start">
-          {/* Map */}
-          <TurfMap locationName={turf.location} turfName={turf.name} />
-
-          {/* Quick Info */}
-          <div className="overflow-hidden rounded-2xl border border-black/5 bg-white shadow-sm dark:border-white/10 dark:bg-[#0d1a10]">
-            <div className="border-b border-black/5 dark:border-white/10 px-4 py-3">
-              <div className="text-sm font-black">🏟️ Turf Info</div>
-            </div>
-            <div className="p-4 grid gap-3">
-              {[
-                { label: "Sport", value: `${meta.icon} ${turf.sport_type}` },
-                { label: "Location", value: `📍 ${turf.location}` },
-                { label: "Price", value: `₹${Number(turf.price_per_slot).toFixed(0)} / slot` },
-                { label: "Total slots", value: `${slots.length} slots available` },
-              ].map((row) => (
-                <div key={row.label} className="flex items-center justify-between gap-2 text-sm">
-                  <span className="text-black/50 dark:text-white/40 font-semibold">{row.label}</span>
-                  <span className="font-bold text-right">{row.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div>
   );
 }

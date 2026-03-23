@@ -68,7 +68,7 @@ export default function CustomerDashboard() {
   const activeStats = (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <StatCard title="Total Reservations" value={bookings?.length ?? 0} icon={Calendar} trend={{ value: "+12%", isUp: true }} />
-      <StatCard title="Sessions Played" value={past.length} icon={Activity} />
+      <StatCard title="Turff Credits" value={Math.floor(totalSpent * 0.1 || 300)} icon={Zap} trend={{ value: "Earn 10%", isUp: true }} />
       <StatCard title="Total Investment" value={`₹${totalSpent.toLocaleString()}`} icon={CreditCard} />
     </div>
   );
