@@ -78,6 +78,30 @@
   color-scheme: dark;
 }
 
+/* ── ELITE UI UTILITIES ── */
+.glass-panel {
+  @apply bg-white/70 backdrop-blur-3xl border border-gray-100 dark:bg-black/40 dark:border-white/5;
+}
+
+.card-premium {
+  @apply bg-white dark:bg-[#121A14] rounded-[3.5rem] border border-gray-100 dark:border-white/5 shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_50px_100px_rgba(0,0,0,0.05)];
+}
+
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-emerald-600;
+}
+
+.btn-primary {
+  @apply px-8 py-4 bg-primary text-white font-black rounded-2xl shadow-xl shadow-green-500/20 hover:scale-105 active:scale-95 transition-all uppercase tracking-widest text-[10px] italic;
+}
+
+.btn-secondary {
+  @apply px-8 py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all uppercase tracking-widest text-[10px] italic;
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
 html { 
   scroll-behavior: smooth; 
   transition: color var(--transition-slow), background-color var(--transition-slow);
