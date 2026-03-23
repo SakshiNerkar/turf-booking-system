@@ -17,7 +17,8 @@ import {
   Zap,
   Coffee,
   Trophy,
-  Activity
+  Activity,
+  Share2
 } from "lucide-react";
 
 type Turf = {
