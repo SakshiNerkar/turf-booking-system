@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Plus, Settings, MapPin, Calendar, CreditCard, Activity, 
   Users, TrendingUp, BarChart3, RefreshCw, Trash2, Edit3,
-  Search, Filter, CheckCircle2, ChevronRight, ArrowLeft, Sparkles, 
+  Search, Filter, CheckCircle2, ChevronRight, ArrowLeft, ArrowRight, Sparkles, 
   MousePointer2, LogOut, Store, LayoutDashboard, Target, Zap, Globe, ShieldCheck
 } from "lucide-react";
 import { ChartProtocol, MiniSparkline } from "@/components/dashboard/ChartProtocol";
@@ -33,6 +33,7 @@ export default function OwnerDashboard() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const currentTab = searchParams.get("tab") || "overview";
+  const setTab = (t: string) => router.push(`/dashboard/owner?tab=${t}`);
 
   const [turfs, setTurfs] = useState<Turf[] | null>(null);
   const [bookings, setBookings] = useState<BookingItem[] | null>(null);
