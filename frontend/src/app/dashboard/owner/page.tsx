@@ -61,8 +61,6 @@ export default function OwnerDashboard() {
 
   useEffect(() => { loadData(); }, [user, token]);
 
-  const setTab = (t: string) => router.push(`/dashboard/owner?tab=${t}`);
-
   const handleCreateTurf = async () => {
     if (!token) return;
     setAddLoading(true);
