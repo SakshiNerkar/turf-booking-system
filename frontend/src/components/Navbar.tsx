@@ -27,89 +27,58 @@ export function Navbar() {
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           
           {/* Logo */}
-          <Link href="/" className="group flex items-center gap-3">
+          <Link href="/" className="group flex items-center gap-4">
             <motion.div 
               whileHover={{ rotate: 10, scale: 1.1 }}
-              className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-green-500 to-green-600 text-lg font-black text-white shadow-lg shadow-green-500/20"
+              className="grid h-12 w-12 place-items-center rounded-2xl bg-primary text-xl font-black text-white shadow-xl shadow-green-500/10 transition-all group-hover:shadow-green-500/30"
             >
               T
             </motion.div>
             <div className="hidden sm:block">
-              <div className="text-lg font-black tracking-tight leading-none text-gray-900 dark:text-gray-100">Turff</div>
-              <div className="text-[10px] font-bold text-green-600 uppercase tracking-widest leading-none mt-0.5">Premium Booking</div>
+              <div className="text-2xl font-black tracking-tighter italic text-gray-900 dark:text-white leading-none uppercase">Turff</div>
+              <div className="text-[9px] font-black text-primary uppercase tracking-[0.4em] leading-none mt-1.5 opacity-60 italic">Marketplace</div>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
-            <NavLink href="/turfs" active={isActive("/turfs")}>
-              <Search className="w-4 h-4" />
-              Browse
-            </NavLink>
-            {user && (
-              <NavLink href={`/dashboard/${user.role}`} active={isActive("/dashboard")}>
-                <LayoutDashboard className="w-4 h-4" />
-                Dashboard
-              </NavLink>
-            )}
-            {user?.role === "customer" && (
-              <NavLink href="/bookings" active={isActive("/bookings")}>
-                <ClipboardList className="w-4 h-4" />
-                Bookings
-              </NavLink>
-            )}
+          <nav className="hidden lg:flex items-center gap-4">
+             {[
+               { href: '/turfs', label: 'BROWSE ARENAS', icon: Search },
+               { href: '/dashboard/customer?tab=history', label: 'MATCH STATS', icon: ClipboardList },
+               { href: '/bookings', label: 'ACTIVE SLOTS', icon: LayoutDashboard }
+             ].map(link => (
+               <Link 
+                 key={link.href} href={link.href} 
+                 className={`flex items-center gap-3 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-transparent ${isActive(link.href) ? 'bg-primary/5 text-primary border-primary/20' : 'text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
+               >
+                 <link.icon className="w-4 h-4 opacity-70" /> {link.label}
+               </Link>
+             ))}
           </nav>
 
           {/* Right Section */}
-          <div className="hidden md:flex items-center gap-4">
-            {user && (
-               <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="relative p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5 transition-colors"
-               >
-                 <Bell className="w-5 h-5" />
-                 <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-[#121A14]" />
-               </motion.button>
-            )}
-
+          <div className="hidden md:flex items-center gap-6">
             {user ? (
-              <div className="flex items-center gap-3 pl-2 border-l border-gray-200 dark:border-white/10">
-                <div className="flex items-center gap-2.5">
-                  <div className="text-right hidden lg:block">
-                    <div className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-none">{user.name}</div>
-                    <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mt-1">{user.role}</div>
+               <div className="flex items-center gap-6 pl-6 border-l border-gray-100 dark:border-white/5">
+                  <div className="flex items-center gap-4 group cursor-pointer" onClick={() => router.push(`/dashboard/${user.role}`)}>
+                     <div className="text-right hidden xl:block">
+                        <div className="text-sm font-black text-gray-900 dark:text-white italic leading-none">{user.name.toUpperCase()}</div>
+                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1 opacity-60 italic">{user.role} RANK</div>
+                     </div>
+                     <div className="h-11 w-11 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 flex items-center justify-center font-black text-gray-400 group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
+                        {initials(user.name)}
+                     </div>
                   </div>
-                  <motion.div 
-                    whileHover={{ scale: 1.05 }}
-                    className="h-10 w-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-white/10 dark:to-white/5 flex items-center justify-center font-black text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10 shadow-sm"
-                  >
-                    {initials(user.name)}
-                  </motion.div>
-                </div>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => { logout(); router.push("/"); }}
-                  className="p-2 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-                  title="Logout"
-                >
-                  <LogOut className="w-5 h-5" />
-                </motion.button>
-              </div>
+                  <button onClick={() => { logout(); router.push("/"); }} className="p-3 rounded-2xl text-red-500 hover:bg-red-500/10 transition-colors active:scale-90"><LogOut className="w-5 h-5" /></button>
+               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <Link href="/login" className="px-5 py-2.5 text-sm font-bold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors">
-                  Login
-                </Link>
-                <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
-                  <Link href="/register" className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-xl shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all">
-                    Register
-                  </Link>
-                </motion.div>
-              </div>
+               <div className="flex items-center gap-4">
+                  <Link href="/login" className="px-6 py-2.5 text-[10px] font-black text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all uppercase tracking-widest">Login</Link>
+                  <Link href="/register" className="px-8 py-3 bg-primary text-white text-[10px] font-black rounded-xl shadow-2xl shadow-green-500/20 hover:scale-105 transition-all uppercase tracking-[0.2em] italic">GET STARTED</Link>
+               </div>
             )}
           </div>
+
 
           {/* Mobile Menu Button */}
           <motion.button
