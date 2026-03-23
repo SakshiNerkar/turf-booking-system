@@ -9,172 +9,108 @@ import {
 } from "lucide-react";
 import { apiFetch } from "../../lib/api";
 import { SkeletonCard, EmptyState } from "../../components/Skeletons";
-import { FilterProtocol } from "@/components/discovery/FilterProtocol";
-import dynamic from "next/dynamic";
 
-const MapView = dynamic(() => import("@/components/discovery/MapView").then(m => m.MapView), {
-  ssr: false,
-  loading: () => <div className="h-full w-full bg-gray-100 animate-pulse flex items-center justify-center text-[10px] font-black uppercase tracking-widest text-gray-400 italic">Sector Map Initializing...</div>
-});
-
-type Turf = {
-  id: string;
-  name: string;
-  location: string;
-  sport_type: string;
-  price_per_slot: string;
-  description: string | null;
-  rating?: number;
-};
-
-const SPORT_META: Record<string, { icon: string; accent: string; label: string }> = {
-  football:  { icon: "⚽", accent: "text-green-500", label: "PRO FIELD" },
-  cricket:   { icon: "🏏", accent: "text-amber-500", label: "ELITE PITCH" },
-  badminton: { icon: "🏸", accent: "text-blue-500", label: "SMASH COURT" },
-  tennis:    { icon: "🎾", accent: "text-orange-500", label: "GRAND SLAM" },
-};
-
-const AMENITIES = [
-  { icon: Zap, label: "Lighting" },
-  { icon: Target, label: "Pro Gear" },
-  { icon: BadgeCheck, label: "Secure" }
-];
+type Turf = { id: string; name: string; location: string; sport_type: string; price_per_slot: string; rating?: number; is_featured?: boolean; };
 
 export default function TurfsPage() {
-  const [turfs, setTurfs]     = useState<Turf[] | null>(null);
+  const [turfs, setTurfs] = useState<Turf[] | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showMap, setShowMap] = useState(false);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all");
 
-  const fetchTurfs = useCallback(async () => {
+  const loadTurfs = useCallback(async () => {
     setLoading(true);
-    const res = await apiFetch<Turf[]>("/api/turfs");
+    const res = await apiFetch<Turf[]>("/api/turfs?limit=50");
     setLoading(false);
     if (res.ok) setTurfs(res.data);
   }, []);
 
-  useEffect(() => { fetchTurfs(); }, [fetchTurfs]);
+  useEffect(() => { loadTurfs(); }, [loadTurfs]);
+
+  const filtered = useMemo(() => {
+    if (!turfs) return [];
+    return turfs.filter(t => {
+      const matchSearch = t.name.toLowerCase().includes(search.toLowerCase()) || 
+                          t.location.toLowerCase().includes(search.toLowerCase());
+      const matchFilter = filter === 'all' || t.sport_type.toLowerCase() === filter.toLowerCase();
+      return matchSearch && matchFilter;
+    });
+  }, [turfs, search, filter]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0B0F0C] transition-colors duration-500 relative">
-      
-      {/* MAP OVERLAY HUB */}
-      <AnimatePresence>
-        {showMap && turfs && <MapView turfs={turfs} onClose={() => setShowMap(false)} />}
-      </AnimatePresence>
-      
-      {/* Advanced Discovery Protocol (Integrated Filter Hub) */}
-      <FilterProtocol totalResults={turfs?.length || 0} />
-
-      <main className="max-w-[1800px] mx-auto pb-40">
-         
-         {/* Sector Header: Visual Hierarchy Upgrade */}
-         <header className="px-8 lg:px-12 py-20 flex flex-col md:flex-row md:items-end justify-between gap-12 border-b border-gray-100 dark:border-white/5">
-            <div className="space-y-6">
-               <div className="flex items-center gap-4">
-                  <span className="px-6 py-2 bg-primary/10 text-primary text-[10px] font-black rounded-xl uppercase tracking-[0.4em] italic border border-primary/20">Discovery Stream Active</span>
-                  <div className="flex gap-1">
-                     {[1,2,3].map(i => <div key={i} className="w-1.5 h-1.5 rounded-full bg-primary/40" />)}
-                  </div>
-               </div>
-               <h2 className="text-6xl md:text-8xl font-black text-gray-900 dark:text-white italic tracking-tighter leading-none uppercase">Combat <br /> Sectors</h2>
-               <div className="flex items-center gap-8 text-[11px] font-black text-gray-400 uppercase tracking-[0.4em] italic leading-none">
-                  ARENA LOGS INITIALIZED · {turfs?.length || 0} SECTORS DETECTED
-               </div>
-            </div>
-            <div className="flex flex-col items-end gap-3 text-right hidden sm:block">
-               <button onClick={() => setShowMap(true)} className="flex items-center gap-4 px-8 py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] font-black rounded-2xl uppercase tracking-[0.2em] shadow-2xl hover:scale-105 transition-all italic mb-4">
-                 <MapIcon className="w-4 h-4" /> SECTOR MAP
-               </button>
-               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-loose max-w-xs opacity-60 italic">Optimizing arena selection logs based on your tactical filter selections.</p>
-               <button onClick={fetchTurfs} className="p-3.5 rounded-2xl bg-gray-50 dark:bg-white/5 text-gray-400 hover:text-primary transition-all shadow-sm"><RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} /></button>
-            </div>
-         </header>
-
-         {/* Sector Grid Hub */}
-         <div className="px-8 lg:px-12 mt-20">
-            {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
-                 {[1,2,3,4,5,6,7,8].map(i => <SkeletonCard key={i} />)}
+    <div className="min-h-screen bg-gray-50/50 dark:bg-[#0B0F0C] pt-28 pb-32">
+      <div className="container-custom space-y-12">
+        
+        {/* 1. DISCOVERY HEADER (Clean High-Contrast) */}
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-10 px-4">
+           <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                 <span className="px-5 py-2 bg-primary/10 text-primary text-[10px] font-black rounded-xl uppercase tracking-[0.4em] italic shadow-sm">Sector Registry Active</span>
+                 <span className="flex h-2 w-2 rounded-full bg-primary animate-ping" />
               </div>
-            ) : (!turfs || turfs.length === 0) ? (
-              <EmptyState 
-                title="Sector Null Data"
-                sub="No matching combat sectors found in the current tactical coordinates. Try adjusting your sport filters or distance protocols."
-                icon={Search}
-                actionLabel="FORMAT ALL PROTOCOLS"
-                actionLink="/turfs"
+              <h1 className="text-6xl md:text-8xl font-black italic tracking-tighter leading-none uppercase text-gray-900 dark:text-white">Discover <span className="text-primary">Sectors</span></h1>
+              <p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40 leading-loose max-w-sm italic">Locate regional sports arenas with verified slot-timing protocols.</p>
+           </div>
+           
+           <div className="flex flex-wrap items-center gap-4 bg-white dark:bg-[#1a241c] p-3 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl">
+              {['all', 'football', 'cricket', 'badminton'].map(s => (
+                <button 
+                  key={s} 
+                  onClick={() => setFilter(s)}
+                  className={`px-8 py-3.5 rounded-[1.75rem] text-[10px] font-black uppercase tracking-[0.4em] transition-all ${filter === s ? 'bg-primary text-white shadow-xl scale-110' : 'text-gray-400 hover:text-primary hover:bg-white/5'}`}
+                >
+                   {s}
+                </button>
+              ))}
+           </div>
+        </header>
+
+        {/* 2. SEARCH ENGINE (Premium Pill) */}
+        <section className="px-4">
+           <div className="relative group max-w-4xl">
+              <Search className="absolute left-10 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 font-extrabold group-focus-within:text-primary transition-all" />
+              <input 
+                value={search} onChange={e => setSearch(e.target.value)}
+                placeholder="Search Arena Identity or Regional Coords..." 
+                className="w-full pl-24 pr-10 py-8 bg-white dark:bg-[#1a241c] border-4 border-transparent focus:border-primary/10 rounded-[4rem] text-sm font-black uppercase tracking-widest outline-none transition-all shadow-2xl italic placeholder:text-gray-300" 
               />
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 lg:gap-16">
-                 {turfs.map(t => {
-                   const meta = SPORT_META[t.sport_type?.toLowerCase()] ?? { icon: "🏟️", accent: "text-gray-500", label: "GENERIC" };
-                   return (
-                     <div key={t.id} className="group bg-white dark:bg-[#121A14] rounded-[4.5rem] border border-gray-100 dark:border-white/5 overflow-hidden shadow-[0_40px_80px_rgba(0,0,0,0.05)] hover:-translate-y-4 hover:shadow-[0_80px_160px_rgba(0,0,0,0.1)] transition-all flex flex-col h-full relative">
-                        
-                        {/* Visual Identity Layer */}
-                        <div className="h-80 relative overflow-hidden">
-                           <img src={`https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=800&auto=format&fit=crop`} alt={t.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-125 transition-all duration-[3s]" />
-                           <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
-                           
-                           {/* Rating Protocol Badge */}
-                           <div className="absolute top-10 right-10 h-16 w-16 rounded-[2.5rem] bg-white/95 dark:bg-black/95 backdrop-blur-3xl flex flex-col items-center justify-center font-black text-primary shadow-2xl border border-white/20 group-hover:rotate-[360deg] transition-all duration-1000">
-                              <Star className="w-4 h-4 mb-0.5 fill-current" />
-                              <span className="text-sm">4.9</span>
-                           </div>
-                           
-                           <div className="absolute bottom-10 left-10 flex flex-wrap gap-3">
-                              <span className={`px-6 py-2.5 bg-white dark:bg-black/80 text-[9px] font-black rounded-xl uppercase tracking-widest italic shadow-2xl flex items-center gap-3 border border-white/5`}>
-                                 <span className="text-xl leading-none">{meta.icon}</span> 
-                                 <span className={meta.accent}>{meta.label}</span>
-                              </span>
-                              <span className="px-6 py-2.5 bg-primary text-white text-[9px] font-black rounded-xl uppercase tracking-widest shadow-2xl border border-white/10 flex items-center gap-2"><BadgeCheck className="w-4 h-4" /> VERIFIED</span>
-                           </div>
-                        </div>
+           </div>
+        </section>
 
-                        {/* Tactical Content Depth */}
-                        <div className="p-12 flex-1 flex flex-col justify-between space-y-12">
-                           <div className="space-y-6 text-left">
-                              <h4 className="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tighter leading-tight group-hover:text-primary transition-colors italic line-clamp-2">{t.name}</h4>
-                              <div className="flex items-center gap-4 text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none bg-gray-50 dark:bg-white/2 p-4 rounded-2xl w-fit">
-                                 <MapPin className="w-4 h-4 text-primary" /> {t.location}
-                              </div>
-                           </div>
-
-                           {/* Intel Icons Integration */}
-                           <div className="flex gap-8 py-8 border-y border-gray-100 dark:border-white/5">
-                              {AMENITIES.map((a, i) => (
-                                <div key={i} className="flex flex-col items-center gap-3 group/icon">
-                                   <div className="w-12 h-12 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center text-gray-400 group-hover/icon:bg-primary/10 group-hover/icon:text-primary transition-all border border-transparent group-hover/icon:border-primary/20">
-                                      <a.icon className="w-5 h-5" />
-                                   </div>
-                                   <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest opacity-0 group-hover/icon:opacity-100 transition-opacity whitespace-nowrap">{a.label}</span>
-                                </div>
-                              ))}
-                           </div>
-
-                           {/* Financial & Slot Execution */}
-                           <div className="flex items-center justify-between gap-6">
-                              <div className="text-left">
-                                 <div className="text-3xl font-black text-gray-900 dark:text-white italic tracking-tighter uppercase leading-none">₹{Number(t.price_per_slot).toLocaleString()}</div>
-                                 <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-2 italic opacity-60">Per 60m session</div>
-                              </div>
-                              <Link href={`/turfs/${t.id}`} className="px-12 py-7 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] font-black rounded-[2rem] uppercase tracking-[0.3em] shadow-2xl hover:scale-110 active:scale-95 transition-all italic flex items-center gap-4">
-                                 RESERVE <ArrowRight className="w-5 h-5" />
-                              </Link>
-                           </div>
-                        </div>
-                        
-                        {/* Layout Grid Overlay */}
-                        <div className="absolute inset-0 bg-primary/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                        <div className="absolute top-0 right-0 p-12 opacity-0 group-hover:opacity-5 transition-all group-hover:scale-110 pointer-events-none shadow-2xl"><Sparkles className="w-64 h-64 text-primary" /></div>
+        {/* 3. SECTOR GRID (Vertical Stack Priority) */}
+        <section className="px-4">
+           {loading ? (
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                {[1,2,3,4,5,6].map(i => <SkeletonCard key={i} />)}
+             </div>
+           ) : filtered.length === 0 ? (
+             <EmptyState title="No Sectors Found" sub="Your discovery parameters matched zero regional records. Resetting filters is recommended." icon={Filter} actionLabel="CLEAR SEARCH" />
+           ) : (
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                {filtered.map(t => (
+                  <Link key={t.id} href={`/turfs/${t.id}`} className="group relative bg-white dark:bg-[#1a241c] rounded-[4.5rem] border border-gray-100 dark:border-white/5 overflow-hidden shadow-2xl hover:-translate-y-4 hover:shadow-[0_80px_160px_rgba(0,0,0,0.1)] transition-all flex flex-col h-[520px]">
+                     <div className="h-2/3 relative">
+                        <img src="https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-[2s]" alt={t.name} />
+                        <div className="absolute top-10 right-10 px-6 py-3 bg-white/95 dark:bg-black/95 backdrop-blur-3xl rounded-[1.25rem] font-black text-primary text-[10px] shadow-2xl group-hover:rotate-6 border border-white/20">★ {t.rating || '4.8'}</div>
+                        <div className="absolute inset-0 bg-primary/2 opacity-0 group-hover:opacity-100 transition-opacity" />
                      </div>
-                   );
-                 })}
-              </div>
-            )}
-         </div>
-      </main>
+                     <div className="p-12 space-y-6 flex-1 flex flex-col justify-between">
+                        <div className="space-y-3">
+                           <h4 className="text-3xl font-black text-gray-900 dark:text-white uppercase italic tracking-tighter leading-none group-hover:text-primary transition-colors">{t.name}</h4>
+                           <div className="flex items-center gap-4 text-[10px] font-black text-gray-400 uppercase tracking-widest italic opacity-60"><MapPin className="w-4 h-4 text-primary" /> {t.location}</div>
+                        </div>
+                        <div className="flex items-center justify-between pt-8 border-t border-gray-100 dark:border-white/5">
+                           <div className="text-3xl font-black text-gray-900 dark:text-white italic tracking-tighter">₹{t.price_per_slot}<span className="text-[10px] not-italic opacity-40">/HR</span></div>
+                           <button className="px-10 py-5 bg-primary text-white text-[10px] font-black rounded-[1.5rem] uppercase tracking-widest shadow-2xl hover:scale-110 transition-all italic flex items-center gap-4">VIEW SLOTS <ArrowRight className="w-5 h-5" /></button>
+                        </div>
+                     </div>
+                  </Link>
+                ))}
+             </div>
+           )}
+        </section>
 
+      </div>
     </div>
   );
 }
