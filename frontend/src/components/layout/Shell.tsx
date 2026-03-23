@@ -8,6 +8,7 @@ import PageTransition from "../PageTransition";
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith('/dashboard');
+  const isLandingPage = pathname === '/';
 
   if (isDashboard) {
     return (
@@ -25,7 +26,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
           {children}
         </PageTransition>
       </main>
-      <Footer />
+      {isLandingPage && <Footer />}
     </div>
   );
 }
+
