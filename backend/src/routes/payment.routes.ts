@@ -5,7 +5,7 @@ import { requireRole } from "../middleware/role.middleware";
 
 export const paymentRouter = Router();
 
-paymentRouter.post("/", requireAuth, requireRole(["customer"]), (req, res, next) => {
+paymentRouter.post("/", requireAuth, requireRole(["user"]), (req, res, next) => {
   createPayment(req, res).catch(next);
 });
 

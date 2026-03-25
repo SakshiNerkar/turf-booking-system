@@ -32,7 +32,7 @@ export async function getTurfSlots(req: Request, res: Response) {
   const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
   const { date } = z.object({ date: z.string().optional() }).parse(req.query);
   
-  const targetDate = date || new Date().toISOString().split('T')[0];
+  const targetDate: string = date || new Date().toISOString().split('T')[0];
   const result = await getTurfSlotsService(id, targetDate);
   return sendOk(res, result);
 }

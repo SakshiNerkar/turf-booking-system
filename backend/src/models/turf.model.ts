@@ -68,6 +68,10 @@ export async function deleteTurf(id: string) {
   await pool.query(`delete from turfs where id = $1`, [id]);
 }
 
+export async function adminDeactivateTurf(id: string) {
+  await deleteTurf(id);
+}
+
 export async function getTurfsByOwner(ownerId: string) {
   const res = await pool.query<TurfRow>(`select * from turfs where owner_id = $1`, [ownerId]);
   return res.rows;
@@ -79,7 +83,7 @@ export async function updateTurfRating(id: string) {
     `select avg(rating) as avg, count(*) as count from reviews where turf_id = $1`,
     [id]
   );
-  const { avg, count } = res.rows[0];
+  const { avg, count } = res.rows[0] || { avg: 4.5, count: 0 };
   await pool.query(
     `update turfs set rating = $1, total_reviews = $2 where id = $3`,
     [avg || 4.5, count || 0, id]

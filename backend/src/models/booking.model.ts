@@ -30,6 +30,11 @@ export async function createBooking(input: Omit<BookingRow, "id" | "created_at" 
   return res.rows[0]!;
 }
 
+export async function getBookingById(id: string) {
+  const res = await pool.query<BookingRow>(`select * from bookings where id = $1`, [id]);
+  return res.rows[0] || null;
+}
+
 export async function getBookingsByTurfAndDate(turfId: string, date: string) {
   const res = await pool.query<BookingRow>(
     `select * from bookings where turf_id = $1 and date = $2 and status != 'cancelled'`,
@@ -65,4 +70,8 @@ export async function listBookingsForOwner(ownerId: string) {
 
 export async function updateBookingStatus(id: string, status: string) {
   await pool.query(`update bookings set status = $1 where id = $2`, [status, id]);
+}
+
+export async function setBookingPaymentStatus(id: string, status: string) {
+  await updateBookingStatus(id, status);
 }
