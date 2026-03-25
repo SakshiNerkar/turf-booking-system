@@ -70,7 +70,7 @@ export default function LandingPage() {
           
           {/* Static Fallback (Always visible to prevent gray flickers) */}
           <img 
-            src={HERO_IMAGES[0]} 
+            src="/images/hero-fallback.png" 
             className="absolute inset-0 w-full h-full object-cover"
             alt="Sports Arena Initial"
           />
