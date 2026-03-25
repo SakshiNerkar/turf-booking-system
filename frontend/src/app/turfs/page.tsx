@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import { apiFetch } from "../../lib/api";
 import { SkeletonCard, EmptyState } from "../../components/Skeletons";
-import { SkeletonCard, EmptyState } from "../../components/Skeletons";
 import { MultiTurfMap } from "../../components/MultiTurfMap";
 
 type Turf = { id: string; name: string; location: string; sport_type: string; price_per_slot: string; rating?: number; is_featured?: boolean; };
