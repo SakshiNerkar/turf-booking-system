@@ -66,8 +66,16 @@ export default function LandingPage() {
       <section className="relative h-[90vh] min-h-[700px] flex items-center justify-center overflow-hidden">
         {/* Animated Background Carousel */}
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-black/60 z-10" />
-          <AnimatePresence initial={false}>
+          <div className="absolute inset-0 bg-black/40 z-10" />
+          
+          {/* Static Fallback (Always visible to prevent gray flickers) */}
+          <img 
+            src={HERO_IMAGES[0]} 
+            className="absolute inset-0 w-full h-full object-cover"
+            alt="Sports Arena Initial"
+          />
+
+          <AnimatePresence>
             <motion.img 
               key={heroIndex}
               src={HERO_IMAGES[heroIndex]} 
