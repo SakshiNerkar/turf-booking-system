@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   MapPin, Search, Star, ArrowRight, CheckCircle2, 
-  Calendar, ShieldCheck, Clock, Users, Trophy, 
+  Calendar, ShieldCheck, Clock, Users, Trophy, Target,
   Zap, CreditCard, Activity, ChevronRight
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
