@@ -41,61 +41,80 @@ export default function TurfsPage() {
   }, [turfs, search, filter]);
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-[#0B0F0C] transition-colors duration-300">
-
-      <div className="container-compact py-8 md:py-16 space-y-10 pb-32 md:pb-16 relative">
+    <div className="min-h-screen bg-stadium-texture dark:bg-[#0B0F0C] transition-colors duration-300">
+      <div className="container-premium py-10 space-y-8 pb-32 relative">
         
-        {/* Breadcrumbs */}
-        <div className="hidden md:flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-           <Link href="/" className="hover:text-primary transition-colors">Home</Link>
-           <span>/</span>
-           <span className="text-gray-900 dark:text-gray-100">Discover Arenas</span>
-        </div>
-
-        {/* 1. DISCOVERY HEADER & TOGGLE */}
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pt-2">
-           <div className="space-y-3">
-              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">Find <span className="text-primary italic">Arenas</span></h1>
-              <p className="text-sm font-medium text-gray-500 max-w-sm">Locate verified sports arenas and lock your match slot instantly.</p>
+        {/* DISCOVERY HEADER & TOGGLE */}
+        <motion.header 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col md:flex-row md:items-center justify-between gap-6"
+        >
+           <div className="space-y-1">
+              <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-gray-900 dark:text-gray-100 uppercase italic">
+                Find <span className="text-primary">Arenas</span>
+              </h1>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Locate. Select. Dominate.</p>
            </div>
            
            <div className="flex items-center gap-4">
-              <div className="flex bg-white dark:bg-card p-1 rounded-xl shadow-sm border border-border">
-                 <button onClick={() => setViewMode("list")} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${viewMode === "list" ? "bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white" : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"}`}><List className="w-4 h-4" /> <span className="hidden sm:inline">List</span></button>
-                 <button onClick={() => setViewMode("map")} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${viewMode === "map" ? "bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white" : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"}`}><MapIcon className="w-4 h-4" /> <span className="hidden sm:inline">Map</span></button>
+              <div className="flex bg-white/50 dark:bg-card/50 backdrop-blur-md p-1 rounded-2xl shadow-sm border border-border">
+                <button 
+                  onClick={() => setViewMode("list")} 
+                  className={`flex items-center gap-2 px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === "list" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-gray-500 hover:text-gray-900 dark:hover:text-white"}`}
+                >
+                  <List className="w-3.5 h-3.5" /> List view
+                </button>
+                <button 
+                  onClick={() => setViewMode("map")} 
+                  className={`flex items-center gap-2 px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === "map" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-gray-500 hover:text-gray-900 dark:hover:text-white"}`}
+                >
+                  <MapIcon className="w-3.5 h-3.5" /> Map view
+                </button>
               </div>
            </div>
-        </header>
+        </motion.header>
 
-        {/* 2. SEARCH & FILTER BAR */}
-        <section className="sticky top-16 z-40 py-2 bg-gray-50/90 dark:bg-[#0B0F0C]/90 backdrop-blur-md">
-           <div className="flex flex-col md:flex-row gap-4">
-              <div className="relative group w-full md:w-2/3">
-                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 font-bold group-focus-within:text-primary transition-all" />
+        {/* 2. FLOATING SEARCH & PILL FILTERS */}
+        <section className="sticky top-20 z-40 space-y-4">
+           <motion.div 
+             initial={{ opacity: 0, scale: 0.95 }}
+             animate={{ opacity: 1, scale: 1 }}
+             className="floating-search"
+           >
+              <div className="relative group w-full">
+                 <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary transition-all" />
                  <input 
                    value={search} onChange={e => setSearch(e.target.value)}
                    placeholder="Search venue or location... 'Pune'" 
-                   className="w-full pl-14 pr-6 py-4 bg-white dark:bg-card border border-border focus:border-primary/40 rounded-2xl text-sm font-semibold outline-none transition-all shadow-sm placeholder:text-gray-400 text-gray-900 dark:text-white" 
+                   className="w-full pl-12 pr-6 py-3 bg-transparent text-sm font-bold outline-none placeholder:text-gray-400 text-gray-900 dark:text-white group-focus-within:translate-x-1 transition-transform" 
                  />
               </div>
-              <div className="flex gap-2 w-full md:w-1/3 overflow-x-auto no-scrollbar pb-2 md:pb-0">
-                 {['all', 'football', 'cricket', 'badminton'].map(s => (
-                   <button 
-                     key={s} 
-                     onClick={() => setFilter(s)}
-                     className={`flex-1 min-w-[100px] px-4 py-4 rounded-2xl text-xs font-bold capitalize transition-all border shadow-sm flex items-center justify-center gap-2 ${filter === s ? 'bg-primary text-white border-primary shadow-primary/20' : 'bg-white dark:bg-card text-gray-600 border-border hover:border-primary/40'}`}
-                   >
-                      {s === 'all' && <Filter className="w-4 h-4" />}
-                      {s}
-                   </button>
-                 ))}
-              </div>
+              <div className="hidden md:block w-px h-8 bg-border" />
+              <button 
+                onClick={loadTurfs}
+                className="btn-premium-primary !py-2.5 !px-6 !text-[10px] shadow-sm w-full md:w-auto"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Update
+              </button>
+           </motion.div>
+
+           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2">
+              {['all', 'football', 'cricket', 'badminton'].map(s => (
+                <button 
+                  key={s} 
+                  onClick={() => setFilter(s)}
+                  className={`pill-filter ${filter === s ? 'pill-filter-active' : 'bg-white/50 dark:bg-card/50 text-gray-500 hover:border-primary/50'}`}
+                >
+                   {s}
+                </button>
+              ))}
            </div>
         </section>
 
-        <div className="flex items-center justify-between text-sm font-bold text-gray-500 pt-4">
-           <span>Showing <strong className="text-gray-900 dark:text-white">{filtered.length}</strong> arenas</span>
-           <button className="flex items-center gap-2 hover:text-primary transition-colors">Sort: Popular <ChevronDown className="w-4 h-4" /></button>
+        <div className="flex items-center justify-between text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">
+           <span className="flex items-center gap-2">Showing <strong className="text-gray-900 dark:text-white text-xs tracking-tighter">{filtered.length}</strong> available results</span>
+           <button className="flex items-center gap-2 hover:text-primary transition-colors">Sort: Popular <ChevronDown className="w-3 h-3" /></button>
         </div>
 
         {/* 3. SECTOR GRID (High Conversion Cards) */}

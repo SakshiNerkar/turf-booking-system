@@ -60,6 +60,11 @@ body {
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
 
+.bg-stadium-texture {
+  background-image: radial-gradient(circle at 2px 2px, rgba(46, 125, 50, 0.05) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
 .hero-gradient {
   background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8));
 }
@@ -72,12 +77,16 @@ body {
   @apply bg-card border border-border rounded-2xl p-6 transition-all duration-300 hover:shadow-premium-hover shadow-premium hover:-translate-y-2 relative overflow-hidden;
 }
 
+.stat-card-premium {
+  @apply bg-card/60 backdrop-blur-md border border-border rounded-2xl p-6 transition-all duration-500 hover:shadow-2xl hover:bg-card hover:-translate-y-1 relative group;
+}
+
 .btn-premium-primary {
-  @apply px-8 py-4 bg-gradient-to-br from-primary to-primary-hover text-white font-bold rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-xl shadow-primary/20 hover:shadow-primary/40 flex items-center justify-center gap-3 text-base;
+  @apply px-8 py-3.5 bg-gradient-to-br from-primary to-primary-hover text-white font-black rounded-xl transition-all duration-500 hover:scale-105 active:scale-95 shadow-xl shadow-primary/20 hover:shadow-primary/40 flex items-center justify-center gap-3 text-sm uppercase tracking-widest;
 }
 
 .btn-premium-outline {
-  @apply px-8 py-4 bg-transparent text-foreground font-bold rounded-xl border-2 border-primary/30 transition-all duration-300 hover:bg-primary/5 hover:border-primary active:scale-95 flex items-center justify-center gap-3 text-base;
+  @apply px-8 py-3.5 bg-transparent text-foreground font-black rounded-xl border-2 border-primary/30 transition-all duration-500 hover:bg-primary/5 hover:border-primary active:scale-95 flex items-center justify-center gap-3 text-sm uppercase tracking-widest;
 }
 
 .glass-panel {
@@ -85,7 +94,28 @@ body {
 }
 
 .floating-search {
-  @apply bg-white/70 backdrop-blur-xl border border-white/20 dark:bg-[#0B0F0C]/80 dark:border-white/5 rounded-2xl shadow-2xl border-border/50 p-2 md:p-4 flex flex-col md:flex-row gap-3 items-center w-full max-w-5xl mx-auto;
+  @apply bg-white/80 backdrop-blur-2xl border border-white/30 dark:bg-[#0B0F0C]/60 dark:border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] p-2 md:p-3 flex flex-col md:flex-row gap-2 items-center w-full max-w-5xl mx-auto transition-all duration-500;
+}
+
+.pill-filter {
+  @apply px-5 py-2 rounded-full border border-border text-xs font-black uppercase tracking-widest transition-all duration-300 hover:scale-105 active:scale-95;
+}
+
+.pill-filter-active {
+  @apply bg-primary text-white border-primary shadow-lg shadow-primary/20;
+}
+
+.step-ring {
+  @apply w-16 h-16 rounded-full border-2 border-primary/20 flex items-center justify-center relative transition-all duration-500 group-hover:border-primary group-hover:shadow-[0_0_20px_rgba(46,125,50,0.3)];
+}
+
+.step-ring::after {
+  content: '';
+  @apply absolute inset-0 rounded-full border-2 border-primary border-t-transparent opacity-0 transition-all duration-700 group-hover:opacity-100 group-hover:rotate-180;
+}
+
+.cta-integrated {
+  @apply bg-gradient-to-br from-gray-900 via-[#121A14] to-black rounded-[2rem] overflow-hidden relative border border-white/5;
 }
 
 /* ── ANIMATIONS ── */
@@ -98,6 +128,10 @@ body {
   animation: slow-zoom 20s infinite alternate linear;
 }
 
-/* ── NO SCROLLBAR ── */
+/* ── CUSTOM SCROLLBAR / UTILS ── */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+.underline-slide {
+  @apply relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full;
+}

@@ -64,29 +64,31 @@ export default function LandingPage() {
 
       {/* 1. HERO SECTION */}
       <section className="relative h-[90vh] min-h-[700px] flex items-center justify-center overflow-hidden">
-        {/* Animated Background Carousel */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-black/40 z-10" />
+        {/* Layered Background Carousel (Zero-glitch Architecture) */}
+        <div className="absolute inset-0 z-0 bg-black">
+          {/* Overlay mask for legibility */}
+          <div className="absolute inset-0 bg-black/40 z-20 pointer-events-none" />
           
-          {/* Static Fallback (Always visible to prevent gray flickers) */}
+          {/* Layered Sports Imagery */}
+          {[...HERO_IMAGES].map((img, i) => (
+            <motion.img 
+              key={img}
+              src={img} 
+              initial={false}
+              animate={{ opacity: i === heroIndex ? 1 : 0 }}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
+              className="absolute inset-0 w-full h-full object-cover z-0"
+              alt={`Arena Layer ${i}`}
+              loading="eager"
+            />
+          ))}
+
+          {/* Fallback base layer always at the bottom if anything fails */}
           <img 
             src="/images/hero-fallback.png" 
-            className="absolute inset-0 w-full h-full object-cover"
-            alt="Sports Arena Initial"
+            className="absolute inset-0 w-full h-full object-cover z-[-1] opacity-50"
+            alt="Arena Fallback"
           />
-
-          <AnimatePresence>
-            <motion.img 
-              key={heroIndex}
-              src={HERO_IMAGES[heroIndex]} 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.5, ease: "linear" }}
-              className="absolute inset-0 w-full h-full object-cover"
-              alt="Sports Arena"
-            />
-          </AnimatePresence>
         </div>
 
         <div className="container-premium relative z-20 text-center px-4">
@@ -241,112 +243,111 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* 4. WHY CHOOSE US */}
-      <section className="py-24 bg-gray-50 dark:bg-primary/5 border-y border-border">
-        <div className="container-premium space-y-16">
-          <div className="text-center space-y-4 max-w-2xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tight">Why Play With <span className="text-primary italic">Us?</span></h2>
-            <p className="text-gray-500 font-medium">We've built the ultimate ecosystem for athletes and arena owners.</p>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-8">
+      {/* 4. STATS SECTION (Compact Card Layout) */}
+      <section className="py-12 bg-stadium-texture border-y border-border">
+        <div className="container-premium">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { icon: Zap, title: "Instant Booking", desc: "No phone calls. No waiting. Just pick a slot and play." },
-              { icon: ShieldCheck, title: "Verified Turfs", desc: "Every arena on our platform is hand-picked and verified." },
-              { icon: CreditCard, title: "Secure Payments", desc: "Integrated UPI and Card payments with instant confirmation." },
-              { icon: Clock, title: "Flexi-Slots", desc: "Need 60, 90, or 120 mins? We support dynamic durations." }
-            ].map((f, i) => (
+              { v: "10K+", l: "Athletes Joined", icon: Users },
+              { v: "500+", l: "Premium Arenas", icon: Target },
+              { v: "50K+", l: "Matches Played", icon: Trophy },
+              { v: "4.9/5", l: "User Rating", icon: Star }
+            ].map((s, i) => (
               <motion.div 
-                key={i} 
-                whileHover={{ y: -10 }}
-                className="bg-card p-8 rounded-2xl border border-border shadow-sm text-center space-y-4 hover:shadow-xl transition-all"
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                viewport={{ once: true }}
+                className="stat-card-premium"
               >
-                <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto">
-                  <f.icon className="w-7 h-7" />
+                <div className="flex flex-col items-center text-center space-y-2">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-1 group-hover:scale-110 transition-transform">
+                    <s.icon className="w-5 h-5" />
+                  </div>
+                  <div className="text-3xl font-black tracking-tighter group-hover:text-primary transition-colors">{s.v}</div>
+                  <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{s.l}</div>
                 </div>
-                <h4 className="text-lg font-black uppercase italic tracking-tight">{f.title}</h4>
-                <p className="text-sm text-gray-500 font-medium leading-relaxed">{f.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 5. HOW IT WORKS */}
-      <section className="py-24 container-premium">
-        <div className="flex flex-col items-center text-center space-y-16">
-          <div className="space-y-4">
-            <h2 className="text-4xl font-black italic uppercase tracking-tight">The <span className="text-primary italic">Protocol</span></h2>
-            <p className="text-gray-500 uppercase text-xs font-bold tracking-[0.3em]">Three simple steps to the pitch</p>
+      {/* 5. HOW IT WORKS (The Protocol) */}
+      <section className="py-12 container-premium overflow-hidden">
+        <div className="flex flex-col items-center text-center space-y-10">
+          <div className="space-y-2">
+            <h2 className="text-3xl font-black italic uppercase tracking-tight">The <span className="text-primary">Protocol</span></h2>
+            <p className="text-gray-500 uppercase text-[10px] font-black tracking-[0.3em]">Three simple steps to the pitch</p>
           </div>
 
-          <div className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-24 relative w-full">
-            {/* Connectors (Desktop) */}
-            <div className="hidden md:block absolute top-12 left-1/4 right-1/4 h-0.5 border-t-2 border-dashed border-border z-0" />
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-20 relative w-full max-w-4xl">
+            {/* Animated Progress Line (Horizontal) */}
+            <motion.div 
+              initial={{ width: 0 }}
+              whileInView={{ width: "66%" }}
+              transition={{ duration: 1.5, delay: 0.5 }}
+              viewport={{ once: true }}
+              className="hidden md:block absolute top-8 left-[17%] h-0.5 border-t-2 border-dashed border-primary/30 z-0" 
+            />
 
             {[
-              { step: "01", icon: Search, label: "Search", sub: "Find arenas near you" },
-              { step: "02", icon: Calendar, label: "Select Slot", sub: "Choose time & date" },
-              { step: "03", icon: Trophy, label: "Win / Play", sub: "Show up and dominate" }
+              { step: "01", icon: Search, label: "Explore", sub: "Find arenas near you" },
+              { step: "02", icon: Calendar, label: "Select", sub: "Pick your prime time" },
+              { step: "03", icon: Trophy, label: "Dominate", sub: "Show up and win" }
             ].map((s, i) => (
-              <div key={i} className="relative z-10 flex flex-col items-center space-y-6">
-                <div className="w-24 h-24 bg-card border-4 border-primary rounded-full flex items-center justify-center shadow-xl group hover:scale-110 transition-transform">
-                  <s.icon className="w-10 h-10 text-primary" />
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-xs font-black italic">
+              <motion.div 
+                key={i} 
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ delay: i * 0.2 }}
+                viewport={{ once: true }}
+                className="relative z-10 flex flex-col items-center space-y-4 group cursor-default"
+              >
+                <div className="step-ring">
+                   <s.icon className="w-6 h-6 text-primary group-hover:rotate-12 transition-transform duration-500" />
+                   <div className="absolute -top-1 -right-1 w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-[9px] font-black italic shadow-lg group-hover:bg-primary transition-colors">
                     {s.step}
                   </div>
                 </div>
-                <div className="text-center">
-                  <h4 className="text-xl font-black uppercase italic tracking-tight">{s.label}</h4>
-                  <p className="text-sm text-gray-500 font-medium">{s.sub}</p>
+                <div className="text-center space-y-1">
+                  <h4 className="text-sm font-black uppercase italic tracking-tight group-hover:text-primary transition-colors">{s.label}</h4>
+                  <p className="text-[11px] text-gray-400 font-bold leading-tight max-w-[120px]">{s.sub}</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 6. TRUST & STATS */}
-      <section className="py-20 border-t border-border bg-gray-50/50 dark:bg-white/[0.02]">
-        <div className="container-premium text-center space-y-12">
-            <h3 className="text-xl md:text-2xl font-bold text-gray-500 uppercase tracking-[0.2em] mb-4">Field-Tested Performance</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-               {[
-                 { v: "10K+", l: "Athletes Joined" },
-                 { v: "500+", l: "Premium Arenas" },
-                 { v: "50K+", l: "Matches Played" },
-                 { v: "4.9/5", l: "User Rating" }
-               ].map((s,i) => (
-                  <div key={i} className="space-y-2 group">
-                     <div className="text-4xl md:text-6xl font-black text-foreground tracking-tighter group-hover:text-primary transition-colors">{s.v}</div>
-                     <div className="text-xs font-black text-gray-400 uppercase tracking-widest">{s.l}</div>
-                  </div>
-               ))}
-            </div>
-        </div>
-      </section>
-
-      {/* 7. CTA SECTION */}
-      <section className="py-24 container-premium pb-32">
-        <div className="bg-gradient-to-br from-gray-900 to-black dark:from-[#121A14] dark:to-black rounded-[2.5rem] p-12 md:p-24 text-white text-center space-y-10 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-            <img src="https://images.unsplash.com/photo-1574629810360-7de62e1069ed?q=80&w=2000&auto=format&fit=crop" className="w-full h-full object-cover" />
+      {/* 6. CTA SECTION (Integrated) */}
+      <section className="pt-8 pb-16 container-premium">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="cta-integrated p-10 md:p-16 text-white text-center shadow-3xl"
+        >
+          {/* Subtle animated overlay */}
+          <div className="absolute inset-0 opacity-20 pointer-events-none">
+            <img src="/images/hero-fallback.png" className="w-full h-full object-cover animate-pulse" />
           </div>
           
           <div className="relative z-10 space-y-6">
-            <h2 className="text-4xl md:text-7xl font-black uppercase italic tracking-tight drop-shadow-xl">
-              Ready To <br /> <span className="text-primary italic">Play?</span>
+            <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter drop-shadow-2xl">
+              Ready to <span className="text-primary">Dominate?</span>
             </h2>
-            <p className="text-lg text-white/50 max-w-xl mx-auto font-medium leading-relaxed">
-              Don't wait for the weekend. Book your favorite turf now and dominate the field. Your next match is just 3 clicks away.
+            <p className="text-sm text-white/60 max-w-lg mx-auto font-bold leading-relaxed tracking-wide">
+              Elite arenas, real-time availability, and instant payments. your next prime-time match is just 3 clicks away.
             </p>
-            <div className="pt-6">
-              <Link href="/turfs" className="btn-premium-primary !rounded-2xl mx-auto shadow-2xl shadow-primary/30">
+            <div className="pt-4 flex justify-center">
+              <Link href="/turfs" className="btn-premium-primary !px-10 hover:shadow-[0_0_30px_rgba(46,125,50,0.5)]">
                 Book Your Game Now
               </Link>
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
     </div>
