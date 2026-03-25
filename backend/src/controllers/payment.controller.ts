@@ -1,12 +1,11 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
 import { sendOk } from "../utils/response";
-import { createPaymentService } from "../services/payment.service";
+import { createPaymentService, type PaymentMethod } from "../services/payment.service";
 
 const CreatePaymentSchema = z.object({
   booking_id: z.string().uuid(),
-  payment_type: z.enum(["online", "offline"]),
-  payment_status: z.enum(["pending", "success", "failed"]),
+  payment_method: z.enum(["UPI", "Card", "Cash", "NetBanking", "Wallet"]),
 });
 
 export async function createPayment(req: Request, res: Response) {
@@ -16,10 +15,8 @@ export async function createPayment(req: Request, res: Response) {
   const result = await createPaymentService({
     bookingId: body.booking_id,
     userId: user.id,
-    payment_type: body.payment_type,
-    payment_status: body.payment_status,
+    payment_method: body.payment_method as PaymentMethod,
   });
 
   return sendOk(res, result, 201);
 }
-
