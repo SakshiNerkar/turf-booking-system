@@ -1,14 +1,15 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
 import { sendOk } from "../utils/response";
-import { createBookingService } from "../services/booking.service";
-import { listBookingsForUser, listBookingsForOwner, updateBookingStatus } from "../models/booking.model";
+import { createBookingService } from "../services/turf.service";
+import { listBookingsForUser, listBookingsForOwner, updateBookingStatus, getBookingById } from "../models/booking.model";
+import { cancelBookingService } from "../services/extra.service";
 
 const CreateBookingSchema = z.object({
   turf_id: z.string().uuid(),
-  date: z.string(), // YYYY-MM-DD
-  start_time: z.string(), // HH:MM
-  end_time: z.string(), // HH:MM
+  booking_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD"),
+  start_time: z.string().regex(/^\d{2}:\d{2}$/, "Time must be HH:MM"),
+  end_time: z.string().regex(/^\d{2}:\d{2}$/, "Time must be HH:MM"),
 });
 
 export async function createBooking(req: Request, res: Response) {
@@ -17,27 +18,38 @@ export async function createBooking(req: Request, res: Response) {
   const booking = await createBookingService({
     userId: user.id,
     turfId: body.turf_id,
-    date: body.date,
+    bookingDate: body.booking_date,
     startTime: body.start_time,
-    endTime: body.end_time
+    endTime: body.end_time,
   });
   return sendOk(res, booking, 201);
 }
 
 export async function listUserBookings(req: Request, res: Response) {
-  const user = req.user!;
-  const bookings = await listBookingsForUser(user.id);
+  const bookings = await listBookingsForUser(req.user!.id);
   return sendOk(res, bookings);
 }
 
 export async function listOwnerBookings(req: Request, res: Response) {
-  const user = req.user!;
-  const bookings = await listBookingsForOwner(user.id);
+  const bookings = await listBookingsForOwner(req.user!.id);
   return sendOk(res, bookings);
+}
+
+export async function getBooking(req: Request, res: Response) {
+  const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+  const booking = await getBookingById(id);
+  if (!booking) return res.status(404).json({ error: "Booking not found" });
+  return sendOk(res, booking);
 }
 
 export async function cancelBooking(req: Request, res: Response) {
   const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
-  await updateBookingStatus(id, "cancelled");
+  const result = await cancelBookingService(id, req.user!.id);
+  return sendOk(res, result);
+}
+
+export async function completeBooking(req: Request, res: Response) {
+  const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+  await updateBookingStatus(id, "completed");
   return sendOk(res, { success: true });
 }

@@ -1,8 +1,9 @@
 import jwt from "jsonwebtoken";
 import { env } from "../config/env";
-import { createUser, getUserByEmail, toPublicUser } from "../models/user.model";
+import { createUser, getUserByEmail, toPublicUser, updateLastLogin } from "../models/user.model";
 import type { UserRole } from "../models/user.model";
 import { hashPassword, verifyPassword } from "../utils/password";
+import { pool } from "../config/db";
 
 export async function registerUser(input: {
   name: string;
@@ -12,20 +13,22 @@ export async function registerUser(input: {
   role: Exclude<UserRole, "admin">;
 }) {
   const existing = await getUserByEmail(input.email);
-  if (existing) {
-    const err = new Error("Email already registered");
-    (err as any).status = 409;
-    throw err;
-  }
+  if (existing) throw Object.assign(new Error("Email already registered"), { status: 409 });
 
   const hashed = await hashPassword(input.password);
-  const user = await createUser({
-    name: input.name,
-    email: input.email,
-    phone: input.phone,
-    password: hashed,
-    role: input.role,
-  });
+  const user = await createUser({ ...input, password: hashed });
+
+  // Auto-create owner_profile for owner registrations
+  if (user.role === "owner") {
+    await pool.query(
+      `INSERT INTO owner_profiles(user_id) VALUES ($1) ON CONFLICT DO NOTHING`,
+      [user.id]
+    );
+    await pool.query(
+      `INSERT INTO owner_finance(owner_id) VALUES ($1) ON CONFLICT DO NOTHING`,
+      [user.id]
+    );
+  }
 
   const token = jwt.sign({ sub: user.id, role: user.role }, env.JWT_SECRET, {
     expiresIn: env.JWT_EXPIRES_IN as any,
@@ -36,18 +39,13 @@ export async function registerUser(input: {
 
 export async function loginUser(input: { email: string; password: string }) {
   const user = await getUserByEmail(input.email);
-  if (!user) {
-    const err = new Error("Invalid email or password");
-    (err as any).status = 401;
-    throw err;
-  }
+  if (!user) throw Object.assign(new Error("Invalid email or password"), { status: 401 });
+  if (!user.is_active) throw Object.assign(new Error("Account is deactivated"), { status: 403 });
 
   const ok = await verifyPassword(input.password, user.password);
-  if (!ok) {
-    const err = new Error("Invalid email or password");
-    (err as any).status = 401;
-    throw err;
-  }
+  if (!ok) throw Object.assign(new Error("Invalid email or password"), { status: 401 });
+
+  await updateLastLogin(user.id);
 
   const token = jwt.sign({ sub: user.id, role: user.role }, env.JWT_SECRET, {
     expiresIn: env.JWT_EXPIRES_IN as any,
@@ -55,4 +53,3 @@ export async function loginUser(input: { email: string; password: string }) {
 
   return { token, user: toPublicUser(user) };
 }
-

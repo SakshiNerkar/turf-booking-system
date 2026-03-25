@@ -10,13 +10,14 @@ import { turfRouter } from "./turf.routes";
 export function mountRoutes(app: Express) {
   const router = Router();
 
-  router.get("/health", (_req, res) => res.json({ ok: true }));
-  router.use("/auth", authRouter);
-  router.use("/turfs", turfRouter);
-  router.use("/bookings", bookingRouter);
+  router.get("/health", (_req, res) => res.json({ ok: true, version: "2.0.0", schema: "production-grade" }));
+
+  router.use("/auth",       authRouter);
+  router.use("/turfs",      turfRouter);
+  router.use("/bookings",   bookingRouter);
   router.use("/dashboards", dashboardRouter);
-  router.use("/reviews", reviewRouter);
-  router.use("/admin", adminRouter);
+  router.use("/reviews",    reviewRouter);
+  router.use("/admin",      adminRouter);
 
   app.use("/api", router);
 }
