@@ -31,74 +31,75 @@ function initSchema() {
     .get();
   if (exists) return;
 
-  console.log("🗄️  Initialising SQLite schema…");
+  console.log("🗄️  Initialising Senior Backend Schema…");
   sqliteDb.exec(`
     CREATE TABLE IF NOT EXISTS users (
-      id TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE,
-      phone TEXT, password TEXT NOT NULL,
-      role TEXT NOT NULL DEFAULT 'customer' CHECK(role IN ('admin','owner','customer')),
+      id TEXT PRIMARY KEY, 
+      name TEXT NOT NULL, 
+      email TEXT NOT NULL UNIQUE,
+      phone TEXT, 
+      password TEXT NOT NULL,
+      profile_image TEXT,
+      favorites TEXT DEFAULT '[]',
+      role TEXT NOT NULL DEFAULT 'user' CHECK(role IN ('admin','owner','user')),
+      earnings_total REAL DEFAULT 0,
+      earnings_monthly REAL DEFAULT 0,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
+
     CREATE TABLE IF NOT EXISTS turfs (
-      id TEXT PRIMARY KEY, owner_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      name TEXT NOT NULL, location TEXT NOT NULL, sport_type TEXT NOT NULL,
-      price_per_slot REAL NOT NULL, description TEXT,
+      id TEXT PRIMARY KEY, 
+      owner_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      name TEXT NOT NULL, 
+      description TEXT,
+      location_city TEXT NOT NULL,
+      location_address TEXT NOT NULL,
+      images TEXT DEFAULT '[]',
+      sports_available TEXT NOT NULL,
+      amenities TEXT DEFAULT '[]',
+      price_weekday REAL NOT NULL,
+      price_weekend REAL NOT NULL,
+      rating REAL DEFAULT 4.5,
+      total_reviews INTEGER DEFAULT 0,
+      opening_time TEXT NOT NULL,
+      closing_time TEXT NOT NULL,
+      slot_duration INTEGER DEFAULT 60,
       is_active INTEGER NOT NULL DEFAULT 1,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
-    CREATE INDEX IF NOT EXISTS idx_turfs_owner      ON turfs(owner_id);
-    CREATE INDEX IF NOT EXISTS idx_turfs_location   ON turfs(location);
-    CREATE INDEX IF NOT EXISTS idx_turfs_sport_type ON turfs(sport_type);
-    CREATE TABLE IF NOT EXISTS time_slots (
-      id TEXT PRIMARY KEY, turf_id TEXT NOT NULL REFERENCES turfs(id) ON DELETE CASCADE,
-      start_time TEXT NOT NULL, end_time TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'available' CHECK(status IN ('available','booked','blocked')),
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-      UNIQUE(turf_id, start_time, end_time), CHECK(end_time > start_time)
-    );
-    CREATE INDEX IF NOT EXISTS idx_time_slots_turf  ON time_slots(turf_id);
-    CREATE INDEX IF NOT EXISTS idx_time_slots_start ON time_slots(start_time);
+
     CREATE TABLE IF NOT EXISTS bookings (
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       turf_id TEXT NOT NULL REFERENCES turfs(id) ON DELETE CASCADE,
-      slot_id TEXT NOT NULL REFERENCES time_slots(id) ON DELETE CASCADE,
-      players INTEGER NOT NULL CHECK(players > 0),
-      total_price REAL NOT NULL,
-      payment_status TEXT NOT NULL DEFAULT 'pending' CHECK(payment_status IN ('pending','success','failed')),
-      booking_date TEXT NOT NULL DEFAULT (datetime('now')),
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-      UNIQUE(slot_id)
-    );
-    CREATE INDEX IF NOT EXISTS idx_bookings_user ON bookings(user_id);
-    CREATE INDEX IF NOT EXISTS idx_bookings_turf ON bookings(turf_id);
-    CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(booking_date);
-    CREATE TABLE IF NOT EXISTS payments (
-      id TEXT PRIMARY KEY,
-      booking_id TEXT NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
-      payment_type TEXT NOT NULL CHECK(payment_type IN ('online','offline')),
-      payment_status TEXT NOT NULL CHECK(payment_status IN ('pending','success','failed')),
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      UNIQUE(booking_id)
-    );
-    CREATE TABLE IF NOT EXISTS revenue (
-      id TEXT PRIMARY KEY,
       owner_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      turf_id TEXT NOT NULL REFERENCES turfs(id) ON DELETE CASCADE,
-      amount REAL NOT NULL,
-      date TEXT NOT NULL DEFAULT (date('now')),
+      date TEXT NOT NULL,
+      start_time TEXT NOT NULL,
+      end_time TEXT NOT NULL,
+      total_price REAL NOT NULL,
+      status TEXT NOT NULL DEFAULT 'confirmed' CHECK(status IN ('pending','confirmed','cancelled','completed')),
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
-    CREATE INDEX IF NOT EXISTS idx_revenue_owner ON revenue(owner_id);
-    CREATE INDEX IF NOT EXISTS idx_revenue_turf  ON revenue(turf_id);
-    CREATE INDEX IF NOT EXISTS idx_revenue_date  ON revenue(date);
+
+    CREATE TABLE IF NOT EXISTS reviews (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      turf_id TEXT NOT NULL REFERENCES turfs(id) ON DELETE CASCADE,
+      rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),
+      comment TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_turfs_owner      ON turfs(owner_id);
+    CREATE INDEX IF NOT EXISTS idx_turfs_city       ON turfs(location_city);
+    CREATE INDEX IF NOT EXISTS idx_bookings_user    ON bookings(user_id);
+    CREATE INDEX IF NOT EXISTS idx_bookings_turf    ON bookings(turf_id);
+    CREATE INDEX IF NOT EXISTS idx_reviews_turf     ON reviews(turf_id);
   `);
-  console.log("✅ SQLite schema ready.");
+  console.log("✅ Platform Schema ready.");
 }
 
 // ─── SQL translator ────────────────────────────────────────────────────────────

@@ -1,14 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   MapPin, Search, Star, ArrowRight, Zap, Target, 
   Layers, CheckCircle2, Navigation, Calendar, 
-  Map as MapIcon, ShieldCheck, Clock, TrendingUp, Users, Target as Aim
+  Map as MapIcon, ShieldCheck, Sparkles, Clock, TrendingUp, Users, Target as Aim, Heart
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api";
+import { Navbar } from "@/components/Navbar";
 
 type TurfItem = { id: string; name: string; location: string; sport_type: string; price_per_slot: string; rating?: number; is_featured?: boolean; };
 
@@ -26,187 +28,186 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col pt-20 bg-gradient-to-br from-green-50 via-white to-green-100 dark:from-[#0a0f0b] dark:to-[#0f1710]">
-      
-      {/* 1. HERO SECTION */}
-      <section className="container-custom pt-12 pb-24 md:pt-32 md:pb-40 text-center">
-         <div className="max-w-3xl mx-auto space-y-8 animate-fade">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary text-xs font-bold rounded-full uppercase tracking-widest italic group">
-               <Zap className="w-4 h-4" /> ⚡ INSTANT BOOKING PRROTOCOL
-            </div>
-            <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.1]">
-               Book Your Perfect Turf <span className="text-primary italic">Anytime.</span>
+    <div className="min-h-screen flex flex-col pt-0 bg-white dark:bg-[#0B0F0C] transition-colors duration-300">
+      <Navbar />
+
+      {/* 1. HERO SECTION (High-Conversion SaaS) */}
+      <section className="container-compact py-16 md:py-24 text-center mt-8">
+         <div className="max-w-3xl mx-auto space-y-8">
+            <motion.div 
+               initial={{ opacity: 0, scale: 0.9 }}
+               animate={{ opacity: 1, scale: 1 }}
+               className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 text-primary text-[11px] font-black rounded-full uppercase tracking-[0.2em] border border-primary/20 shadow-sm"
+            >
+               <Zap className="w-4 h-4 fill-primary/40" /> ⚡ BOOK MULTIPLE ARENAS INSTANTLY
+            </motion.div>
+            
+            <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight leading-[1.05]">
+               Book Your Perfect Turf <br className="hidden md:block" />
+               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-green-400">Anytime, Anywhere.</span>
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 font-medium px-4">
-               Premium arena booking, regional match synchronization, and verified sector access for athletes everywhere.
+            
+            <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 font-medium max-w-xl mx-auto leading-relaxed">
+               Join 10,000+ players relying on Turff to locate elite arenas, view real-time slots, and commit sessions seamlessly.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 px-6 md:pt-8">
-               <Link href="/turfs" className="btn-primary w-full sm:w-auto px-10 py-5 text-base shadow-lg shadow-green-500/20">
-                  Explore Turfs <ArrowRight className="w-5 h-5" />
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
+               <Link href="/turfs" className="btn-sports w-full sm:w-auto px-10 py-4 text-base shadow-primary/30 hover:-translate-y-1">
+                  Book Your Game <ArrowRight className="w-5 h-5" />
                </Link>
-               <Link href="/register?role=owner" className="btn-secondary w-full sm:w-auto px-10 py-5 text-base hover:bg-white dark:hover:bg-white/10">
+               <Link href="/register?role=owner" className="btn-secondary w-full sm:w-auto px-8 py-4 text-base">
                   List Your Turf
                </Link>
             </div>
-         </div>
-         
-         {/* Clean hero asset (Subtle Illustration context) */}
-         <div className="mt-20 px-4 max-w-5xl mx-auto opacity-40 grayscale hover:grayscale-0 transition-all duration-1000">
-            <img src="https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=1200&auto=format&fit=crop" className="rounded-[3rem] shadow-2xl border-8 border-white dark:border-white/5" alt="Turff Hero" />
+            
+            <div className="flex items-center justify-center gap-6 pt-10 opacity-70">
+               <div className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-widest"><ShieldCheck className="w-4 h-4 text-primary" /> Verified Assets</div>
+               <div className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-widest"><Clock className="w-4 h-4 text-primary" /> Instant Confirm</div>
+            </div>
          </div>
       </section>
 
-      {/* 2. SEARCH ENGINE PILL */}
-      <div className="container-custom -mt-20 relative z-10 px-4 sm:px-10">
-         <div className="bg-white dark:bg-[#1a241c] p-6 rounded-[2.5rem] shadow-[0_40px_80px_rgba(0,0,0,0.1)] border border-gray-100 dark:border-white/5 flex flex-col md:flex-row gap-6 max-w-4xl mx-auto">
-            <div className="flex-1 relative flex items-center">
-               <MapPin className="absolute left-6 w-6 h-6 text-primary" />
-               <input placeholder="Search your location..." className="w-full pl-16 pr-6 py-5 bg-gray-50 dark:bg-white/5 border border-transparent rounded-[1.5rem] text-sm font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all italic" />
+      {/* 2. COMPACT SEARCH PILL */}
+      <div className="container-compact -mt-4 mb-16 relative z-10">
+         <div className="glass-panel p-2 md:p-3 rounded-2xl shadow-premium border border-border flex flex-col md:flex-row gap-2 max-w-4xl mx-auto items-center">
+            <div className="flex-1 relative flex items-center w-full">
+               <MapPin className="absolute left-4 w-5 h-5 text-primary" />
+               <input placeholder="Detecting location... or search Pune, Mumbai" className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-[#0B0F0C] border border-border focus:border-primary/40 rounded-xl text-sm font-semibold outline-none focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-gray-400" />
             </div>
-            <button className="btn-primary px-12 py-5 text-base">
-               <Search className="w-5 h-5" /> SEARCH
+            <div className="flex-1 relative flex items-center w-full">
+               <Calendar className="absolute left-4 w-5 h-5 text-primary" />
+               <input type="date" className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-[#0B0F0C] border border-border focus:border-primary/40 rounded-xl text-sm font-semibold outline-none focus:ring-4 focus:ring-primary/10 transition-all text-gray-400" />
+            </div>
+            <button className="btn-sports px-10 py-3 w-full md:w-auto h-full rounded-xl uppercase tracking-widest text-xs">
+               <Search className="w-4 h-4" /> DISCOVER
             </button>
          </div>
       </div>
 
-      {/* 3. FEATURED SECTORS */}
-      <section className="container-custom py-32 space-y-16">
-         <div className="flex flex-col md:flex-row items-end justify-between gap-8 px-4">
-            <div className="space-y-4">
-               <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-none">Featured Arenas</h2>
-               <p className="text-gray-500 dark:text-gray-400 font-bold text-xs uppercase tracking-widest italic opacity-60">TOP-RATED REGIONAL SECTORS READY FOR DISCOVERY</p>
+      {/* 3. ELITE COLLECTIONS (Personalized & Trust) */}
+      <section className="container-compact py-20 space-y-16 border-t border-border/50">
+         <div className="flex flex-col md:flex-row items-end justify-between gap-8">
+            <div className="space-y-4 text-center md:text-left">
+               <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-500 text-[10px] font-black rounded-lg uppercase tracking-widest border border-amber-500/20 shadow-sm"><Sparkles className="w-3.5 h-3.5" /> Curated Intelligence</div>
+               <h2 className="text-4xl lg:text-5xl font-black text-gray-900 dark:text-gray-100 tracking-tighter leading-none italic uppercase">Recommended <span className="text-primary italic">Sectors</span></h2>
+               <p className="text-sm font-semibold text-gray-500 uppercase tracking-[0.2em] opacity-60">ANALYZING REGIONAL MATCH CADENCE...</p>
             </div>
-            <Link href="/turfs" className="text-sm font-bold text-primary hover:underline underline-offset-8 decoration-2 flex items-center gap-3">EXPLORE ALL <ArrowRight className="w-4 h-4" /></Link>
+            <Link href="/turfs" className="hidden md:flex items-center gap-4 px-8 py-4 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white text-[11px] font-black rounded-2xl uppercase tracking-widest hover:bg-white dark:hover:bg-white/10 transition-all shadow-sm border border-border">
+               View Global Inventory <ArrowRight className="w-4 h-4" />
+            </Link>
          </div>
 
-         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10 px-4">
-            {loading ? [1,2,3].map(i => <div key={i} className="h-[450px] bg-white dark:bg-[#1a241c] rounded-[3rem] animate-pulse" />) : (
+         <div className="grid md:grid-cols-3 gap-10">
+            {loading ? [1,2,3].map(i => <div key={i} className="h-96 bg-card border border-border rounded-[2.5rem] animate-pulse" />) : (
               featuredTurfs.map(t => (
-                <div key={t.id} className="card-premium group relative overflow-hidden flex flex-col h-[500px] border-transparent hover:border-primary/20">
-                   <div className="h-2/3 relative">
-                      <img src="https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt={t.name} />
-                      <div className="absolute top-8 right-8 px-5 py-2.5 bg-white/95 dark:bg-black/95 backdrop-blur-3xl rounded-2xl font-black text-primary text-xs shadow-2xl transition-transform group-hover:rotate-6 border border-white/20">★ {t.rating || '4.8'}</div>
-                   </div>
-                   <div className="p-8 flex-1 flex flex-col justify-between">
-                      <div className="space-y-2">
-                        <h4 className="text-2xl font-extrabold text-gray-900 dark:text-white group-hover:text-primary transition-colors truncate italic">{t.name}</h4>
-                        <div className="flex items-center gap-3 text-xs font-bold text-gray-400 uppercase tracking-widest"><MapPin className="w-4 h-4 text-primary" /> {t.location}</div>
+                <div key={t.id} className="card-compact group flex flex-col h-[480px] p-0 rounded-[3rem] shadow-2xl hover:shadow-premium-hover border-border relative overflow-hidden">
+                   <div className="h-[240px] relative bg-gray-100 dark:bg-[#0B0F0C] overflow-hidden">
+                      <img src="https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover transition-transform duration-[4s] group-hover:scale-110" alt={t.name} />
+                      
+                      <div className="absolute top-6 left-6 flex flex-col gap-3">
+                         <span className="px-4 py-2 bg-white/95 dark:bg-[#121A14]/95 backdrop-blur-xl rounded-[1.2rem] font-black text-gray-900 dark:text-gray-100 text-[10px] uppercase shadow-2xl flex items-center gap-2 border border-white/20"><ShieldCheck className="w-4 h-4 text-primary" /> Verified Hub</span>
+                         {Number(t.price_per_slot) < 1000 && <span className="px-4 py-2 bg-primary text-white backdrop-blur-md rounded-[1.2rem] font-black text-[9px] uppercase shadow-2xl flex items-center gap-2">Hot Deal</span>}
                       </div>
-                      <div className="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
-                         <div className="text-3xl font-black text-gray-900 dark:text-white italic tracking-tighter uppercase leading-none">₹{t.price_per_slot}<span className="text-[10px] not-italic opacity-40">/HR</span></div>
-                         <Link href={`/turfs/${t.id}`} className="btn-primary px-8 py-4 text-xs">BOOK NOW</Link>
+
+                      <div className="absolute top-6 right-6 flex flex-col items-end gap-3">
+                         <div className="px-4 py-2 bg-white/95 dark:bg-[#121A14]/95 backdrop-blur-xl rounded-[1.2rem] font-black text-amber-500 text-[12px] shadow-2xl flex items-center gap-2 border border-white/20">★ {t.rating || '4.9'} <span className="text-[9px] text-gray-400 font-bold opacity-60 tracking-tighter">({(Math.random()*200 + 100).toFixed(0)})</span></div>
+                         {(t.rating || 0) >= 4.8 && <span className="px-3 py-1 bg-rose-500 text-white text-[9px] font-black italic rounded-lg shadow-xl animate-pulse uppercase tracking-widest">High Demand</span>}
+                      </div>
+
+                      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+                      <div className="absolute bottom-6 left-6 text-white space-y-1">
+                         <div className="text-[10px] font-black uppercase tracking-[0.3em] opacity-80 flex items-center gap-2"><Navigation className="w-3 h-3 fill-current" /> {t.location.split(',')[0]} Sector</div>
                       </div>
                    </div>
-                   <div className="absolute inset-0 bg-primary/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                   
+                   <div className="p-8 flex flex-col flex-1 justify-between bg-white dark:bg-[#121A14]">
+                      <div className="space-y-4">
+                        <h4 className="text-2xl font-black text-gray-900 dark:text-gray-100 tracking-tighter leading-none group-hover:text-primary transition-colors italic uppercase">{t.name}</h4>
+                        <div className="flex items-center gap-3">
+                           <div className="flex -space-x-2">
+                              {[1,2,3].map(i => <div key={i} className="w-6 h-6 rounded-full border-2 border-white dark:border-[#121A14] bg-gray-200 dark:bg-card overflow-hidden"><img src={`https://i.pravatar.cc/100?u=${t.id}${i}`} /></div>)}
+                           </div>
+                           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Booked 5 times today</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-8 border-t border-gray-100 dark:border-white/5">
+                         <div className="space-y-1">
+                            <span className="text-[9px] uppercase font-black text-gray-400 tracking-[0.2em] italic leading-none">ENTRY PROTOCOL</span>
+                            <div className="text-2xl font-black text-gray-900 dark:text-gray-100 tracking-tighter italic">₹{t.price_per_slot}<span className="text-[10px] font-black text-gray-400 opacity-60 tracking-widest">/HR</span></div>
+                         </div>
+                         <Link href={`/turfs/${t.id}`} className="btn-sports px-8 py-4 rounded-[1.5rem] shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all">Select Slot</Link>
+                      </div>
+                   </div>
+                   
+                   <div className="absolute -bottom-10 -right-10 p-20 opacity-[0.02] group-hover:scale-110 group-hover:-translate-x-4 transition-all duration-[5s] pointer-events-none grayscale"><Aim className="w-48 h-48" /></div>
                 </div>
               ))
             )}
          </div>
       </section>
 
-      {/* 4. HOW IT WORKS (Tactical Simplification) */}
-      <section className="bg-white dark:bg-black/20 py-32 border-y border-gray-100 dark:border-white/5">
-         <div className="container-custom space-y-20">
-            <div className="text-center space-y-4">
-               <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white uppercase italic tracking-tighter">Core Protocol</h2>
-               <p className="text-xs font-bold text-gray-400 uppercase tracking-[0.4em] italic opacity-60">THREE STEPS TO FIELD DOMINANCE</p>
-            </div>
-            
-            <div className="grid md:grid-cols-3 gap-16 px-4">
+      {/* 4. SOCIAL PROOF / TRUST STRIP */}
+      <section className="bg-primary/5 dark:bg-primary/10 py-16 border-y border-primary/10">
+         <div className="container-compact text-center space-y-10">
+            <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">Trusted by over <span className="text-primary italic font-black">10,000+</span> Athletes Daily</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto opacity-70">
                {[
-                 { icon: Search, title: "Search", sub: "Locate regional arenas based on your discipline protocol." },
-                 { icon: Calendar, title: "Select Slot", sub: "View real-time temporal sector availability." },
-                 { icon: ShieldCheck, title: "Book", sub: "Initialize match sync and commit your session." }
-               ].map((v, i) => (
-                 <div key={i} className="text-center space-y-8 relative group">
-                    <div className="w-24 h-24 rounded-[2.5rem] bg-primary/10 text-primary flex items-center justify-center mx-auto shadow-inner border border-primary/20 transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">
-                       <v.icon className="w-10 h-10" />
-                    </div>
-                    <div className="space-y-4">
-                       <h4 className="text-2xl font-black text-gray-900 dark:text-white uppercase italic">{v.title}</h4>
-                       <p className="text-sm font-medium text-gray-500 dark:text-gray-400 leading-relaxed italic">{v.sub}</p>
-                    </div>
-                    {i < 2 && <ArrowRight className="hidden lg:block absolute top-12 -right-8 w-12 h-12 text-gray-100 dark:text-white/5" />}
-                 </div>
+                 { v: "50K+", l: "Matches Played" },
+                 { v: "150+", l: "Verified Turfs" },
+                 { v: "4.9/5", l: "Average Rating" },
+                 { v: "<60s", l: "Booking Speed" }
+               ].map((s,i) => (
+                  <div key={i} className="space-y-2">
+                     <div className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tighter">{s.v}</div>
+                     <div className="text-[10px] font-bold text-primary uppercase tracking-widest">{s.l}</div>
+                  </div>
                ))}
             </div>
          </div>
       </section>
 
-      {/* 5. BENEFITS (High-Contrast Elite) */}
-      <section className="container-custom py-32 grid lg:grid-cols-2 gap-20 items-center px-4">
-          <div className="space-y-12">
-             <div className="space-y-4">
-                <h2 className="text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-none italic uppercase">Platform Benefits</h2>
-                <div className="text-xs font-black text-primary uppercase tracking-[0.4em] italic leading-none">ELITE SECTOR STANDARDS</div>
-             </div>
-             <div className="grid sm:grid-cols-2 gap-10">
-                 {[
-                   { icon: Zap, label: "FAST SYNC", sub: "Book in under 60s" },
-                   { icon: BadgeCheck, label: "VERIFIED", sub: "Trusted arena owners" },
-                   { icon: Target, label: "PRECISION", sub: "Perfect slot timing" },
-                   { icon: ShieldCheck, label: "SECURE", sub: "Encrypted payments" }
-                 ].map((b, i) => (
-                   <div key={i} className="flex flex-col gap-4 p-8 bg-white dark:bg-white/2 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-xl transition-all">
-                      <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center"><b.icon className="w-6 h-6" /></div>
-                      <div>
-                         <div className="text-base font-black text-gray-900 dark:text-white uppercase italic truncate leading-none mb-2">{b.label}</div>
-                         <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest italic opacity-60 leading-none">{b.sub}</p>
-                      </div>
-                   </div>
-                 ))}
-             </div>
-          </div>
-          <div className="relative h-[600px] rounded-[4rem] overflow-hidden grayscale group hover:grayscale-0 transition-all duration-1000 hidden lg:block shadow-2xl border-4 border-white dark:border-white/5">
-             <img src="https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=800&auto=format&fit=crop" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[3s]" alt="Benefits" />
-             <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/80 to-transparent p-12 flex items-end">
-                <p className="text-white text-lg font-black italic tracking-widest uppercase">SYDNEY SPORTS PARK SECTOR V</p>
-             </div>
-          </div>
-      </section>
-
-      {/* 6. CALL TO ACTION (Elite Conversion) */}
-      <section className="container-custom py-40 text-center px-4">
-         <div className="bg-primary rounded-[5rem] p-20 text-white space-y-12 relative overflow-hidden group shadow-[0_60px_120px_rgba(34,197,94,0.3)]">
-            <div className="relative z-10 space-y-8">
-               <h2 className="text-6xl font-black italic tracking-tighter uppercase leading-none">Start Booking Now</h2>
-               <p className="text-xl font-bold opacity-80 max-w-2xl mx-auto italic px-4">Join thousands of athletes and arena owners in the most elite sports network.</p>
-               <Link href="/turfs" className="btn-primary bg-white text-primary px-16 py-6 text-xl mx-auto hover:bg-gray-100 hover:scale-110 shadow-2xl">
-                  INITIALIZE DISCOVERY <ArrowRight className="w-8 h-8" />
-               </Link>
-            </div>
-            <div className="absolute top-0 right-0 p-16 opacity-10 pointer-events-none group-hover:scale-125 transition-transform duration-[5s]"><Zap className="w-96 h-96" /></div>
-            <div className="absolute bottom-0 left-0 p-16 opacity-10 pointer-events-none group-hover:rotate-12 transition-transform duration-[5s]"><Aim className="w-64 h-64" /></div>
+      {/* 5. USER FLOW (High Usability) */}
+      <section className="container-compact py-24 space-y-16">
+         <div className="text-center space-y-4">
+            <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">How It Works</h2>
+            <p className="text-sm font-semibold text-gray-500 uppercase tracking-widest">A seamless reservation protocol</p>
          </div>
-      </section>
-
-      {/* 7. FOOTER (Landing Only) */}
-      <footer className="bg-white dark:bg-[#0a0f0b] border-t border-gray-100 dark:border-white/5 py-24 mt-auto">
-         <div className="container-custom grid md:grid-cols-4 gap-16 px-4">
-            <div className="space-y-6">
-               <span className="text-3xl font-black text-primary tracking-tighter italic">TURFF</span>
-               <p className="text-sm font-medium text-gray-400 leading-relaxed italic">The premier sports tech marketplace for sector-based booking protocols.</p>
-            </div>
-            {['Sectors', 'Network', 'Support'].map(title => (
-               <div key={title} className="space-y-6">
-                  <h4 className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest italic">{title}</h4>
-                  <ul className="space-y-4">
-                     {[1,2,3].map(i => <li key={i}><Link href="#" className="text-sm font-bold text-gray-400 hover:text-primary transition-colors italic">Registry Link {i}</Link></li>)}
-                  </ul>
-               </div>
+         
+         <div className="grid md:grid-cols-4 gap-8">
+            {[
+              { icon: Search, title: "1. Discover", sub: "Locate verified regional arenas." },
+              { icon: Calendar, title: "2. Schedule", sub: "Select your temporal slot." },
+              { icon: ShieldCheck, title: "3. Commit", sub: "Pay securely via platform." },
+              { icon: CheckCircle2, title: "4. Play", sub: "Arrive and execute your match." }
+            ].map((v, i) => (
+              <div key={i} className="card-compact p-8 text-center space-y-5 bg-transparent border-transparent shadow-none hover:shadow-none hover:-translate-y-2 hover:bg-gray-50 dark:hover:bg-[#121A14] flex flex-col items-center group">
+                 <div className="w-16 h-16 rounded-2xl bg-white dark:bg-[#1A241D] text-primary flex items-center justify-center border border-border shadow-sm group-hover:scale-110 transition-transform duration-500">
+                    <v.icon className="w-8 h-8 opacity-80" />
+                 </div>
+                 <div className="space-y-2">
+                    <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100">{v.title}</h4>
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{v.sub}</p>
+                 </div>
+              </div>
             ))}
          </div>
-         <div className="container-custom border-t border-gray-100 dark:border-white/5 mt-20 pt-10 text-center">
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.5em] italic opacity-40">© 2026 TURFF SECTOR OPERATIONS · ALL LOGS PERSISTED · CLOUD-SCALE</p>
+      </section>
+
+      {/* 6. BOTTOM CTA */}
+      <section className="container-compact py-24 text-center pb-32">
+         <div className="bg-gray-900 dark:bg-[#121A14] rounded-3xl p-12 md:p-20 text-white space-y-8 shadow-premium-hover border border-gray-800 dark:border-white/5 relative overflow-hidden">
+            <div className="relative z-10 space-y-6">
+               <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight">Ready for the Pitch?</h2>
+               <p className="text-base text-gray-400 max-w-xl mx-auto font-medium">Join the elite sports network and automate your booking experience today.</p>
+               <Link href="/turfs" className="btn-sports bg-primary hover:bg-primary-hover text-white px-10 py-4 text-base mx-auto max-w-xs shadow-xl shadow-primary/30">
+                  Book Your Next Match
+               </Link>
+            </div>
+            <div className="absolute top-0 right-0 opacity-5 pointer-events-none scale-150 -translate-y-12 translate-x-12"><Target className="w-96 h-96 text-primary" /></div>
          </div>
-      </footer>
+      </section>
 
     </div>
   );
 }
-
-const BadgeCheck = ({ className }: { className: string }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-  </svg>
-);

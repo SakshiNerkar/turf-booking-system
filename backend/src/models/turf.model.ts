@@ -4,164 +4,84 @@ export type TurfRow = {
   id: string;
   owner_id: string;
   name: string;
-  location: string;
-  sport_type: string;
-  price_per_slot: string;
   description: string | null;
+  location_city: string;
+  location_address: string;
+  images: string; // JSON string
+  sports_available: string; // comma-separated or JSON
+  amenities: string; // JSON string
+  price_weekday: number;
+  price_weekend: number;
+  rating: number;
+  total_reviews: number;
+  opening_time: string; // e.g. "06:00"
+  closing_time: string; // e.g. "23:00"
+  slot_duration: number; // in minutes
   is_active: boolean;
   created_at: string;
   updated_at: string;
 };
 
-export async function listTurfs(filters: {
-  q?: string;
-  location?: string;
-  sport_type?: string;
-  owner_id?: string;
-  min_price?: number;
-  max_price?: number;
-  limit: number;
-  offset: number;
-}) {
-  const where: string[] = ["is_active = true"];
-  const params: Array<string | number> = [];
-  const add = (sql: string, val: string | number) => {
-    params.push(val);
-    where.push(sql.replace("?", `$${params.length}`));
-  };
-
-  if (filters.q) {
-    const term = `%${filters.q}%`;
-    params.push(term, term, term);
-    const a = `$${params.length - 2}`;
-    const b = `$${params.length - 1}`;
-    const c = `$${params.length}`;
-    where.push(`(name ilike ${a} or location ilike ${b} or sport_type ilike ${c})`);
-  }
-
-  if (filters.location) add("location ilike ?", `%${filters.location}%`);
-  if (filters.sport_type) add("sport_type = ?", filters.sport_type);
-  if (filters.owner_id) add("owner_id = ?", filters.owner_id);
-  if (filters.min_price !== undefined) add("price_per_slot >= ?", filters.min_price);
-  if (filters.max_price !== undefined) add("price_per_slot <= ?", filters.max_price);
-
-  params.push(filters.limit);
-  const limitParam = `$${params.length}`;
-  params.push(filters.offset);
-  const offsetParam = `$${params.length}`;
-
-  const res = await pool.query<TurfRow>(
-    `
-    select *
-    from turfs
-    where ${where.join(" and ")}
-    order by created_at desc
-    limit ${limitParam}
-    offset ${offsetParam}
-  `,
-    params,
-  );
-
-  return res.rows;
-}
-
 export async function getTurfById(id: string) {
-  const res = await pool.query<TurfRow>(
-    `select * from turfs where id = $1 and is_active = true limit 1`,
-    [id],
-  );
+  const res = await pool.query<TurfRow>(`select * from turfs where id = $1`, [id]);
   return res.rows[0] ?? null;
 }
 
-export async function createTurf(input: {
-  owner_id: string;
-  name: string;
-  location: string;
-  sport_type: string;
-  price_per_slot: number;
-  description?: string;
-}) {
+export async function listTurfs(filters: { city?: string; sport?: string; minPrice?: number; maxPrice?: number } = {}) {
+  let sql = `select * from turfs where is_active = 1`;
+  const params: any[] = [];
+
+  if (filters.city) {
+    params.push(filters.city);
+    sql += ` and location_city like $${params.length}`;
+  }
+  if (filters.sport) {
+    params.push(`%${filters.sport}%`);
+    sql += ` and sports_available like $${params.length}`;
+  }
+
+  const res = await pool.query<TurfRow>(sql, params);
+  return res.rows;
+}
+
+export async function createTurf(input: Omit<TurfRow, "id" | "is_active" | "created_at" | "updated_at" | "rating" | "total_reviews">) {
   const res = await pool.query<TurfRow>(
     `
-    insert into turfs(owner_id, name, location, sport_type, price_per_slot, description)
-    values ($1, $2, $3, $4, $5, $6)
+    insert into turfs(
+      owner_id, name, description, location_city, location_address, 
+      images, sports_available, amenities, price_weekday, price_weekend,
+      opening_time, closing_time, slot_duration
+    )
+    values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
     returning *
   `,
     [
-      input.owner_id,
-      input.name,
-      input.location,
-      input.sport_type,
-      input.price_per_slot,
-      input.description ?? null,
+      input.owner_id, input.name, input.description, input.location_city, input.location_address,
+      input.images, input.sports_available, input.amenities, input.price_weekday, input.price_weekend,
+      input.opening_time, input.closing_time, input.slot_duration
     ],
   );
   return res.rows[0]!;
 }
 
-export async function updateTurf(id: string, ownerId: string, patch: Partial<{
-  name: string;
-  location: string;
-  sport_type: string;
-  price_per_slot: number;
-  description: string | null;
-}>) {
-  const fields: string[] = [];
-  const params: Array<string | number | null> = [];
-  const add = (col: string, val: string | number | null) => {
-    params.push(val);
-    fields.push(`${col} = $${params.length}`);
-  };
-
-  if (patch.name !== undefined) add("name", patch.name);
-  if (patch.location !== undefined) add("location", patch.location);
-  if (patch.sport_type !== undefined) add("sport_type", patch.sport_type);
-  if (patch.price_per_slot !== undefined) add("price_per_slot", patch.price_per_slot);
-  if (patch.description !== undefined) add("description", patch.description);
-
-  if (fields.length === 0) return null;
-
-  params.push(id);
-  const idParam = `$${params.length}`;
-  params.push(ownerId);
-  const ownerParam = `$${params.length}`;
-
-  const res = await pool.query<TurfRow>(
-    `
-    update turfs
-    set ${fields.join(", ")}, updated_at = now()
-    where id = ${idParam} and owner_id = ${ownerParam} and is_active = true
-    returning *
-  `,
-    params,
-  );
-
-  return res.rows[0] ?? null;
+export async function deleteTurf(id: string) {
+  await pool.query(`delete from turfs where id = $1`, [id]);
 }
 
-export async function deactivateTurf(id: string, ownerId: string) {
-  const res = await pool.query<TurfRow>(
-    `
-    update turfs
-    set is_active = false, updated_at = now()
-    where id = $1 and owner_id = $2 and is_active = true
-    returning *
-  `,
-    [id, ownerId],
-  );
-  return res.rows[0] ?? null;
+export async function getTurfsByOwner(ownerId: string) {
+  const res = await pool.query<TurfRow>(`select * from turfs where owner_id = $1`, [ownerId]);
+  return res.rows;
 }
 
-export async function adminDeactivateTurf(id: string) {
-  const res = await pool.query<TurfRow>(
-    `
-    update turfs
-    set is_active = false, updated_at = now()
-    where id = $1 and is_active = true
-    returning *
-  `,
-    [id],
+export async function updateTurfRating(id: string) {
+  // Recalculate rating from reviews table
+  const res = await pool.query<{ avg: number; count: number }>(
+    `select avg(rating) as avg, count(*) as count from reviews where turf_id = $1`,
+    [id]
   );
-  return res.rows[0] ?? null;
+  const { avg, count } = res.rows[0];
+  await pool.query(
+    `update turfs set rating = $1, total_reviews = $2 where id = $3`,
+    [avg || 4.5, count || 0, id]
+  );
 }
-

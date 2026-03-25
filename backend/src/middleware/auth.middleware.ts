@@ -5,13 +5,13 @@ import { sendError } from "../utils/response";
 
 export type JwtPayload = {
   sub: string;
-  role: "admin" | "owner" | "customer";
+  role: "admin" | "owner" | "user";
 };
 
 declare global {
   namespace Express {
     interface Request {
-      user?: { id: string; role: JwtPayload["role"] };
+      user?: { id: string; role: "admin" | "owner" | "user" };
     }
   }
 }

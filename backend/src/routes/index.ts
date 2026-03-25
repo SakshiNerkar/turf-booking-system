@@ -3,8 +3,8 @@ import { Router } from "express";
 import { adminRouter } from "./admin.routes";
 import { authRouter } from "./auth.routes";
 import { bookingRouter } from "./booking.routes";
-import { paymentRouter } from "./payment.routes";
-import { slotRouter } from "./slot.routes";
+import { dashboardRouter } from "./dashboard.routes";
+import { reviewRouter } from "./review.routes";
 import { turfRouter } from "./turf.routes";
 
 export function mountRoutes(app: Express) {
@@ -14,10 +14,9 @@ export function mountRoutes(app: Express) {
   router.use("/auth", authRouter);
   router.use("/turfs", turfRouter);
   router.use("/bookings", bookingRouter);
-  router.use("/payments", paymentRouter);
-  router.use("/", slotRouter);
+  router.use("/dashboards", dashboardRouter);
+  router.use("/reviews", reviewRouter);
   router.use("/admin", adminRouter);
 
   app.use("/api", router);
 }
-

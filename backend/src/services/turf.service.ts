@@ -1,85 +1,74 @@
 import { z } from "zod";
 import {
   createTurf,
-  deactivateTurf,
   getTurfById,
   listTurfs,
-  updateTurf,
+  getTurfsByOwner,
+  deleteTurf,
 } from "../models/turf.model";
-import { listTimeSlotsByTurfId } from "../models/timeslot.model";
+import { getBookingsByTurfAndDate } from "../models/booking.model";
 
 export const ListTurfsQuerySchema = z.object({
-  q: z.string().optional(),
-  location: z.string().optional(),
-  sport_type: z.string().optional(),
-  owner_id: z.string().uuid().optional(),
-  min_price: z.coerce.number().optional(),
-  max_price: z.coerce.number().optional(),
-  limit: z.coerce.number().int().positive().max(100).optional().default(20),
-  offset: z.coerce.number().int().min(0).optional().default(0),
+  city: z.string().optional(),
+  sport: z.string().optional(),
+  minPrice: z.coerce.number().optional(),
+  maxPrice: z.coerce.number().optional(),
 });
 
 export async function listTurfsService(query: unknown) {
   const q = ListTurfsQuerySchema.parse(query);
-  return listTurfs({
-    q: q.q,
-    location: q.location,
-    sport_type: q.sport_type,
-    owner_id: q.owner_id,
-    min_price: q.min_price,
-    max_price: q.max_price,
-    limit: q.limit,
-    offset: q.offset,
-  });
+  return listTurfs(q);
 }
 
-export async function getTurfDetailsService(id: string, opts?: {
-  from?: string;
-  to?: string;
-}) {
+/**
+ * DYNAMIC SLOT GENERATION LOGIC
+ * Senior Backend Specification implementation
+ */
+export async function getTurfSlotsService(id: string, date: string) {
   const turf = await getTurfById(id);
-  if (!turf) {
-    const err = new Error("Turf not found");
-    (err as any).status = 404;
-    throw err;
+  if (!turf) throw new Error("Turf not found");
+
+  const bookings = await getBookingsByTurfAndDate(id, date);
+  
+  const slots = [];
+  let current = turf.opening_time; // e.g. "06:00"
+  const end = turf.closing_time; // e.g. "23:00"
+
+  while (current < end) {
+    const [h, m] = current.split(':').map(Number);
+    const dateObj = new Date(2000, 0, 1, h, m);
+    dateObj.setMinutes(dateObj.getMinutes() + turf.slot_duration);
+    
+    const nextH = String(dateObj.getHours()).padStart(2, '0');
+    const nextM = String(dateObj.getMinutes()).padStart(2, '0');
+    const next = `${nextH}:${nextM}`;
+
+    if (next > end) break;
+
+    const isBooked = bookings.some(b => 
+      (current >= b.start_time && current < b.end_time) ||
+      (next > b.start_time && next <= b.end_time)
+    );
+
+    slots.push({
+      start_time: current,
+      end_time: next,
+      status: isBooked ? "booked" : "available"
+    });
+
+    current = next;
   }
-  const slots = await listTimeSlotsByTurfId(id, opts);
+
   return { turf, slots };
 }
 
-export async function createTurfService(ownerId: string, input: {
-  name: string;
-  location: string;
-  sport_type: string;
-  price_per_slot: number;
-  description?: string;
-}) {
+export async function createTurfService(ownerId: string, input: any) {
   return createTurf({ owner_id: ownerId, ...input });
 }
 
-export async function updateTurfService(ownerId: string, turfId: string, patch: Partial<{
-  name: string;
-  location: string;
-  sport_type: string;
-  price_per_slot: number;
-  description: string | null;
-}>) {
-  const updated = await updateTurf(turfId, ownerId, patch);
-  if (!updated) {
-    const err = new Error("Turf not found or not owned by you");
-    (err as any).status = 404;
-    throw err;
-  }
-  return updated;
-}
-
 export async function deleteTurfService(ownerId: string, turfId: string) {
-  const deleted = await deactivateTurf(turfId, ownerId);
-  if (!deleted) {
-    const err = new Error("Turf not found or not owned by you");
-    (err as any).status = 404;
-    throw err;
-  }
-  return deleted;
+  const turf = await getTurfById(turfId);
+  if (!turf || turf.owner_id !== ownerId) throw new Error("Unauthorized");
+  await deleteTurf(turfId);
+  return { success: true };
 }
-

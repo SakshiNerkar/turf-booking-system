@@ -2,17 +2,26 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { 
-  PlusCircle, Search, History, Star, Clock, MapPin, 
-  ArrowRight, Users, Zap, ShieldCheck, Target, Sparkles, 
-  Calendar, CreditCard, LayoutDashboard
+  PlusCircle, History, Clock, MapPin, ArrowRight, Zap, Target,
+  Calendar, CreditCard, Heart, Trophy, Activity, RotateCw
 } from "lucide-react";
 import { useAuth } from "../../../components/AuthProvider";
 import { apiFetch } from "../../../lib/api";
 import { SkeletonStat, SkeletonRow, EmptyState } from "../../../components/Skeletons";
+import { Navbar } from "@/components/Navbar";
 
-type Booking = { id: string; turf_name: string; start_time: string; end_time: string; total_price: string; status: string; };
+type Booking = { 
+  id: string; 
+  turf_name: string; 
+  date: string;
+  start_time: string; 
+  end_time: string; 
+  total_price: string; 
+  status: string;
+  turf_id?: string;
+};
 
 export default function CustomerDashboard() {
   const { user, logout } = useAuth();
@@ -23,113 +32,148 @@ export default function CustomerDashboard() {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const res = await apiFetch<Booking[]>("/api/bookings/customer");
+      const res = await apiFetch<any>("/api/dashboards/user");
       setLoading(false);
-      if (res.ok) setBookings(res.data);
+      if (res.ok) setBookings(res.data.bookings);
     })();
   }, []);
 
+  const upcomingMatches = useMemo(() => {
+    return bookings.filter(b => b.status === "confirmed")
+                   .sort((a,b) => new Date(`${a.date} ${a.start_time}`).getTime() - new Date(`${b.date} ${b.start_time}`).getTime())
+                   .slice(0, 3);
+  }, [bookings]);
+
+  const pastMatches = useMemo(() => {
+    return bookings.filter(b => b.status !== "confirmed")
+                   .sort((a,b) => new Date(`${b.date} ${b.start_time}`).getTime() - new Date(`${a.date} ${a.start_time}`).getTime())
+                   .slice(0, 5);
+  }, [bookings]);
+
   const stats = useMemo(() => [
-    { label: 'Active Matches', value: bookings.filter(b => b.status === 'confirmed').length, icon: Calendar, color: 'bg-primary' },
-    { label: 'Total Energy', value: `₹${bookings.reduce((s, b) => s + Number(b.total_price), 0)}`, icon: Zap, color: 'bg-amber-500' },
-    { label: 'Match History', value: bookings.length, icon: History, color: 'bg-blue-500' }
-  ], [bookings]);
+    { label: 'Upcoming Matches', value: upcomingMatches.length, icon: Calendar, color: 'text-primary bg-primary/10 border-primary/20' },
+    { label: 'Total Played', value: pastMatches.length, icon: Trophy, color: 'text-amber-500 bg-amber-500/10 border-amber-500/20' },
+    { label: 'Favorite Arena', value: "Alpha Turf HQ", icon: Heart, color: 'text-rose-500 bg-rose-500/10 border-rose-500/20' }
+  ], [upcomingMatches, pastMatches]);
 
   if (!user) return null;
 
   return (
-    <div className="space-y-12 pb-32">
-      
-      {/* 1. SECTOR HEADER (Mobile-First Stacking) */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-10 px-4">
-         <div className="space-y-4">
-            <div className="flex items-center gap-4">
-               <span className="px-5 py-2 bg-primary/10 text-primary text-[9px] font-black rounded-xl uppercase tracking-[0.4em] italic shadow-sm">Sync Status: Optimal</span>
-               <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-            </div>
-            <h1 className="text-6xl md:text-8xl font-black italic tracking-tighter leading-none uppercase text-gray-900 dark:text-white">Domain <span className="text-primary">Control</span></h1>
-            <p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40 leading-loose max-w-sm italic">Operational match registry for User {user.id.slice(0, 8)}.</p>
-         </div>
-         
-         <Link href="/turfs" className="btn-primary px-12 py-5 text-sm shadow-[0_20px_40px_rgba(34,197,94,0.3)]">
-            <PlusCircle className="w-6 h-6" /> NEW ENGAGEMENT
-         </Link>
-      </header>
+    <div className="min-h-screen bg-gray-50/50 dark:bg-[#0B0F0C] transition-colors duration-300 pb-32 md:pb-16 relative">
+      <Navbar />
 
-      {/* 2. STATS CLUSTER (Tactical Grid) */}
-      <section className="grid sm:grid-cols-3 gap-8 px-4">
-         {loading ? [1,2,3].map(i => <SkeletonStat key={i} />) : stats.map((s, i) => (
-           <div key={i} className="card-premium p-10 flex flex-col justify-between h-56 border-transparent hover:border-primary/20 hover:scale-105">
-              <div className={`w-14 h-14 rounded-2xl ${s.color} text-white flex items-center justify-center shadow-xl shadow-black/10`}><s.icon className="w-6 h-6" /></div>
-              <div className="space-y-2">
-                 <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest italic opacity-60">{s.label}</div>
-                 <div className="text-4xl font-black italic tracking-tighter text-gray-900 dark:text-white leading-none">{s.value}</div>
+      <div className="container-compact py-8 md:py-12 space-y-12">
+        
+        {/* COMPACT DASHBOARD HEADER */}
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+           <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                 <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase tracking-widest border border-primary/20 flex items-center gap-1.5"><Activity className="w-3 h-3" /> Player Profile Active</span>
               </div>
+              <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">Welcome Back, <span className="text-primary italic">{user.name.split(' ')[0]}</span></h1>
+              <p className="text-sm font-medium text-gray-500">Manage your reservations, track performance, and fast-book your favorite arenas.</p>
            </div>
-         ))}
-      </section>
+           
+           <Link href="/turfs" className="btn-sports px-8 py-3.5 shadow-md shadow-primary/20 flex-shrink-0">
+              <PlusCircle className="w-5 h-5" /> Book a Match
+           </Link>
+        </header>
 
-      {/* 3. CORE REGISTRY (Simplified Vertical List) */}
-      <section className="px-4 space-y-10">
-         <div className="flex items-center justify-between">
-            <h3 className="text-3xl font-black text-gray-900 dark:text-white uppercase italic tracking-tighter leading-none">Booking Protocol</h3>
-            <button className="text-[10px] font-black text-primary uppercase tracking-widest underline underline-offset-8 italic decoration-primary/20 decoration-2">VIEW ALL RECORDS</button>
-         </div>
-
-         {loading ? (
-           <div className="space-y-6">
-              {[1,2,3,4].map(i => <SkeletonRow key={i} />)}
-           </div>
-         ) : bookings.length === 0 ? (
-           <EmptyState title="No Records Yet" sub="You haven't initialized any matches. Proceed to the sector discovery hub." icon={Calendar} actionLabel="DISCOVER SECTORS" actionLink="/turfs" />
-         ) : (
-           <div className="space-y-6">
-              {bookings.map(b => (
-                <div key={b.id} className="card-premium p-8 group flex items-center justify-between gap-8 hover:bg-white dark:hover:bg-[#1a241c] hover:border-primary/20">
-                   <div className="flex items-center gap-8">
-                      <div className="w-20 h-20 rounded-[1.75rem] bg-gray-50 dark:bg-black flex items-center justify-center text-gray-900 dark:text-white shadow-inner group-hover:rotate-12 transition-transform duration-700 font-extrabold italic text-2xl">🏟️</div>
-                      <div className="space-y-2">
-                         <h4 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-none italic">{b.turf_name}</h4>
-                         <div className="flex items-center gap-4 text-[10px] font-black text-gray-400 uppercase tracking-widest italic opacity-60">
-                            <Clock className="w-4 h-4 text-primary" /> {new Date(b.start_time).toLocaleDateString()} · {new Date(b.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                         </div>
-                      </div>
-                   </div>
-                   <div className="flex items-center gap-10">
-                      <div className="text-right hidden sm:block">
-                         <div className="text-xs font-black text-gray-900 dark:text-white italic tracking-tighter">₹{b.total_price}</div>
-                         <div className={`text-[8px] font-black uppercase tracking-widest italic mt-1 ${b.status === 'confirmed' ? 'text-primary' : 'text-amber-500'}`}>{b.status} PROTOCOL</div>
-                      </div>
-                      <button className="p-4 rounded-xl bg-gray-50 dark:bg-white/5 group-hover:bg-primary group-hover:text-white transition-all shadow-sm"><ArrowRight className="w-5 h-5" /></button>
-                   </div>
+        {/* STATS (High Usability Grid) */}
+        <section className="grid sm:grid-cols-3 gap-6">
+           {loading ? [1,2,3].map(i => <SkeletonStat key={i} />) : stats.map((s, i) => (
+             <div key={i} className="card-compact p-6 flex flex-col justify-between h-40 border-border group hover:border-primary/30 transition-all">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm transition-transform group-hover:scale-110 ${s.color}`}>
+                   <s.icon className="w-5 h-5" />
                 </div>
-              ))}
-           </div>
-         )}
-      </section>
-
-      {/* 4. AI RECOMMENDATIONS (Clean) */}
-      <section className="px-4 py-16 bg-white dark:bg-black/20 rounded-[5rem] border border-gray-100 dark:border-white/5 space-y-12">
-          <div className="flex items-center gap-6 px-10">
-             <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center"><Sparkles className="w-6 h-6" /></div>
-             <h3 className="text-4xl font-black text-gray-900 dark:text-white uppercase italic tracking-tighter leading-none">Sector Discovery <span className="text-primary italic">AI</span></h3>
-          </div>
-          <p className="px-10 text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] italic opacity-60 leading-loose max-w-lg">Synthetic analysis suggests these regional arenas align with your historical engagement frequency.</p>
-          <div className="grid md:grid-cols-3 gap-10 px-10">
-              {[1,2,3].map(i => (
-                <div key={i} className="flex items-center gap-6 p-6 rounded-[2rem] bg-gray-50 dark:bg-white/5 border border-transparent hover:border-primary/20 transition-all cursor-pointer group">
-                   <div className="w-16 h-16 rounded-2xl bg-white dark:bg-black overflow-hidden shadow-xl grayscale group-hover:grayscale-0 transition-all duration-700">
-                      <img src="https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=200&auto=format&fit=crop" className="w-full h-full object-cover" />
-                   </div>
-                   <div>
-                      <div className="text-sm font-black text-gray-900 dark:text-white uppercase italic leading-none mb-1">Elite Sector {i}</div>
-                      <div className="text-[8px] font-black text-primary uppercase tracking-widest opacity-60 italic">98% Match Sync</div>
-                   </div>
+                <div className="space-y-1 mt-4">
+                   <div className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">{s.label}</div>
+                   <div className="text-2xl font-black tracking-tight text-gray-900 dark:text-gray-100 truncate">{s.value}</div>
                 </div>
-              ))}
-          </div>
-      </section>
+             </div>
+           ))}
+        </section>
 
+        {/* TWO COLUMN LAYOUT: UPCOMING VS PAST */}
+        <div className="grid lg:grid-cols-12 gap-8 md:gap-12">
+           
+           {/* LEFT: UPCOMING MATCHES (Actionable) */}
+           <div className="lg:col-span-7 space-y-6">
+              <div className="flex items-center justify-between border-b border-border pb-4">
+                 <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 tracking-tight flex items-center gap-2">
+                    <Target className="w-5 h-5 text-primary" /> Upcoming Matches
+                 </h3>
+              </div>
+
+              {loading ? (
+                <div className="space-y-4">{[1,2].map(i => <SkeletonRow key={i} />)}</div>
+              ) : upcomingMatches.length === 0 ? (
+                <EmptyState title="No Scheduled Matches" sub="You have no upcoming confirmed matches. Book an arena to organize your next game." icon={Calendar} actionLabel="Find Arena" actionLink="/turfs" />
+              ) : (
+                <div className="space-y-4">
+                   {upcomingMatches.map(b => (
+                     <div key={b.id} className="card-compact p-5 group hover:border-primary/40 focus-within:border-primary/40 transition-all">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+                           <div className="flex items-start gap-4">
+                              <div className="w-14 h-14 shrink-0 rounded-2xl bg-primary/10 flex flex-col items-center justify-center text-primary border border-primary/20">
+                                 <div className="text-xs font-bold uppercase tracking-widest leading-none">{new Date(b.date).toLocaleDateString('en-US', { month: 'short' })}</div>
+                                 <div className="text-xl font-black leading-none mt-1">{new Date(b.date).getDate()}</div>
+                              </div>
+                              <div className="space-y-1.5">
+                                 <h4 className="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-none">{b.turf_name}</h4>
+                                 <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-gray-500">
+                                    <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-primary" /> {b.start_time} - {b.end_time}</span>
+                                    <span className="hidden sm:inline w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
+                                    <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-primary" /> Pune</span>
+                                 </div>
+                              </div>
+                           </div>
+                           <div className="flex sm:flex-col items-center sm:items-end justify-between gap-2 border-t sm:border-0 border-border pt-4 sm:pt-0">
+                               <span className="px-2.5 py-1 bg-green-500/10 text-green-600 dark:text-green-400 text-[10px] font-bold uppercase tracking-widest rounded-md border border-green-500/20">Confirmed</span>
+                               <Link href={`/turfs`} className="text-xs font-bold text-primary hover:text-primary-hover transition-colors flex items-center gap-1.5">Details <ArrowRight className="w-3.5 h-3.5" /></Link>
+                           </div>
+                        </div>
+                     </div>
+                   ))}
+                </div>
+              )}
+           </div>
+
+           {/* RIGHT: PAST MATCHES & REBOOK */}
+           <div className="lg:col-span-5 space-y-6">
+              <div className="flex items-center justify-between border-b border-border pb-4">
+                 <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 tracking-tight flex items-center gap-2">
+                    <History className="w-5 h-5 text-gray-400" /> Recent Activity
+                 </h3>
+                 <Link href="/dashboard/customer/history" className="text-[10px] font-bold text-primary uppercase tracking-widest hover:underline underline-offset-4">View All</Link>
+              </div>
+
+              {loading ? (
+                <div className="space-y-4">{[1,2,3].map(i => <SkeletonRow key={i} />)}</div>
+              ) : pastMatches.length === 0 ? (
+                <div className="text-center py-10 px-6 card-compact">
+                   <RotateCw className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                   <p className="text-sm font-semibold text-gray-500">No past activity recorded.</p>
+                </div>
+              ) : (
+                <div className="space-y-3 flex flex-col">
+                   {pastMatches.map(b => (
+                     <div key={b.id} className="p-4 rounded-xl bg-white dark:bg-[#121A14] border border-border flex items-center justify-between gap-4 group hover:bg-card-hover transition-colors shadow-sm">
+                        <div className="space-y-1 overflow-hidden">
+                           <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">{b.turf_name}</h4>
+                           <div className="text-[11px] font-medium text-gray-500">{new Date(b.start_time).toLocaleDateString()}</div>
+                        </div>
+                        <button className="flex items-center justify-center p-2 rounded-lg bg-gray-50 dark:bg-white/5 text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors border border-border" title="Quick Rebook">
+                           <RotateCw className="w-4 h-4" />
+                        </button>
+                     </div>
+                   ))}
+                </div>
+              )}
+           </div>
+
+        </div>
+      </div>
     </div>
   );
 }

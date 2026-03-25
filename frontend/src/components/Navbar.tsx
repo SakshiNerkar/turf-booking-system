@@ -2,182 +2,182 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "./AuthProvider";
-import { Menu, X, Bell, LayoutDashboard, Search, ClipboardList, LogOut } from "lucide-react";
+import { 
+  Menu, X, Bell, LayoutDashboard, Search, History, LogOut, 
+  User, CheckCircle2, ChevronRight, MapPin, Target, Home
+} from "lucide-react";
 
 export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const isActive = (href: string) =>
     pathname === href || (href !== "/" && pathname.startsWith(href));
 
   return (
-    <motion.header 
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="sticky top-0 z-40 w-full"
-    >
-      <div className="border-b border-black/5 bg-white/70 backdrop-blur-xl dark:border-white/5 dark:bg-[#121A14]/90 transition-colors duration-500">
-        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <>
+      <motion.header 
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+          scrolled 
+            ? "glass-panel shadow-sm" 
+            : "bg-white dark:bg-[#0B0F0C] border-b border-border"
+        }`}
+      >
+        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 md:px-6">
           
-          {/* Logo */}
-          <Link href="/" className="group flex items-center gap-4">
-            <motion.div 
-              whileHover={{ rotate: 10, scale: 1.1 }}
-              className="grid h-12 w-12 place-items-center rounded-2xl bg-primary text-xl font-black text-white shadow-xl shadow-green-500/10 transition-all group-hover:shadow-green-500/30"
-            >
-              T
-            </motion.div>
-            <div className="hidden sm:block">
-              <div className="text-2xl font-black tracking-tighter italic text-gray-900 dark:text-white leading-none uppercase">Turff</div>
-              <div className="text-[9px] font-black text-primary uppercase tracking-[0.4em] leading-none mt-1.5 opacity-60 italic">Marketplace</div>
+          {/* Minimal Logo */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center text-white font-black text-xl italic skew-x-3 transition-transform group-hover:skew-x-0 shadow-lg shadow-primary/20">
+               T
             </div>
+            <span className="text-xl font-extrabold tracking-tighter text-gray-900 dark:text-gray-100 uppercase italic">Turff</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-4">
-             {[
-               { href: '/turfs', label: 'BROWSE ARENAS', icon: Search },
-               { href: '/dashboard/customer?tab=history', label: 'MATCH STATS', icon: ClipboardList },
-               { href: '/bookings', label: 'ACTIVE SLOTS', icon: LayoutDashboard }
-             ].map(link => (
-               <Link 
-                 key={link.href} href={link.href} 
-                 className={`flex items-center gap-3 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-transparent ${isActive(link.href) ? 'bg-primary/5 text-primary border-primary/20' : 'text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
-               >
-                 <link.icon className="w-4 h-4 opacity-70" /> {link.label}
-               </Link>
-             ))}
+          {/* Desktop Links */}
+          <nav className="hidden md:flex items-center gap-2">
+             <NavLink href="/" label="Home" icon={Home} active={pathname === "/"} />
+             <NavLink href="/turfs" label="Discover" icon={Search} active={pathname.startsWith("/turfs")} />
+             {user && (
+               <NavLink 
+                 href={`/dashboard/${user.role}`} 
+                 label="Dashboard" 
+                 icon={LayoutDashboard} 
+                 active={pathname.startsWith("/dashboard")} 
+               />
+             )}
           </nav>
 
-          {/* Right Section */}
-          <div className="hidden md:flex items-center gap-6">
+          {/* User Hub & Trust Signals */}
+          <div className="flex items-center gap-6">
+            <div className="hidden lg:flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary italic opacity-70">
+              <CheckCircle2 className="w-4 h-4" /> Secure Hub
+            </div>
+
             {user ? (
-               <div className="flex items-center gap-6 pl-6 border-l border-gray-100 dark:border-white/5">
-                  <div className="flex items-center gap-4 group cursor-pointer" onClick={() => router.push(`/dashboard/${user.role}`)}>
-                     <div className="text-right hidden xl:block">
-                        <div className="text-sm font-black text-gray-900 dark:text-white italic leading-none">{user.name.toUpperCase()}</div>
-                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1 opacity-60 italic">{user.role} RANK</div>
-                     </div>
-                     <div className="h-11 w-11 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 flex items-center justify-center font-black text-gray-400 group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
+               <div className="flex items-center gap-4">
+                  <button className="hidden sm:flex relative p-2 text-gray-400 hover:text-primary transition-colors">
+                    <Bell className="w-5 h-5" />
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                  </button>
+                  <div 
+                    className="flex items-center gap-3 cursor-pointer group"
+                    onClick={() => router.push(`/dashboard/${user.role}`)}
+                  >
+                     <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-card border border-border flex items-center justify-center font-black text-sm text-gray-500 group-hover:bg-primary group-hover:border-primary group-hover:text-white transition-all shadow-sm">
                         {initials(user.name)}
                      </div>
                   </div>
-                  <button onClick={() => { logout(); router.push("/"); }} className="p-3 rounded-2xl text-red-500 hover:bg-red-500/10 transition-colors active:scale-90"><LogOut className="w-5 h-5" /></button>
+                  <button onClick={() => { logout(); router.push("/"); }} className="hidden sm:flex p-2 text-gray-400 hover:text-red-500 transition-colors">
+                    <LogOut className="w-5 h-5" />
+                  </button>
                </div>
             ) : (
-               <div className="flex items-center gap-4">
-                  <Link href="/login" className="px-6 py-2.5 text-[10px] font-black text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all uppercase tracking-widest">Login</Link>
-                  <Link href="/register" className="px-8 py-3 bg-primary text-white text-[10px] font-black rounded-xl shadow-2xl shadow-green-500/20 hover:scale-105 transition-all uppercase tracking-[0.2em] italic">GET STARTED</Link>
+               <div className="hidden sm:flex items-center gap-3">
+                  <Link href="/login" className="px-5 py-2.5 text-xs font-bold text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">Log In</Link>
+                  <Link href="/register" className="btn-sports px-6 py-2.5">Sign Up</Link>
                </div>
             )}
+            
+            {/* Mobile Header Menu Trigger (For generic pages) */}
+            <button
+              className="p-2 -mr-2 md:hidden text-gray-500 hover:text-primary transition-colors"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
-
-
-          {/* Mobile Menu Button */}
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            className="p-2 -mr-2 md:hidden rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </motion.button>
         </div>
-      </div>
 
-      {/* Mobile Menu Overlay */}
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="absolute top-full left-0 w-full bg-white dark:bg-[#121A14] border-b border-gray-200 dark:border-white/10 overflow-hidden md:hidden shadow-2xl transition-colors duration-500"
-          >
-            <div className="p-4 space-y-2">
-              <MobileLink href="/turfs" active={isActive("/turfs")} onClick={() => setMenuOpen(false)}>
-                <Search className="w-4 h-4" /> Browse Turfs
-              </MobileLink>
-              {user && (
-                <>
-                  <MobileLink href={`/dashboard/${user.role}`} active={isActive("/dashboard")} onClick={() => setMenuOpen(false)}>
-                    <LayoutDashboard className="w-4 h-4" /> Dashboard
-                  </MobileLink>
-                  {user.role === "customer" && (
-                    <MobileLink href="/bookings" active={isActive("/bookings")} onClick={() => setMenuOpen(false)}>
-                      <ClipboardList className="w-4 h-4" /> My Bookings
-                    </MobileLink>
-                  )}
-                  <div className="my-4 border-t border-gray-100 dark:border-white/5" />
-                  <div className="flex items-center gap-3 p-3">
-                    <div className="h-10 w-10 rounded-xl bg-gray-100 dark:bg-white/10 flex items-center justify-center font-bold">
-                      {initials(user.name)}
-                    </div>
-                    <div>
-                      <div className="text-sm font-bold text-gray-900 dark:text-white leading-none">{user.name}</div>
-                      <div className="text-xs text-gray-500 mt-1">{user.email}</div>
-                    </div>
-                  </div>
+        {/* Mobile Dropdown (Auth/Logout Only) */}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden border-b border-border bg-white dark:bg-card shadow-xl overflow-hidden"
+            >
+              <div className="p-4 space-y-4">
+                {user ? (
                   <button
                     onClick={() => { logout(); router.push("/"); setMenuOpen(false); }}
-                    className="w-full flex items-center gap-3 p-3 text-red-500 font-bold hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors"
+                    className="w-full flex items-center justify-center gap-2 py-3 bg-red-50 dark:bg-red-500/10 text-red-600 rounded-xl font-bold text-sm"
                   >
-                    <LogOut className="w-4 h-4" /> Logout
+                    <LogOut className="w-4 h-4" /> Sign Out
                   </button>
-                </>
-              )}
-              {!user && (
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                  <Link href="/login" onClick={() => setMenuOpen(false)} className="py-3 text-center text-sm font-bold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-white/5 rounded-xl">
-                    Login
-                  </Link>
-                  <Link href="/register" onClick={() => setMenuOpen(false)} className="py-3 text-center text-sm font-bold text-white bg-primary rounded-xl">
-                    Register
-                  </Link>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.header>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3">
+                    <Link href="/login" onClick={() => setMenuOpen(false)} className="btn-secondary">Log In</Link>
+                    <Link href="/register" onClick={() => setMenuOpen(false)} className="btn-sports">Sign Up</Link>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.header>
+
+      {/* MOBILE BOTTOM NAVIGATION BAR */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-50 glass-panel border-t shadow-sticky pb-safe">
+        <div className="flex items-center justify-around h-16 px-2">
+          <BottomNavIcon href="/" label="Home" icon={Home} active={pathname === "/"} />
+          <BottomNavIcon href="/turfs" label="Discover" icon={Search} active={pathname.startsWith("/turfs")} />
+          {user && (
+            <BottomNavIcon 
+              href={`/dashboard/${user.role}`} 
+              label="Dashboard" 
+              icon={LayoutDashboard} 
+              active={pathname.startsWith("/dashboard")} 
+            />
+          )}
+          {user && (
+            <BottomNavIcon 
+              href={`/dashboard/${user.role}/history`} 
+              label="Activity" 
+              icon={History} 
+              active={pathname.includes("history")} 
+            />
+          )}
+        </div>
+      </div>
+    </>
   );
 }
 
-function NavLink({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
+function NavLink({ href, label, icon: Icon, active }: { href: string; label: string; icon: any; active: boolean }) {
   return (
-    <Link
-      href={href}
-      className={`relative px-4 py-2 flex items-center gap-2.5 text-sm font-bold transition-all duration-300 group
-        ${active ? 'text-primary' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'}`}
+    <Link 
+      href={href} 
+      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all relative group
+        ${active ? 'text-primary bg-primary/10' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5'}`}
     >
-      {children}
-      <motion.div 
-        className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full origin-left"
-        initial={false}
-        animate={{ scaleX: active ? 1 : 0 }}
-        transition={{ duration: 0.3 }}
-      />
-      <div className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary/20 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+      <Icon className={`w-4 h-4 ${active ? 'text-primary' : 'text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'}`} /> 
+      {label}
     </Link>
   );
 }
 
-function MobileLink({ href, active, onClick, children }: { href: string; active: boolean; onClick: () => void; children: React.ReactNode }) {
+function BottomNavIcon({ href, label, icon: Icon, active }: { href: string; label: string; icon: any; active: boolean }) {
   return (
-    <Link
-      href={href}
-      onClick={onClick}
-      className={`flex items-center gap-3 p-3 rounded-xl text-sm font-bold transition-colors
-        ${active ? 'bg-primary/10 text-primary' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5'}`}
-    >
-      {children}
+    <Link href={href} className="flex flex-col items-center justify-center w-full h-full gap-1 group">
+      <div className={`p-1.5 rounded-xl transition-all ${active ? 'bg-primary/10 text-primary' : 'text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'}`}>
+        <Icon className={`w-5 h-5 ${active ? 'fill-primary/20' : ''}`} />
+      </div>
+      <span className={`text-[10px] font-bold ${active ? 'text-primary' : 'text-gray-500'}`}>{label}</span>
     </Link>
   );
 }

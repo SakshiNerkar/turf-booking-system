@@ -1,6 +1,6 @@
 import { pool } from "../config/db";
 
-export type UserRole = "admin" | "owner" | "customer";
+export type UserRole = "admin" | "owner" | "user";
 
 export type UserRow = {
   id: string;
@@ -8,7 +8,11 @@ export type UserRow = {
   email: string;
   phone: string | null;
   password: string;
+  profile_image: string | null;
+  favorites: string; // JSON string of turf IDs
   role: UserRole;
+  earnings_total: number;
+  earnings_monthly: number;
   created_at: string;
   updated_at: string;
 };
@@ -34,14 +38,22 @@ export async function createUser(input: {
   phone?: string;
   password: string;
   role: UserRole;
+  profile_image?: string;
 }) {
   const res = await pool.query<UserRow>(
     `
-    insert into users(name, email, phone, password, role)
-    values ($1, $2, $3, $4, $5)
+    insert into users(name, email, phone, password, role, profile_image)
+    values ($1, $2, $3, $4, $5, $6)
     returning *
   `,
-    [input.name, input.email, input.phone ?? null, input.password, input.role],
+    [
+      input.name, 
+      input.email, 
+      input.phone ?? null, 
+      input.password, 
+      input.role, 
+      input.profile_image ?? null
+    ],
   );
   return res.rows[0]!;
 }
