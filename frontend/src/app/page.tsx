@@ -259,7 +259,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
                 viewport={{ once: true }}
-                className="stat-card-premium"
+                className="stat-card-premium group"
               >
                 <div className="flex flex-col items-center text-center space-y-2">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-1 group-hover:scale-110 transition-transform">

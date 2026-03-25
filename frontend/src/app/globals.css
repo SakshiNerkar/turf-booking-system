@@ -78,7 +78,7 @@ body {
 }
 
 .stat-card-premium {
-  @apply bg-card/60 backdrop-blur-md border border-border rounded-2xl p-6 transition-all duration-500 hover:shadow-2xl hover:bg-card hover:-translate-y-1 relative group;
+  @apply bg-card/60 backdrop-blur-md border border-border rounded-2xl p-6 transition-all duration-500 hover:shadow-2xl hover:bg-card hover:-translate-y-1 relative;
 }
 
 .btn-premium-primary {
@@ -106,7 +106,7 @@ body {
 }
 
 .step-ring {
-  @apply w-16 h-16 rounded-full border-2 border-primary/20 flex items-center justify-center relative transition-all duration-500 group-hover:border-primary group-hover:shadow-[0_0_20px_rgba(46,125,50,0.3)];
+  @apply w-16 h-16 rounded-full border-2 border-primary/20 flex items-center justify-center relative transition-all duration-500 hover:border-primary hover:shadow-[0_0_20px_rgba(46,125,50,0.3)];
 }
 
 .step-ring::after {
