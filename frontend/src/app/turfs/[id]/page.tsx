@@ -7,7 +7,6 @@ import {
   MapPin, ChevronLeft, Share2, Activity, Star,
   CheckCircle2, ChevronRight
 } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
 import { CalendarBooking } from "@/components/CalendarBooking";
 import { ReviewSystem } from "@/components/ReviewSystem";
 import { TurfMap } from "@/components/TurfMap";
@@ -62,7 +61,6 @@ export default async function TurfDetailsPage(props: { params: Promise<{ id: str
 
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-[#0B0F0C] transition-colors duration-300 pb-24 md:pb-16 relative">
-      <Navbar />
 
       <div className="container-compact py-6 md:py-10 space-y-8">
         

@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { apiFetch } from "../../lib/api";
 import { SkeletonCard, EmptyState } from "../../components/Skeletons";
-import { Navbar } from "@/components/Navbar";
+import { SkeletonCard, EmptyState } from "../../components/Skeletons";
 import { MultiTurfMap } from "../../components/MultiTurfMap";
 
 type Turf = { id: string; name: string; location: string; sport_type: string; price_per_slot: string; rating?: number; is_featured?: boolean; };
@@ -43,7 +43,6 @@ export default function TurfsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-[#0B0F0C] transition-colors duration-300">
-      <Navbar />
 
       <div className="container-compact py-8 md:py-16 space-y-10 pb-32 md:pb-16 relative">
         

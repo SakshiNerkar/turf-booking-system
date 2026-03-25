@@ -9,7 +9,6 @@ import {
   Zap, CreditCard, Activity, ChevronRight
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
-import { Navbar } from "@/components/Navbar";
 
 type TurfItem = { 
   id: string; 
@@ -48,7 +47,6 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#0B0F0C] text-foreground transition-colors duration-500 overflow-x-hidden">
-      <Navbar />
 
       {/* 1. HERO SECTION */}
       <section className="relative h-[90vh] min-h-[700px] flex items-center justify-center overflow-hidden">
@@ -322,45 +320,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 8. FOOTER */}
-      <footer className="bg-white dark:bg-[#0B0F0C] border-t border-border py-16">
-        <div className="container-premium">
-          <div className="grid md:grid-cols-4 gap-12 md:gap-8">
-            <div className="col-span-1 md:col-span-2 space-y-6">
-              <span className="text-3xl font-black text-foreground italic uppercase tracking-tighter">
-                TURFF<span className="text-primary italic">.</span>
-              </span>
-              <p className="text-gray-500 max-w-sm text-sm font-medium leading-relaxed">
-                The world's most advanced turf booking ecosystem. Bridging the gap between elite arenas and professional athletes.
-              </p>
-            </div>
-            <div className="space-y-6">
-              <h5 className="font-black uppercase italic tracking-widest text-xs">For Players</h5>
-              <ul className="space-y-4 text-sm font-bold text-gray-500">
-                <li><Link href="/turfs" className="hover:text-primary transition-colors">Explore Venues</Link></li>
-                <li><Link href="/bookings" className="hover:text-primary transition-colors">My Bookings</Link></li>
-                <li><Link href="/" className="hover:text-primary transition-colors">Favorite Hubs</Link></li>
-              </ul>
-            </div>
-            <div className="space-y-6">
-               <h5 className="font-black uppercase italic tracking-widest text-xs">For Owners</h5>
-               <ul className="space-y-4 text-sm font-bold text-gray-500">
-                <li><Link href="/register?role=owner" className="hover:text-primary transition-colors">List Your Arena</Link></li>
-                <li><Link href="/dashboard/owner" className="hover:text-primary transition-colors">Owner Dashboard</Link></li>
-                <li><Link href="/" className="hover:text-primary transition-colors">Partner Program</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="pt-16 mt-16 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs font-bold text-gray-400">© 2026 TURFF ARENA TECHNOLOGIES. ALL RIGHTS RESERVED.</p>
-            <div className="flex items-center gap-8 text-[11px] font-black text-gray-400 uppercase tracking-widest">
-               <Link href="/" className="hover:text-primary transition-colors">Security</Link>
-               <Link href="/" className="hover:text-primary transition-colors">Privacy</Link>
-               <Link href="/" className="hover:text-primary transition-colors">Terms</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
