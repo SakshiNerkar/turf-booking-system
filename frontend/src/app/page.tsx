@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   MapPin, Search, Star, ArrowRight, CheckCircle2, 
   Calendar, ShieldCheck, Clock, Users, Trophy, 
@@ -20,9 +20,23 @@ type TurfItem = {
   images?: { url: string; is_primary: boolean }[];
 };
 
+const HERO_IMAGES = [
+  "https://images.unsplash.com/photo-1574629810360-7de62e1069ed?q=80&w=2000&auto=format&fit=crop", // Football
+  "https://images.unsplash.com/photo-1531415074968-036ba1b575da?q=80&w=2000&auto=format&fit=crop", // Cricket
+  "https://images.unsplash.com/photo-1626225967045-9c76db7b62fe?q=80&w=2000&auto=format&fit=crop", // Padel/Court
+];
+
 export default function LandingPage() {
   const [featuredTurfs, setFeaturedTurfs] = useState<TurfItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [heroIndex, setHeroIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -50,14 +64,21 @@ export default function LandingPage() {
 
       {/* 1. HERO SECTION */}
       <section className="relative h-[90vh] min-h-[700px] flex items-center justify-center overflow-hidden">
-        {/* Animated Background */}
+        {/* Animated Background Carousel */}
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-black/50 z-10" />
-          <img 
-            src="https://images.unsplash.com/photo-1574629810360-7de62e1069ed?q=80&w=2000&auto=format&fit=crop" 
-            className="w-full h-full object-cover animate-slow-zoom blur-[2px]"
-            alt="Stadium Background"
-          />
+          <div className="absolute inset-0 bg-black/60 z-10" />
+          <AnimatePresence mode="wait">
+            <motion.img 
+              key={heroIndex}
+              src={HERO_IMAGES[heroIndex]} 
+              initial={{ opacity: 0, scale: 1.1 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
+              className="w-full h-full object-cover blur-[1px]"
+              alt="Sports Arena"
+            />
+          </AnimatePresence>
         </div>
 
         <div className="container-premium relative z-20 text-center px-4">
