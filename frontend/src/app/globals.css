@@ -106,7 +106,7 @@ body {
 }
 
 .step-ring {
-  @apply w-16 h-16 rounded-full border-2 border-primary/20 flex items-center justify-center relative transition-all duration-500 hover:border-primary hover:shadow-[0_0_20px_rgba(46,125,50,0.3)];
+  @apply w-16 h-16 rounded-full border-2 border-primary/20 flex items-center justify-center relative transition-all duration-500 hover:border-primary hover:shadow-[0_0_20px_rgba(46,125,50,0.3)] bg-white dark:bg-[#0B0F0C] z-10;
 }
 
 .step-ring::after {
