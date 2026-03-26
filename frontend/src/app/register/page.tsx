@@ -19,7 +19,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"customer" | "owner">("customer");
+  const [role, setRole] = useState<"user" | "owner">("user");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showPw, setShowPw] = useState(false);
@@ -73,22 +73,22 @@ export default function RegisterPage() {
             layout
             className="absolute inset-y-1.5 w-[calc(50%-6px)] bg-white dark:bg-white/10 rounded-xl shadow-sm z-0"
             animate={{ 
-              x: role === "customer" ? 0 : "100%",
-            }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          />
-          <button
-            onClick={() => setRole("customer")}
-            className={`relative z-10 flex-1 py-3 text-sm font-black transition-colors ${role === "customer" ? "text-primary" : "text-gray-400"}`}
-          >
-            I&apos;m a Player
-          </button>
-          <button
-            onClick={() => setRole("owner")}
-            className={`relative z-10 flex-1 py-3 text-sm font-black transition-colors ${role === "owner" ? "text-primary" : "text-gray-400"}`}
-          >
-            I Own a Turf
-          </button>
+            x: role === "user" ? 0 : "100%",
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        />
+        <button
+          onClick={() => setRole("user")}
+          className={`relative z-10 flex-1 py-3 text-sm font-black transition-colors ${role === "user" ? "text-primary" : "text-gray-400"}`}
+        >
+          I&apos;m a Player
+        </button>
+        <button
+          onClick={() => setRole("owner")}
+          className={`relative z-10 flex-1 py-3 text-sm font-black transition-colors ${role === "owner" ? "text-primary" : "text-gray-400"}`}
+        >
+          I Own a Turf
+        </button>
         </div>
 
         <form onSubmit={handleRegister} className="grid grid-cols-1 md:grid-cols-2 gap-6">
