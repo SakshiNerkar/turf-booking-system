@@ -63,28 +63,34 @@ export default function AdminDashboard() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] dark:bg-[#080B09] flex transition-colors duration-500 overflow-hidden">
+    <div className="min-h-screen bg-[#FDFDFD] dark:bg-[#060806] flex transition-colors duration-500 overflow-hidden">
       
-      {/* 1. SIDEBAR NAVIGATION */}
-      <aside className={`admin-sidebar ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-         <div className="p-8 pb-4 flex items-center gap-3">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-black italic">T</div>
-            <span className="text-sm font-black uppercase tracking-tighter dark:text-white">Admin <span className="text-primary">Core</span></span>
+      {/* 1. SIDEBAR NAVIGATION - DYNAMIC LAYOUT */}
+      <aside className={`
+        w-64 border-r border-border bg-white dark:bg-[#0B0F0C] flex flex-col h-screen 
+        transition-all duration-300 z-50
+        fixed lg:static top-0 left-0
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        ${isSidebarOpen ? 'shadow-2xl lg:shadow-none' : ''}
+      `}>
+         <div className="p-6 pb-4 flex items-center gap-3">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-black italic shadow-lg shadow-primary/20">T</div>
+            <span className="text-sm font-black uppercase tracking-tighter dark:text-white">Admin <span className="text-primary italic">Core</span></span>
          </div>
 
-         <nav className="flex-1 px-4 py-8 overflow-y-auto no-scrollbar">
-            <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 px-4">Management</div>
+         <nav className="flex-1 px-4 py-6 overflow-y-auto no-scrollbar">
+            <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 px-4 opacity-50">Management</div>
             <NavItem icon={LayoutDashboard} label="Overview" active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} />
             <NavItem icon={Users} label="Users" active={activeTab === 'users'} onClick={() => setActiveTab('users')} />
             <NavItem icon={Map} label="Arenas" active={activeTab === 'turfs'} onClick={() => setActiveTab('turfs')} />
             
-            <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-10 mb-4 px-4">Operations</div>
+            <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-10 mb-4 px-4 opacity-50">Operations</div>
             <NavItem icon={Database} label="System Logs" active={activeTab === 'logs'} onClick={() => setActiveTab('logs')} />
             <NavItem icon={ShieldAlert} label="Overrides" active={activeTab === 'system'} onClick={() => setActiveTab('system')} />
-            <NavItem icon={Settings} label="Global Config" active={false} onClick={() => {}} />
+            <NavItem icon={Settings} label="Config" active={false} onClick={() => {}} />
          </nav>
 
-         <div className="p-6 border-t border-border">
+         <div className="p-6 border-t border-border bg-gray-50/50 dark:bg-white/[0.02]">
             <button onClick={logout} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-xs font-black text-rose-500 hover:bg-rose-500/10 transition-all uppercase tracking-widest">
                <LogOut className="w-4 h-4" /> Sign Out
             </button>
@@ -92,7 +98,7 @@ export default function AdminDashboard() {
       </aside>
 
       {/* MAIN CONTENT AREA */}
-      <main className="flex-1 flex flex-col h-screen overflow-hidden lg:pl-64">
+      <main className="flex-1 flex flex-col h-screen overflow-hidden relative border-l border-border/10">
          
          {/* TOP HEADERBAR */}
          <header className="h-16 border-b border-border bg-white/80 dark:bg-[#080B09]/80 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-40">
