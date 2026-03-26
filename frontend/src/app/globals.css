@@ -135,3 +135,38 @@ body {
 .underline-slide {
   @apply relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full;
 }
+
+/* Admin Specific */
+.admin-sidebar {
+  @apply w-64 border-r border-border bg-white dark:bg-[#0B0F0C] flex flex-col h-screen fixed top-0 left-0 z-50 transition-transform duration-300;
+}
+
+.admin-nav-item {
+  @apply flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-all mb-1;
+}
+
+.admin-nav-item-active {
+  @apply bg-primary/10 text-primary border-r-4 border-primary shadow-sm;
+}
+
+.status-indicator {
+  @apply w-2.5 h-2.5 rounded-full relative;
+}
+
+.status-indicator::after {
+  @apply content-[''] absolute inset-0 rounded-full animate-ping opacity-75;
+}
+
+.status-online { @apply bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]; }
+.status-online::after { @apply bg-emerald-500; }
+
+.status-warning { @apply bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.3)]; }
+.status-warning::after { @apply bg-amber-500; }
+
+.status-critical { @apply bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.3)]; }
+.status-critical::after { @apply bg-rose-500; }
+
+.table-premium { @apply w-full text-left overflow-hidden border-separate border-spacing-0; }
+.th-premium { @apply text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 border-b border-border py-4 px-6; }
+.tr-premium { @apply border-b border-border transition-all hover:bg-gray-50/50 dark:hover:bg-white/[0.02]; }
+.td-premium { @apply py-5 px-6 text-sm font-bold text-gray-900 dark:text-gray-100; }
