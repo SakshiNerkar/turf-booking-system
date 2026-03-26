@@ -50,7 +50,13 @@ export function Sidebar() {
            <div className="text-[9px] font-black text-gray-400 uppercase tracking-[0.4em] mb-4 italic opacity-40">Main Protocol</div>
            <div className="grid gap-1">
               {items.map(item => {
-                const isActive = pathname === item.path;
+                const searchParamsString = typeof window !== 'undefined' ? window.location.search : '';
+                const currentFullVisiblePath = pathname + searchParamsString;
+                
+                // Exact match for the path + params OR if it's the base path and item is 'Overview/Global'
+                const isActive = (currentFullVisiblePath === item.path) || 
+                                (item.path === '/dashboard/admin' && currentFullVisiblePath === '/dashboard/admin');
+
                 return (
                   <Link 
                     key={item.label} 

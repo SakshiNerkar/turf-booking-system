@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useRef } from "react";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { 
   Users, Activity, Trophy, Shield, Zap, TrendingUp, CreditCard, 
@@ -17,17 +18,32 @@ import { SkeletonStat, SkeletonRow } from "../../../components/Skeletons";
 import { ChartProtocol } from "@/components/dashboard/ChartProtocol";
 import { notify } from "../../../lib/toast";
 import { useTheme, VIBES } from "../../../components/ThemeContext";
+import { Suspense } from "react";
 
-type Tab = 'overview' | 'users' | 'turfs' | 'logs' | 'system';
+type Tab = 'overview' | 'users' | 'turfs' | 'history' | 'settings';
 
-export default function AdminDashboard() {
+function AdminDashboardContent() {
   const { user, token, logout } = useAuth();
   const { vibe, setVibe } = useTheme();
-  const [activeTab, setActiveTab] = useState<Tab>('overview');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  
+  const currentTab = (searchParams.get('tab') || 'overview') as Tab;
+  const [activeTab, setActiveTab] = useState<Tab>(currentTab);
   const [data, setData] = useState<any>({ users: [], turfs: [], bookings: [], revenue: 145000 });
   const [loading, setLoading] = useState(true);
+
+  // Sync state with URL - MISSION CRITICAL
+  useEffect(() => {
+    if (currentTab) setActiveTab(currentTab);
+  }, [currentTab]);
+
+  const switchTab = (tab: Tab) => {
+    router.push(`/dashboard/admin?tab=${tab}`);
+  };
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [hudOpen, setHudOpen] = useState(false);
+  const [exitModalOpen, setExitModalOpen] = useState(false);
   const [hudSearch, setHudSearch] = useState("");
 
   const loadData = async () => {
@@ -47,6 +63,11 @@ export default function AdminDashboard() {
     }
     setLoading(false);
   }
+
+  const handleLogout = () => {
+     logout();
+     router.push('/');
+  };
 
   useEffect(() => { loadData(); }, [user, token]);
 
@@ -114,11 +135,24 @@ export default function AdminDashboard() {
             </div>
             
             <div className="flex items-center gap-4">
+               {/* Contextual Tab Toggles */}
+               <div className="hidden xl:flex bg-gray-100 dark:bg-white/5 p-1 rounded-2xl border border-border mr-4">
+                  {(['overview', 'users', 'turfs'] as Tab[]).map(t => (
+                     <button 
+                        key={t} onClick={() => switchTab(t)}
+                        className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === t ? 'bg-primary text-white shadow-xl shadow-primary/20 scale-105' : 'text-gray-400 hover:text-primary'}`}
+                     >
+                        {t}
+                     </button>
+                  ))}
+               </div>
+
                <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-white/5 rounded-2xl border border-border group cursor-pointer" onClick={() => setHudOpen(true)}>
                   <Command className="w-3 h-3 text-gray-400" />
                   <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">+ K</span>
                </div>
                <button onClick={loadData} className="btn-premium-primary !py-3 !px-6 !text-[11px]"><RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Sync Nodes</button>
+               <button onClick={() => setExitModalOpen(true)} className="p-3 bg-rose-500/10 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all shadow-sm"><LogOut className="w-5 h-5" /></button>
             </div>
          </div>
 
@@ -438,6 +472,19 @@ function HoloCard({ label, value, icon: Icon, trend, chart, color }: any) {
             </div>
          </div>
       </motion.div>
+   );
+}
+
+// ENTRY POINT WRAPPED IN SUSPENSE FOR NEXT.JS COMPATIBILITY
+export default function AdminDashboard() {
+   return (
+      <Suspense fallback={
+         <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#060806]">
+            <RefreshCw className="w-10 h-10 text-primary animate-spin" />
+         </div>
+      }>
+         <AdminDashboardContent />
+      </Suspense>
    );
 }
 
