@@ -95,92 +95,89 @@ export default function AdminDashboard() {
       <main className="flex-1 flex flex-col h-screen overflow-hidden lg:pl-64">
          
          {/* TOP HEADERBAR */}
-         <header className="h-20 border-b border-border bg-white/80 dark:bg-[#080B09]/80 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-40">
-            <div className="flex items-center gap-6 flex-1">
+         <header className="h-16 border-b border-border bg-white/80 dark:bg-[#080B09]/80 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-40">
+            <div className="flex items-center gap-4 flex-1">
                <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg">
                   <Menu className="w-5 h-5 dark:text-white" />
                </button>
-               <div className="relative group max-w-md w-full hidden md:block">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input placeholder="Search users, turfs, or txn..." className="w-full pl-11 pr-4 py-2.5 bg-gray-50 dark:bg-white/5 border border-border rounded-xl text-xs font-bold focus:border-primary outline-none transition-all dark:text-white" />
+               <div className="relative group max-w-sm w-full hidden md:block">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                  <input placeholder="Search protocol..." className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-white/5 border border-border rounded-lg text-[11px] font-bold focus:border-primary outline-none transition-all dark:text-white" />
                </div>
             </div>
 
             <div className="flex items-center gap-4">
-               <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 rounded-full group cursor-pointer">
+               <div className="flex items-center gap-2 px-2.5 py-1 bg-emerald-500/10 rounded-full group cursor-pointer border border-emerald-500/20">
                   <div className="status-indicator status-online" />
-                  <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Live Nodes</span>
+                  <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest leading-none">Healthy</span>
                </div>
-               <button className="relative p-2.5 text-gray-500 hover:text-primary transition-colors">
-                  <Bell className="w-5 h-5" />
-                  <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-white dark:border-[#080B09]" />
+               <button className="relative p-2 text-gray-500 hover:text-primary transition-colors">
+                  <Bell className="w-4 h-4" />
+                  <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-primary rounded-full border border-white dark:border-[#080B09]" />
                </button>
-               <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center text-xs font-black dark:text-white border border-border group cursor-pointer relative">
+               <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center text-[10px] font-black dark:text-white border border-border group cursor-pointer relative">
                   {user.name[0]}
-                  <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-card border border-border rounded-2xl shadow-2xl p-2 hidden group-hover:block animate-in fade-in slide-in-from-top-2">
+                  <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-card border border-border rounded-xl shadow-2xl p-1.5 hidden group-hover:block transition-all">
                      <div className="p-3 border-b border-border mb-1">
-                        <div className="text-xs font-black dark:text-white truncate">{user.name}</div>
-                        <div className="text-[10px] font-bold text-gray-500 truncate">{user.email}</div>
+                        <div className="text-[10px] font-black dark:text-white truncate">{user.name}</div>
+                        <div className="text-[9px] font-bold text-gray-500 truncate">{user.email}</div>
                      </div>
-                     <button className="w-full text-left px-4 py-2 text-[10px] font-black uppercase text-gray-500 hover:text-primary hover:bg-primary/5 rounded-lg transition-all">Profile</button>
-                     <button className="w-full text-left px-4 py-2 text-[10px] font-black uppercase text-gray-500 hover:text-primary hover:bg-primary/5 rounded-lg transition-all">Settings</button>
+                     <button className="w-full text-left px-3 py-2 text-[9px] font-black uppercase text-gray-500 hover:text-primary hover:bg-primary/5 rounded-lg transition-all">Profile</button>
+                     <button className="w-full text-left px-3 py-2 text-[9px] font-black uppercase text-gray-500 hover:text-primary hover:bg-primary/5 rounded-lg transition-all">Settings</button>
                   </div>
                </div>
             </div>
          </header>
 
          {/* CONTENT SCROLL AREA */}
-         <div className="flex-1 overflow-y-auto p-8 space-y-10 no-scrollbar pb-32">
+         <div className="flex-1 overflow-y-auto p-6 space-y-6 no-scrollbar pb-32">
             <AnimatePresence mode="wait">
                {activeTab === 'overview' && (
                   <motion.div 
                     key="overview" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                    className="space-y-10"
+                    className="space-y-6"
                   >
-                     {/* STATS DECK */}
-                     <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                     {/* STATS DECK - HIGH DENSITY */}
+                     <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <StatCard label="Total Athletes" value={data.totalUsers} icon={Users} trend="+12%" chart={[30,45,32,60,40]} color="primary" />
                         <StatCard label="Live Arenas" value={data.totalTurfs} icon={Map} trend="+2%" chart={[40,30,50,45,60]} color="blue" />
-                        <StatCard label="Booking Volume" value={`₹${(data.revenue/1000).toFixed(0)}K`} icon={TrendingUp} trend="+28%" chart={[20,60,40,80,90]} color="amber" />
-                        <StatCard label="System Load" value="1.2ms" icon={Activity} trend="Optimal" chart={[10,12,11,13,12]} color="purple" />
+                        <StatCard label="Volume" value={`₹${(data.revenue/1000).toFixed(0)}K`} icon={TrendingUp} trend="+28%" chart={[20,60,40,80,90]} color="amber" />
+                        <StatCard label="Latency" value="1.2ms" icon={Activity} trend="Optimal" chart={[10,12,11,13,12]} color="purple" />
                      </section>
 
-                     <div className="grid lg:grid-cols-12 gap-8">
-                        <div className="lg:col-span-8 space-y-8">
+                     <div className="grid lg:grid-cols-12 gap-6">
+                        <div className="lg:col-span-8 space-y-6">
                            {/* PRIMARY CHART */}
-                           <div className="card-compact !p-0 overflow-hidden bg-white dark:bg-card border-border shadow-2xl relative">
-                              <div className="p-8 border-b border-border flex items-center justify-between">
+                           <div className="card-compact !p-0 overflow-hidden bg-white dark:bg-card border-border shadow-md">
+                              <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-gray-50 dark:bg-white/[0.02]">
                                  <div>
-                                    <h3 className="text-sm font-black uppercase tracking-widest dark:text-white">Revenue Intelligence</h3>
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-1">Real-time monetary velocity tracker</p>
+                                    <h3 className="text-[11px] font-black uppercase tracking-widest dark:text-white">Monetary Flow</h3>
                                  </div>
-                                 <div className="flex bg-gray-100 dark:bg-white/5 p-1 rounded-xl">
+                                 <div className="flex bg-gray-200 dark:bg-white/10 p-0.5 rounded-lg">
                                     {['7D', '30D', '1Y'].map(f => (
-                                       <button key={f} className={`px-3 py-1.5 rounded-lg text-[9px] font-black transition-all ${f==='7D' ? 'bg-white dark:bg-white/10 shadow-sm dark:text-white' : 'text-gray-400'}`}>{f}</button>
+                                       <button key={f} className={`px-2.5 py-1 rounded-md text-[8px] font-black transition-all ${f==='7D' ? 'bg-white dark:bg-white/10 shadow-sm dark:text-white' : 'text-gray-400'}`}>{f}</button>
                                     ))}
                                  </div>
                               </div>
-                              <div className="p-8 pb-12">
+                              <div className="p-6">
                                  <ChartProtocol 
                                     data={[
                                       { label: 'MON', value: 4500 }, { label: 'TUE', value: 5200 },
                                       { label: 'WED', value: 6100 }, { label: 'THU', value: 8800 },
                                       { label: 'FRI', value: 9200 }, { label: 'SAT', value: 12500 }
                                     ]} 
-                                    title="Protocol Revenue" 
-                                    subtitle="High Velocity Trading" 
+                                    title="Revenue Intelligence" 
+                                    subtitle="Gross Trading Velocity" 
                                  />
                               </div>
                            </div>
 
-                           {/* RECENT ACTIVITY TABLE */}
-                           <div className="space-y-6">
-                              <SectionHeader title="System Activity Feed" icon={Database} actionLabel="Full Stream" />
-                              <div className="space-y-3">
+                           {/* FEED */}
+                           <div className="space-y-4">
+                              <SectionHeader title="System Activity Feed" icon={Database} actionLabel="View Streams" />
+                              <div className="space-y-2">
                                  {loading ? (
                                     [1,2,3].map(i => <SkeletonRow key={i} />)
-                                 ) : data.bookings.length === 0 ? (
-                                    <div className="py-12 text-center text-gray-400 font-bold uppercase text-[10px] tracking-widest border-2 border-dashed border-border rounded-3xl">No live activity detected</div>
                                  ) : (
                                     data.bookings.slice(0, 5).map((b: any) => (
                                        <ActivityRow key={b.id} item={b} />
@@ -192,31 +189,30 @@ export default function AdminDashboard() {
 
                         {/* RIGHT SYSTEM PANEL */}
                         <div className="lg:col-span-4 space-y-6">
-                           <div className="card-compact p-8 space-y-8 bg-white dark:bg-card border-border shadow-xl">
-                              <div className="space-y-2">
-                                 <h3 className="text-sm font-black uppercase tracking-widest dark:text-white">System Nodes</h3>
-                                 <div className="flex items-center gap-2">
-                                    <div className="status-indicator status-online" />
-                                    <span className="text-[10px] font-black text-emerald-500 uppercase">Universal Operational</span>
+                           <div className="card-compact p-6 space-y-6 bg-white dark:bg-card border-border shadow-md">
+                              <div className="space-y-1">
+                                 <h3 className="text-[11px] font-black uppercase tracking-widest dark:text-white">Active Nodes</h3>
+                                 <div className="flex items-center gap-1.5 overflow-hidden">
+                                     <span className="text-[9px] font-black text-emerald-500 uppercase flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> All Services Operational</span>
                                  </div>
                               </div>
 
-                              <div className="grid gap-3">
+                              <div className="grid gap-2">
                                  <SystemNode label="Auth Gateway" value="99.9%" status="online" />
                                  <SystemNode label="Payment Sync" value="100%" status="online" />
-                                 <SystemNode label="Search Index" value="99.7%" status="warning" />
-                                 <SystemNode label="Asset Storage" value="100%" status="online" />
+                                 <SystemNode label="Match Grid" value="99.7%" status="warning" />
+                                 <SystemNode label="Storage" value="100%" status="online" />
                               </div>
 
-                              <div className="space-y-3 pt-4">
+                              <div className="space-y-2 pt-2 border-t border-border">
                                  <button 
                                     onClick={runDiagnostics} disabled={!!actionLoading}
-                                    className="btn-premium-primary !py-3 !text-[10px] w-full shadow-lg"
+                                    className="btn-premium-primary !py-2.5 !text-[9px] w-full shadow-md"
                                  >
-                                    {actionLoading === 'diag' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-                                    Run Deep Diagnostics
+                                    {actionLoading === 'diag' ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
+                                    Run Protocol Check
                                  </button>
-                                 <button className="btn-secondary w-full !text-[9px] !py-3">Download System Logs</button>
+                                 <button className="btn-secondary w-full !text-[8px] !py-2.5">Export logs</button>
                               </div>
                            </div>
                         </div>
@@ -380,28 +376,22 @@ function StatCard({ label, value, icon: Icon, trend, chart, color }: any) {
    };
    
    return (
-      <div className="card-compact !p-6 flex flex-col justify-between h-48 border border-border group hover:border-primary/40 transition-all shadow-sm bg-white dark:bg-card relative overflow-hidden">
-         <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:scale-125 transition-transform duration-[4s] pointer-events-none">
-            <Icon className="w-24 h-24" />
-         </div>
-         <div className="flex items-start justify-between relative z-10">
-            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center border shadow-sm transition-transform group-hover:scale-110 ${colors[color]}`}>
+      <div className="card-compact !p-4 flex items-center justify-between border border-border group hover:border-primary/40 transition-all shadow-sm bg-white dark:bg-card h-[92px]">
+         <div className="flex items-center gap-4">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm transition-transform group-hover:scale-110 ${colors[color]}`}>
                <Icon className="w-5 h-5 font-black" />
             </div>
-            <div className="flex flex-col items-end gap-1">
-               <div className="text-[9px] font-black uppercase tracking-widest text-emerald-500">{trend}</div>
-               <div className="flex items-end gap-1 h-6">
-                  {chart.map((v: number, i: number) => (
-                     <div key={i} className={`w-1 rounded-full ${colors[color].split(' ')[0].replace('text-', 'bg-')} opacity-30`} style={{ height: `${(v/Math.max(...chart))*100}%` }} />
-                  ))}
-               </div>
+            <div className="space-y-0.5">
+               <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{label}</div>
+               <div className="text-xl font-black tracking-tighter text-gray-900 dark:text-white leading-none">{value === undefined ? '...' : value}</div>
             </div>
          </div>
-         <div className="space-y-1 relative z-10">
-            <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">{label}</div>
-            <div className="text-3xl font-black tracking-tighter text-gray-900 dark:text-white leading-none">{value === undefined ? '...' : value}</div>
-            <div className="flex items-center gap-1 text-[8px] font-black text-primary opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-widest cursor-pointer mt-2">
-               View Details <ArrowUpRight className="w-2.5 h-2.5" />
+         <div className="flex flex-col items-end gap-1.5">
+            <div className="text-[10px] font-black italic text-emerald-500">{trend}</div>
+            <div className="flex items-end gap-1 h-5 w-16">
+               {chart.map((v: number, i: number) => (
+                  <div key={i} className={`w-1 rounded-full ${colors[color].split(' ')[0].replace('text-', 'bg-')} opacity-20`} style={{ height: `${(v/Math.max(...chart))*100}%` }} />
+               ))}
             </div>
          </div>
       </div>
@@ -410,11 +400,11 @@ function StatCard({ label, value, icon: Icon, trend, chart, color }: any) {
 
 function SectionHeader({ title, icon: Icon, actionLabel }: any) {
    return (
-      <div className="flex items-center justify-between border-b border-border pb-4 w-full">
-         <h3 className="text-lg font-black text-gray-900 dark:text-gray-100 tracking-tighter uppercase italic flex items-center gap-2">
-            <Icon className="w-5 h-5 text-gray-400" /> {title}
+      <div className="flex items-center justify-between border-b border-border pb-3 w-full">
+         <h3 className="text-sm font-black text-gray-900 dark:text-gray-100 tracking-tighter uppercase italic flex items-center gap-2">
+            <Icon className="w-4 h-4 text-gray-400" /> {title}
          </h3>
-         {actionLabel && <button className="text-[9px] font-black text-primary uppercase tracking-[0.2em] hover:opacity-70 transition-opacity">{actionLabel} →</button>}
+         {actionLabel && <button className="text-[8px] font-black text-primary uppercase tracking-[0.2em] hover:opacity-70 transition-opacity">{actionLabel} →</button>}
       </div>
    );
 }
