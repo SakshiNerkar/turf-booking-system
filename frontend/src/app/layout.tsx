@@ -37,6 +37,8 @@ import ThemeSwitcher from "../components/ThemeSwitcher";
 import ScrollProgress from "../components/ScrollProgress";
 import { Shell } from "../components/layout/Shell";
 
+import { ThemeProvider } from "../components/ThemeContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -45,16 +47,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-gray-900 dark:bg-[#0B0F0C] dark:text-gray-100 transition-colors duration-500`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-gray-900 dark:bg-[#060806] dark:text-gray-100 transition-colors duration-500`}
       >
-        <AuthProvider>
-          <ScrollProgress />
-          <Shell>
-            {children}
-          </Shell>
-          <ThemeSwitcher />
-          <ToasterProvider />
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <ScrollProgress />
+            <Shell>
+              {children}
+            </Shell>
+            <ThemeSwitcher />
+            <ToasterProvider />
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

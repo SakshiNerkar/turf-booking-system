@@ -7,9 +7,10 @@
 :root {
   --background:     #ffffff;
   --foreground:     #111827;
-  --primary:        #2E7D32;
-  --primary-hover:  #1b5e20;
-  --primary-light:  #e8f5e9;
+  --primary-hue:    122; /* Default: Turff Green */
+  --primary:        hsl(var(--primary-hue), 45%, 34%);
+  --primary-hover:  hsl(var(--primary-hue), 55%, 24%);
+  --primary-light:  hsl(var(--primary-hue), 40%, 94%);
   --secondary:      #4b5563;
   --border:         rgba(0,0,0,0.06);
   --card:           #ffffff;

@@ -42,11 +42,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-[#0B0F0C] transition-colors duration-500 pb-24 lg:pb-0 lg:pl-64">
+    <div className="min-h-screen bg-[#FDFDFD] dark:bg-[#060806] transition-colors duration-500 pb-24 lg:pb-0 lg:pl-64 relative">
       
+      {/* 0. GLOBAL BACKGROUND DECOR (WOW FACTOR) */}
+      <div className="fixed inset-0 pointer-events-none opacity-40 dark:opacity-20 bg-stadium-texture" />
+      <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -mr-64 -mt-64" />
+      <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] lg:ml-64 -mb-64" />
+
       {/* 1. DESKTOP SIDEBAR (Static/Fixed) */}
-      <aside className="hidden lg:block fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-[#121A14] border-r border-gray-100 dark:border-white/5 z-40 overflow-y-auto no-scrollbar shadow-sm">
-         <div className="p-10">
+      <aside className="hidden lg:block fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-[#0B0F0C] border-r border-gray-100 dark:border-white/5 z-40 overflow-y-auto no-scrollbar shadow-sm">
+         <div className="p-8">
             <Link href="/" className="text-3xl font-black text-primary tracking-tighter italic block mb-12">TURFF</Link>
             <Sidebar />
          </div>
@@ -58,8 +63,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* 3. MAIN CONTENT ENGINE */}
-      <main className="max-w-7xl mx-auto p-4 md:p-10 animate-fade">
-         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+      <main className="max-w-7xl mx-auto p-6 md:p-12 relative z-10">
+         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             {children}
          </motion.div>
       </main>

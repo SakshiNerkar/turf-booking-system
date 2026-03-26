@@ -5,15 +5,17 @@ import { usePathname, useRouter } from "next/navigation";
 import { 
   LayoutDashboard, Search, History, User, Settings, 
   Store, PlusCircle, Bell, LogOut, ShieldCheck, Zap,
-  TrendingUp, Activity, Database, Globe
+  TrendingUp, Activity, Database, Globe, Palette
 } from "lucide-react";
 import { useAuth } from "../AuthProvider";
+import { useTheme, VIBES } from "../ThemeContext";
 import { motion } from "framer-motion";
 
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { vibe, setVibe } = useTheme();
 
   const menuItems = {
     customer: [
@@ -43,21 +45,21 @@ export function Sidebar() {
 
   return (
     <div className="flex flex-col h-full justify-between pb-10">
-      <div className="space-y-12">
+      <div className="space-y-10">
         <div className="space-y-4">
-           <div className="text-[9px] font-black text-gray-400 uppercase tracking-[0.4em] mb-8 italic opacity-40">Main Protocol</div>
-           <div className="grid gap-2">
+           <div className="text-[9px] font-black text-gray-400 uppercase tracking-[0.4em] mb-4 italic opacity-40">Main Protocol</div>
+           <div className="grid gap-1">
               {items.map(item => {
                 const isActive = pathname === item.path;
                 return (
                   <Link 
                     key={item.label} 
                     href={item.path}
-                    className={`flex items-center gap-6 px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all group ${
-                      isActive ? 'bg-primary text-white shadow-lg shadow-green-500/20 scale-105 italic' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-primary italic'
+                    className={`flex items-center gap-5 px-5 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all group ${
+                      isActive ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105 italic' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-primary italic'
                     }`}
                   >
-                    <item.icon className="w-5 h-5 opacity-40 group-hover:opacity-100 transition-opacity" />
+                    <item.icon className="w-4 h-4 opacity-40 group-hover:opacity-100 transition-opacity" />
                     {item.label}
                   </Link>
                 );
@@ -65,27 +67,44 @@ export function Sidebar() {
            </div>
         </div>
 
+        {/* Theme Vibe Selector */}
         <div className="space-y-4">
-           <div className="text-[9px] font-black text-gray-400 uppercase tracking-[0.4em] mb-8 italic opacity-40">Operational</div>
-           <div className="grid gap-2">
-              <Link href="/" className="flex items-center gap-6 px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-primary transition-all italic">
-                 <Globe className="w-5 h-5 opacity-40" /> Public Site
+           <div className="text-[9px] font-black text-gray-400 uppercase tracking-[0.4em] mb-4 italic opacity-40">Identity Vibe</div>
+           <div className="flex flex-wrap gap-2 px-2">
+              {VIBES.map(v => (
+                 <button 
+                    key={v.name} 
+                    onClick={() => setVibe(v)}
+                    className={`w-6 h-6 rounded-full border-2 transition-all p-0.5 ${vibe.name === v.name ? 'border-primary ring-2 ring-primary/20 scale-125 shadow-lg' : 'border-transparent opacity-40 hover:opacity-100'}`}
+                    title={v.name}
+                 >
+                    <div className="w-full h-full rounded-full" style={{ backgroundColor: v.color }} />
+                 </button>
+              ))}
+           </div>
+        </div>
+
+        <div className="space-y-4">
+           <div className="text-[9px] font-black text-gray-400 uppercase tracking-[0.4em] mb-4 italic opacity-40">Operational</div>
+           <div className="grid gap-1">
+              <Link href="/" className="flex items-center gap-5 px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-primary transition-all italic">
+                 <Globe className="w-4 h-4 opacity-40" /> Public Site
               </Link>
               <button 
                 onClick={() => { logout(); router.push('/'); }}
-                className="flex items-center gap-6 px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 dark:hover:bg-red-500/5 transition-all italic"
+                className="flex items-center gap-5 px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 dark:hover:bg-red-500/5 transition-all italic"
               >
-                 <LogOut className="w-5 h-5" /> Terminate
+                 <LogOut className="w-4 h-4" /> Terminate
               </button>
            </div>
         </div>
       </div>
 
       {/* Profile Mini Card */}
-      <div className="mt-20 p-6 bg-gray-50 dark:bg-black/40 rounded-[2rem] border border-gray-100 dark:border-white/5 flex items-center gap-4 group cursor-pointer hover:border-primary/20 transition-all">
-         <div className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center font-black italic shadow-lg shadow-green-500/20">{user?.name[0]}</div>
+      <div className="mt-10 p-4 bg-gray-50 dark:bg-black/40 rounded-[1.5rem] border border-gray-100 dark:border-white/5 flex items-center gap-3 transition-all">
+         <div className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center font-black italic shadow-lg shadow-primary/20">{user?.name[0]}</div>
          <div className="overflow-hidden">
-            <div className="text-[10px] font-black text-gray-900 dark:text-white uppercase truncate italic">{user?.name}</div>
+            <div className="text-[10px] font-black text-gray-900 dark:text-white uppercase truncate italic leading-none">{user?.name}</div>
             <div className="text-[8px] font-black text-primary uppercase tracking-widest opacity-60 leading-none mt-1">Operational</div>
          </div>
       </div>
