@@ -9,7 +9,7 @@ import {
   Zap, ShieldCheck, Star, Bell, Settings, LogOut, Search, Filter,
   CheckCircle2, AlertCircle, Trash2, Edit3, MoreVertical, Hash,
   RefreshCw, Power, Info, Download, Trash, UserPlus, X, Wallet,
-  Calendar, Check, XCircle
+  Check, XCircle
 } from "lucide-react";
 import { useAuth } from "../../../components/AuthProvider";
 import { apiFetch } from "../../../lib/api";
@@ -31,7 +31,7 @@ function OwnerDashboardContent() {
   
   const currentTab = (searchParams.get('tab') || 'overview') as Tab;
   const [activeTab, setActiveTab] = useState<Tab>(currentTab);
-  const [data, setData] = useState<any>({ turfs: [], bookings: [], customers: [], finance: { daily: [], history: [] } });
+  const [data, setData] = useState<any>({ turfs: [], bookings: [], customers: [], finance: { daily: [], history: [], total: 0 } });
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   
