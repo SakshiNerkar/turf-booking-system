@@ -158,24 +158,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Demo Accounts */}
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
-           <DemoBadge role="Customer" onClick={() => { setEmail("customer@turff.local"); setPassword("Customer@123"); }} />
-           <DemoBadge role="Owner" onClick={() => { setEmail("owner@turff.local"); setPassword("Owner@123"); }} />
-           <DemoBadge role="Admin" onClick={() => { setEmail("admin@turff.local"); setPassword("Admin@123"); }} />
-        </div>
       </motion.div>
     </div>
-  );
-}
-
-function DemoBadge({ role, onClick }: { role: string; onClick: () => void }) {
-  return (
-    <button 
-      onClick={onClick}
-      className="px-3 py-1 bg-gray-100 dark:bg-white/5 rounded-full text-[10px] font-black text-gray-500 hover:text-primary transition-colors uppercase tracking-widest border border-transparent hover:border-primary/20"
-    >
-      Demo {role}
-    </button>
   );
 }
