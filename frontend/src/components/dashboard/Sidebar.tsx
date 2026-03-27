@@ -5,7 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { 
   LayoutDashboard, Search, History, User, Settings, 
   Store, PlusCircle, Bell, LogOut, ShieldCheck, Zap,
-  TrendingUp, Activity, Database, Globe, Palette
+  TrendingUp, Activity, Database, Globe, Palette,
+  Calendar, Clock, BarChart3, Users
 } from "lucide-react";
 import { useAuth } from "../AuthProvider";
 import { useTheme, VIBES } from "../ThemeContext";
@@ -27,9 +28,14 @@ export function Sidebar() {
     ],
     owner: [
       { path: '/dashboard/owner', icon: LayoutDashboard, label: 'Ops center' },
+      { path: '/dashboard/owner?tab=bookings', icon: Calendar, label: 'Bookings' },
+      { path: '/dashboard/owner?tab=slots', icon: Clock, label: 'Slots' },
       { path: '/dashboard/owner?tab=turfs', icon: Store, label: 'Arenas' },
-      { path: '/dashboard/owner?tab=add', icon: PlusCircle, label: 'Initialize' },
-      { path: '/dashboard/owner?tab=earnings', icon: TrendingUp, label: 'Energy' },
+      { path: '/dashboard/owner?tab=finance', icon: TrendingUp, label: 'Finance' },
+      { path: '/dashboard/owner?tab=customers', icon: Users, label: 'CRM' },
+      { path: '/dashboard/owner?tab=coupons', icon: Zap, label: 'Coupons' },
+      { path: '/dashboard/owner?tab=staff', icon: ShieldCheck, label: 'Staff' },
+      { path: '/dashboard/owner?tab=reports', icon: BarChart3, label: 'Reports' },
       { path: '/dashboard/owner?tab=profile', icon: User, label: 'Identity' },
     ],
     admin: [
