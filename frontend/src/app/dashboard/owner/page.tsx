@@ -292,6 +292,9 @@ function OwnerDashboardContent() {
                   </div>
                </motion.div>
             )}
+
+            {/* TAB: TURFS */}
+            {activeTab === 'turfs' && (
                <motion.div key="turfs" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-10">
                   <div className="flex items-center justify-between">
                      <h2 className="text-3xl font-black uppercase italic dark:text-white tracking-widest">Arena <span className="text-primary italic opacity-60">Governance</span></h2>
