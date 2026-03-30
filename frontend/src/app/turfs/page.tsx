@@ -12,7 +12,7 @@ import { apiFetch } from "../../lib/api";
 import { SkeletonCard, EmptyState } from "../../components/Skeletons";
 import { MultiTurfMap } from "../../components/MultiTurfMap";
 
-type Turf = { id: string; name: string; location: string; sport_type: string; price_per_slot: string; rating?: number; is_featured?: boolean; images?: string; };
+type Turf = { id: string; name: string; location_city: string; sports_available: string; price_weekday: number; rating?: number; images?: string; };
 
 export default function TurfsPage() {
   const [turfs, setTurfs] = useState<Turf[] | null>(null);
@@ -34,8 +34,8 @@ export default function TurfsPage() {
     if (!turfs) return [];
     return turfs.filter(t => {
       const matchSearch = t.name.toLowerCase().includes(search.toLowerCase()) || 
-                          t.location.toLowerCase().includes(search.toLowerCase());
-      const matchFilter = filter === 'all' || t.sport_type.toLowerCase() === filter.toLowerCase();
+                          t.location_city.toLowerCase().includes(search.toLowerCase());
+      const matchFilter = filter === 'all' || t.sports_available.toLowerCase() === filter.toLowerCase();
       return matchSearch && matchFilter;
     });
   }, [turfs, search, filter]);
@@ -138,7 +138,7 @@ export default function TurfsPage() {
                            />
                           <div className="absolute top-4 left-4 flex flex-col gap-2">
                              <span className="px-3 py-1.5 bg-white/95 dark:bg-[#121A14]/95 backdrop-blur-md rounded-lg font-black text-gray-900 dark:text-gray-100 text-[10px] uppercase shadow-sm flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-primary" /> Verified</span>
-                             {Number(t.price_per_slot) < 1000 && <span className="px-3 py-1.5 bg-primary/10 text-primary backdrop-blur-md rounded-lg font-black text-[9px] uppercase shadow-sm border border-primary/20 flex items-center gap-1.5">Best Value</span>}
+                             {t.price_weekday < 1000 && <span className="px-3 py-1.5 bg-primary/10 text-primary backdrop-blur-md rounded-lg font-black text-[9px] uppercase shadow-sm border border-primary/20 flex items-center gap-1.5">Best Value</span>}
                           </div>
                           <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
                              <div className="px-3 py-1 bg-white/95 dark:bg-[#121A14]/95 backdrop-blur-md rounded-lg font-black text-amber-500 text-[11px] shadow-sm flex items-center gap-1.5">★ {t.rating || '4.9'}</div>
@@ -153,13 +153,13 @@ export default function TurfsPage() {
                                  {t.name} <BadgeCheck className="w-5 h-5 text-primary" /> <Sparkles className="w-4 h-4 text-amber-500" />
                                </h4>
                              </div>
-                             <div className="flex items-center gap-2 text-xs font-semibold text-gray-500"><MapPin className="w-3.5 h-3.5 text-primary" /> {t.location}</div>
+                             <div className="flex items-center gap-2 text-xs font-semibold text-gray-500"><MapPin className="w-3.5 h-3.5 text-primary" /> {t.location_city}</div>
                           </div>
                           
                           <div className="flex items-center justify-between pt-6 border-t border-border/50">
                              <div>
                                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">From</div>
-                               <div className="text-xl font-black text-gray-900 dark:text-gray-100">₹{t.price_per_slot}<span className="text-xs font-semibold text-gray-500 opacity-60">/hr</span></div>
+                               <div className="text-xl font-black text-gray-900 dark:text-gray-100">₹{t.price_weekday}<span className="text-xs font-semibold text-gray-500 opacity-60">/hr</span></div>
                              </div>
                              <button className="btn-sports py-3 px-6 shadow-md shadow-primary/20">Book</button>
                           </div>

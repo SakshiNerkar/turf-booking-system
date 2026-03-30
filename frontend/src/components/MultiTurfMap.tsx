@@ -6,8 +6,8 @@ import Link from "next/link";
 type TurfPoint = {
   id: string;
   name: string;
-  location: string;
-  price_per_slot: string;
+  location_city: string;
+  price_weekday: number;
   rating?: number;
 };
 
@@ -55,14 +55,14 @@ export function MultiTurfMap({ turfs }: { turfs: TurfPoint[] }) {
 
       // Add pins for each turf
       const pins = await Promise.all(turfs.slice(0, 10).map(async (t) => {
-        const coords = await geocode(t.location);
+        const coords = await geocode(t.location_city);
         if (coords) {
           const marker = L.marker(coords).addTo(map);
           marker.bindPopup(`
             <div style="padding: 10px; font-family: sans-serif;">
               <h4 style="margin: 0 0 5px; font-weight: 800; font-size: 14px;">${t.name}</h4>
-              <p style="margin: 0; font-size: 11px; color: #666;">${t.location}</p>
-              <div style="margin-top: 8px; font-weight: 900; color: #2E7D32;">₹${t.price_per_slot}/hr</div>
+              <p style="margin: 0; font-size: 11px; color: #666;">${t.location_city}</p>
+              <div style="margin-top: 8px; font-weight: 900; color: #2E7D32;">₹${t.price_weekday}/hr</div>
               <a href="/turfs/${t.id}" style="display: block; margin-top: 10px; background: #2E7D32; color: white; text-align: center; padding: 5px; border-radius: 5px; text-decoration: none; font-size: 11px; font-weight: 800;">View Arena</a>
             </div>
           `);

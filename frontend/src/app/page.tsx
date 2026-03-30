@@ -17,7 +17,7 @@ type TurfItem = {
   sports_available: string; 
   price_weekday: number; 
   rating?: number; 
-  images?: { url: string; is_primary: boolean }[];
+  images: string; // JSON string
 };
 
 const HERO_IMAGES = [
@@ -209,12 +209,19 @@ export default function LandingPage() {
         >
           {loading ? [1,2,3].map(i => (
             <div key={i} className="h-[450px] bg-card/50 animate-pulse rounded-2xl border border-border" />
-          )) : (
-            featuredTurfs.map(t => (
-              <motion.div key={t.id} variants={itemVariants} className="card-premium group p-0 min-h-[480px] flex flex-col">
-                <div className="relative h-64 overflow-hidden">
-                  <img 
-                    src={t.images?.[0]?.url || "https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=600&auto=format&fit=crop"} 
+          )) : featuredTurfs.length === 0 ? (
+            <div className="md:col-span-3 text-center py-20 bg-gray-50 dark:bg-white/5 rounded-[3rem] border-2 border-dashed border-border/50">
+               <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">No Arenas Synchronized Yet</p>
+            </div>
+          ) : (
+            featuredTurfs.map(t => {
+              const imageArray = t.images ? JSON.parse(t.images) : [];
+              const mainImage = imageArray[0] || "https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=600&auto=format&fit=crop";
+              return (
+                <motion.div key={t.id} variants={itemVariants} className="card-premium group p-0 min-h-[480px] flex flex-col">
+                  <div className="relative h-64 overflow-hidden">
+                    <img 
+                      src={mainImage} 
                     className="w-full h-full object-cover transition-transform duration-[5s] group-hover:scale-110"
                     alt={t.name}
                   />
@@ -253,8 +260,9 @@ export default function LandingPage() {
                     </Link>
                   </div>
                 </div>
-              </motion.div>
-            ))
+                </motion.div>
+              );
+            })
           )}
         </motion.div>
       </section>

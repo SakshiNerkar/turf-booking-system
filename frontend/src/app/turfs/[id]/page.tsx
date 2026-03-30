@@ -13,8 +13,8 @@ import { TurfMap } from "@/components/TurfMap";
 import { apiFetch, type ApiResponse } from "@/lib/api";
 
 type Turf = {
-  id: string; owner_id: string; name: string; location: string;
-  sport_type: string; price_per_slot: string; description: string | null;
+  id: string; owner_id: string; name: string; location_city: string;
+  sports_available: string; price_weekday: number; description: string | null;
   rating?: number; images?: string;
 };
 
@@ -74,7 +74,7 @@ export default function TurfDetailsPage({ params }: { params: Promise<{ id: stri
   );
 
   const { turf, slots } = data;
-  const meta = SPORT_META[turf.sport_type?.toLowerCase()] ?? { icon: "🏟️", accent: "bg-gray-600" };
+  const meta = SPORT_META[turf.sports_available?.toLowerCase()] ?? { icon: "🏟️", accent: "bg-gray-600" };
 
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-[#0B0F0C] transition-colors duration-300 pb-24 md:pb-16 relative">
@@ -122,7 +122,7 @@ export default function TurfDetailsPage({ params }: { params: Promise<{ id: stri
                  </div>
                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-none">{turf.name}</h1>
                  <div className="flex flex-wrap items-center gap-4 text-[11px] font-bold text-white/80 uppercase tracking-widest">
-                    <span className="flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> {turf.location}</span>
+                    <span className="flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> {turf.location_city}</span>
                     <span className="w-1.5 h-1.5 rounded-full bg-white/30" />
                     <span className="flex items-center gap-2 text-amber-400"><Star className="w-4 h-4 fill-amber-400" /> {turf.rating || '4.9'} Ratings</span>
                  </div>
@@ -148,9 +148,9 @@ export default function TurfDetailsPage({ params }: { params: Promise<{ id: stri
                  turfId={turf.id}
                  turfName={turf.name}
                  turfOwnerId={turf.owner_id}
-                 pricePerSlot={Number(turf.price_per_slot)}
+                 pricePerSlot={turf.price_weekday}
                  slots={slots}
-                 location={turf.location}
+                 location={turf.location_city}
               />
               
               <div className="space-y-6">
@@ -200,7 +200,7 @@ export default function TurfDetailsPage({ params }: { params: Promise<{ id: stri
                  </div>
 
                  <div className="h-48 rounded-2xl overflow-hidden border border-border shadow-sm">
-                    <TurfMap locationName={turf.location} turfName={turf.name} />
+                    <TurfMap locationName={turf.location_city} turfName={turf.name} />
                  </div>
               </div>
            </div>
@@ -211,7 +211,7 @@ export default function TurfDetailsPage({ params }: { params: Promise<{ id: stri
       <div className="md:hidden fixed bottom-0 inset-x-0 glass-panel border-t shadow-sticky z-40 px-4 py-4 flex items-center justify-between pb-safe">
          <div className="space-y-0.5">
             <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Cost / HR</div>
-            <div className="text-xl font-black text-gray-900 dark:text-gray-100 uppercase tracking-tight">₹{turf.price_per_slot}</div>
+            <div className="text-xl font-black text-gray-900 dark:text-gray-100 uppercase tracking-tight">₹{turf.price_weekday}</div>
          </div>
          <button className="btn-sports px-8 shadow-md">Select Time</button>
       </div>
