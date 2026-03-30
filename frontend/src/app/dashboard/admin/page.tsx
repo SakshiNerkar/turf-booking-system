@@ -71,19 +71,27 @@ function AdminDashboardContent() {
   const loadData = async () => {
     if (!token) return;
     setLoading(true);
-    const res = await apiFetch<any>("/api/dashboards/admin");
-    if (res.ok) {
-       setData({
-         users: res.data.recentUsers || [],
-         turfs: Array(res.data.totalTurfs).fill({}), 
-         bookings: res.data.recentBookings || [],
-         revenue: 145200,
-         totalUsers: res.data.totalUsers,
-         totalTurfs: res.data.totalTurfs,
-         totalBookings: res.data.totalBookings
-       });
+    try {
+      const [stats, usersRes, turfsRes] = await Promise.all([
+        apiFetch<any>("/api/dashboards/admin", { token }),
+        apiFetch<any[]>("/api/admin/users", { token }),
+        apiFetch<any[]>("/api/admin/turfs", { token })
+      ]);
+
+      if (stats.ok && usersRes.ok && turfsRes.ok) {
+        setData({
+          users: usersRes.data,
+          turfs: turfsRes.data,
+          bookings: stats.data.recentBookings || [],
+          revenue: 145200,
+          totalUsers: stats.data.totalUsers,
+          totalTurfs: stats.data.totalTurfs,
+          totalBookings: stats.data.totalBookings
+        });
+      }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   const handleLogout = () => {
@@ -107,10 +115,30 @@ function AdminDashboardContent() {
   }, []);
 
   const handleAction = async (id: string, action: string) => {
+    if (!token) return;
     setActionLoading(id);
-    await new Promise(r => setTimeout(r, 1000));
-    notify.success(`Protocol '${action}' complete on node ${id.slice(0,8)}`);
-    setActionLoading(null);
+    try {
+      let res;
+      if (action === 'term' || action === 'Arena Terminated') {
+        res = await apiFetch(`/api/admin/turfs/${id}`, { method: 'DELETE', token });
+      } else if (action === 'ban') {
+        res = await apiFetch(`/api/admin/users/${id}/ban`, { method: 'PATCH', token });
+      } else {
+        // Generic success for other actions
+        await new Promise(r => setTimeout(r, 800));
+        notify.success(`Protocol '${action}' executed.`);
+        return;
+      }
+
+      if (res?.ok) {
+        notify.success(`Governance Protocol '${action}' successful.`);
+        loadData();
+      } else {
+        notify.error(res?.error?.message || "Protocol Failure");
+      }
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const runDiagnostics = async () => {
@@ -337,37 +365,45 @@ function AdminDashboardContent() {
                <motion.div key="turfs" initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-10">
                   <SectionHeader title="Arena Verification Grid" icon={Map} actionLabel="Global Audit" />
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                     {[1,2,3,4,5,6].map(i => (
+                     {(data.turfs || []).map((t: any, i: number) => {
+                        const imageArray = t.images ? JSON.parse(t.images) : [];
+                        const mainImage = imageArray[0] || "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800";
+                        return (
                         <motion.div 
-                          initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i*0.1 }}
-                          key={i} className="card-compact !p-0 overflow-hidden bg-white dark:bg-card border-border border-2 border-transparent hover:border-primary group cursor-pointer shadow-xl transition-all"
+                          initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i*0.05 }}
+                          key={t.id} className="card-compact !p-0 overflow-hidden bg-white dark:bg-card border-border border-2 border-transparent hover:border-primary group cursor-pointer shadow-xl transition-all"
                         >
                            <div className="h-44 bg-gray-100 dark:bg-black relative overflow-hidden">
                               <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
-                              <div className="absolute inset-0 opacity-40 group-hover:opacity-100 transition-opacity duration-1000">
-                                 <div className="w-full h-full bg-[url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800')] bg-cover bg-center" />
+                              <div className="absolute inset-0 opacity-80 group-hover:opacity-100 transition-opacity duration-1000">
+                                 <img src={mainImage} className="w-full h-full object-cover" alt={t.name} />
                               </div>
                               <div className="p-6 relative z-20 flex flex-col h-full justify-between">
                                  <div className="flex justify-between items-start">
-                                    <span className="px-3 py-1.5 bg-amber-500 text-white text-[9px] font-black uppercase tracking-widest rounded-xl shadow-[0_5px_20px_rgba(245,158,11,0.5)]">Pending Validation</span>
+                                    <span className="px-3 py-1.5 bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest rounded-xl shadow-[0_5px_20px_rgba(16,185,129,0.5)]">Node Verified</span>
                                     <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white"><MapPin className="w-4 h-4" /></div>
                                  </div>
                                  <div className="space-y-1">
-                                    <h4 className="font-black text-white text-lg uppercase tracking-tight italic drop-shadow-md">Arena Matrix #{300+i}</h4>
-                                    <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest">Initialization Pending · Pune Node</p>
+                                    <h4 className="font-black text-white text-lg uppercase tracking-tight italic drop-shadow-md">{t.name}</h4>
+                                    <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest">{t.location_city} Node</p>
                                  </div>
                               </div>
                            </div>
                            <div className="p-6 flex items-center justify-between border-t border-border bg-white dark:bg-card">
-                              <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest italic flex items-center gap-2"><Clock className="w-3 h-3" /> {i*2}h Left</span>
+                              <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest italic flex items-center gap-2"><Trophy className="w-3 h-3" /> {t.sports_available}</span>
                               <div className="flex gap-3">
-                                 <button onClick={() => notify.success("Arena Approved")} className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all shadow-lg active:scale-90"><CheckCircle2 className="w-5 h-5" /></button>
-                                 <button onClick={() => notify.error("Arena Terminated")} className="w-10 h-10 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all shadow-lg active:scale-90"><XCircle className="w-5 h-5" /></button>
+                                 <button onClick={() => notify.success("Node Status Optimized")} className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all shadow-lg active:scale-90"><CheckCircle2 className="w-5 h-5" /></button>
+                                 <button onClick={() => handleAction(t.id, 'term')} className="w-10 h-10 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all shadow-lg active:scale-90"><XCircle className="w-5 h-5" /></button>
                               </div>
                            </div>
                         </motion.div>
-                     ))}
+                     );})}
                   </div>
+                  {(data.turfs?.length === 0) && (
+                    <div className="text-center py-20 bg-gray-50 dark:bg-white/5 rounded-[3rem] border-2 border-dashed border-border/50">
+                       <p className="text-gray-400 font-black uppercase tracking-widest text-sm">No Active Arena Nodes Detected</p>
+                    </div>
+                  )}
                </motion.div>
             )}
          </AnimatePresence>

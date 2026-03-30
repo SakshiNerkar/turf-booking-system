@@ -48,8 +48,8 @@ export async function listTurfs(filters: {
     conditions.push(`sports_available ILIKE $${params.length}`);
   }
 
-  const limit = filters.limit ?? 50;
-  const offset = filters.offset ?? 0;
+  const limit = parseInt(String(filters.limit ?? 50), 10);
+  const offset = parseInt(String(filters.offset ?? 0), 10);
   params.push(limit, offset);
 
   const sql = `
