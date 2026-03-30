@@ -10,6 +10,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const isDashboard = pathname.startsWith('/dashboard');
   const isLandingPage = pathname === '/';
   const isAuthPage = pathname === '/login' || pathname === '/register';
+  const isDiscoverPage = pathname.startsWith('/turfs');
 
   // Dashboards handle their own layout (usually with a sidebar)
   if (isDashboard) {
@@ -33,8 +34,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </PageTransition>
       </main>
 
-      {/* Global Footer for all non-dashboard pages */}
-      {!isAuthPage && <Footer />}
+      {/* Global Footer for all non-dashboard, non-discover, non-auth pages */}
+      {!isAuthPage && !isDiscoverPage && <Footer />}
     </div>
   );
 }
