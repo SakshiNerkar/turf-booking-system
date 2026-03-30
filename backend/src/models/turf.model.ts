@@ -88,3 +88,10 @@ export async function createTurf(input: any) {
   );
   return res.rows[0]!;
 }
+export async function softDeleteTurf(id: string) {
+  await pool.query(`UPDATE turfs SET is_active = false WHERE id = $1`, [id]);
+}
+
+export async function adminDeactivateTurf(id: string) {
+  await pool.query(`UPDATE turfs SET is_active = false WHERE id = $1`, [id]);
+}

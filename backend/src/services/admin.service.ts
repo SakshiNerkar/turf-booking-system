@@ -8,7 +8,6 @@ export async function adminListTurfs() {
     `SELECT t.*, u.name as owner_name, u.email as owner_email
      FROM turfs t
      JOIN users u ON u.id = t.owner_id
-     WHERE t.deleted_at IS NULL
      ORDER BY t.created_at DESC`
   );
   return res.rows;
