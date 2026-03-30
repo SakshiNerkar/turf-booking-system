@@ -20,6 +20,16 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showPw, setShowPw] = useState(false);
+  const { user } = useAuth();
+
+  // Failsafe: If user is already authenticated (or just logged in), initiate priority navigation
+  useEffect(() => {
+    if (user) {
+      const dashboard = user.role === "admin" ? "admin" : 
+                       user.role === "owner" ? "owner" : "customer";
+      router.replace(`/dashboard/${dashboard}`);
+    }
+  }, [user, router]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -33,15 +43,17 @@ export default function LoginPage() {
       if (!res.ok) {
         setError(res.error.message);
         notify.error(res.error.message);
+        setLoading(false); // Stop loading early if error
         return;
       }
+      
+      // Persistence synchronization
       setAuth(res.data.token, res.data.user);
       notify.success(`Success! Welcome back, ${res.data.user.name.split(' ')[0]}!`);
       
-      const dashboard = res.data.user.role === "admin" ? "admin" : 
-                       res.data.user.role === "owner" ? "owner" : "customer";
-      router.push(`/dashboard/${dashboard}`);
-    } finally {
+      // Navigation is now handled by the observer above
+    } catch (err: any) {
+      setError("Synchronization failed. Please check node connectivity.");
       setLoading(false);
     }
   }

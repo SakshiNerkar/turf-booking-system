@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { 
   LayoutDashboard, Search, History, User, Settings, 
   Store, PlusCircle, Bell, LogOut, ShieldCheck, Zap,
@@ -14,9 +14,12 @@ import { motion } from "framer-motion";
 
 export function Sidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const { user, logout } = useAuth();
   const { vibe, setVibe } = useTheme();
+
+  const currentTab = searchParams.get('tab');
 
   const menuItems = {
     customer: [
@@ -54,29 +57,28 @@ export function Sidebar() {
       <div className="space-y-10">
         <div className="space-y-4">
            <div className="text-[9px] font-black text-gray-400 uppercase tracking-[0.4em] mb-4 italic opacity-40">Main Protocol</div>
-           <div className="grid gap-1">
-              {items.map(item => {
-                const searchParamsString = typeof window !== 'undefined' ? window.location.search : '';
-                const currentFullVisiblePath = pathname + searchParamsString;
-                
-                // Exact match for the path + params OR if it's the base path and item is 'Overview/Global'
-                const isActive = (currentFullVisiblePath === item.path) || 
-                                (item.path === '/dashboard/admin' && currentFullVisiblePath === '/dashboard/admin');
+            <div className="grid gap-1">
+               {items.map(item => {
+                 // Precision Path Matching Protocol
+                 const [basePath, searchQuerry] = item.path.split('?');
+                 const itemTab = searchQuerry ? new URLSearchParams(searchQuerry).get('tab') : null;
+                 
+                 const isActive = (pathname === basePath && currentTab === itemTab);
 
-                return (
-                  <Link 
-                    key={item.label} 
-                    href={item.path}
-                    className={`flex items-center gap-5 px-5 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all group ${
-                      isActive ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105 italic' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-primary italic'
-                    }`}
-                  >
-                    <item.icon className="w-4 h-4 opacity-40 group-hover:opacity-100 transition-opacity" />
-                    {item.label}
-                  </Link>
-                );
-              })}
-           </div>
+                 return (
+                   <Link 
+                     key={item.label} 
+                     href={item.path}
+                     className={`flex items-center gap-5 px-5 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all group ${
+                       isActive ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105 italic' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-primary italic'
+                     }`}
+                   >
+                     <item.icon className={`w-4 h-4 transition-opacity ${isActive ? 'opacity-100' : 'opacity-40 group-hover:opacity-100'}`} />
+                     {item.label}
+                   </Link>
+                 );
+               })}
+            </div>
         </div>
 
         {/* Theme Vibe Selector */}
