@@ -106,6 +106,50 @@ function OwnerDashboardContent() {
             )}
          </AnimatePresence>
 
+         {/* ── MANDATORY ONBOARDING PROTOCOL ── */}
+         <AnimatePresence>
+            {!loading && data.turfs.length === 0 && (
+               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-[150] bg-white dark:bg-[#060806] flex items-center justify-center p-6 sm:p-12 overflow-y-auto">
+                  <div className="absolute inset-0 bg-stadium-texture opacity-[0.03] pointer-events-none" />
+                  <motion.div 
+                    initial={{ y: 50, scale: 0.95 }} animate={{ y: 0, scale: 1 }}
+                    className="w-full max-w-2xl bg-white dark:bg-card border border-border shadow-3xl rounded-[3rem] p-10 md:p-16 relative overflow-hidden"
+                  >
+                     <div className="absolute top-0 right-0 p-16 opacity-[0.02] text-9xl font-black italic text-primary pointer-events-none uppercase tracking-tighter">START</div>
+                     
+                     <div className="space-y-10 relative z-10">
+                        <div className="space-y-2">
+                           <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest rounded-lg border border-primary/20">
+                              <ShieldCheck className="w-4 h-4" /> Operational Initiation
+                           </div>
+                           <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter dark:text-white leading-none">
+                              Initialize Your <span className="text-primary italic">First Arena</span>
+                           </h2>
+                           <p className="text-[11px] font-black text-gray-500 uppercase tracking-widest italic max-w-md">Our global network requires at least one active node to synchronize your command credentials.</p>
+                        </div>
+
+                        <form className="space-y-8" onSubmit={(e) => { e.preventDefault(); notify.success('Arena Synched Successfully!'); loadData(); }}>
+                           <div className="grid md:grid-cols-2 gap-6">
+                              <Input label="Facility Designation*" placeholder="Ex: Camp Nou Arena" required />
+                              <Input label="Operational City*" placeholder="Ex: Pune / Mumbai" required />
+                           </div>
+                           <div className="grid md:grid-cols-2 gap-6">
+                              <Input label="Primary Discipline*" placeholder="Ex: Football, Cricket" required />
+                              <Input label="Hourly Yield (₹)*" placeholder="Ex: 1800" type="number" required />
+                           </div>
+                           <div className="pt-6">
+                              <button type="submit" className="btn-premium-primary !w-full !py-5 !text-sm !italic shadow-[0_30px_60px_rgba(34,197,94,0.3)]">
+                                 Authorize & Launch Arena Node
+                              </button>
+                              <button onClick={() => logout()} type="button" className="w-full mt-6 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-rose-500 transition-all italic">Abort Identification & Sign Out</button>
+                           </div>
+                        </form>
+                     </div>
+                  </motion.div>
+               </motion.div>
+            )}
+         </AnimatePresence>
+
          {/* TOP TACTICAL HEADER */}
          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
             <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="group">

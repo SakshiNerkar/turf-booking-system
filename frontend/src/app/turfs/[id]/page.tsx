@@ -1,16 +1,16 @@
 "use client";
 
+import React, { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { useState } from "react";
 import { 
   Wifi, Car, Droplets, ShieldCheck, Info, Clock, 
   MapPin, ChevronLeft, Share2, Activity, Star,
-  CheckCircle2, ChevronRight
+  CheckCircle2, ChevronRight, RefreshCw
 } from "lucide-react";
 import { CalendarBooking } from "@/components/CalendarBooking";
 import { ReviewSystem } from "@/components/ReviewSystem";
 import { TurfMap } from "@/components/TurfMap";
-import { API_BASE_URL, type ApiResponse } from "@/lib/api";
+import { apiFetch, type ApiResponse } from "@/lib/api";
 
 type Turf = {
   id: string; owner_id: string; name: string; location: string;
@@ -34,29 +34,46 @@ const AMENITIES = [
   { icon: ShieldCheck, label: "24/7 Security" },
 ];
 
-export default async function TurfDetailsPage(props: { params: Promise<{ id: string }>; }) {
-  const { id } = await props.params;
+export default function TurfDetailsPage({ params }: { params: Promise<{ id: string }>; }) {
+  const { id } = use(params);
+  const [data, setData] = useState<TurfDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  let json: ApiResponse<TurfDetails>;
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/turfs/${id}`, { cache: "no-store" });
-    json = (await res.json()) as ApiResponse<TurfDetails>;
-  } catch {
-    return (
-      <div className="container-compact py-32 text-center flex flex-col items-center gap-6">
-        <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center text-3xl shadow-sm">🔌</div>
-        <div className="space-y-2">
-           <h1 className="text-3xl font-extrabold tracking-tight">System Offline</h1>
-           <p className="text-sm font-medium text-gray-500 max-w-sm">Unable to fetch arena details. Ensure backend connection is active.</p>
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      const res = await apiFetch<TurfDetails>(`/api/turfs/${id}`);
+      setLoading(false);
+      if (res.ok) {
+        setData(res.data);
+      } else {
+        setError(res.error.message);
+      }
+    })();
+  }, [id]);
+
+  if (loading) return (
+     <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#060806]">
+        <div className="flex flex-col items-center gap-6">
+           <RefreshCw className="w-10 h-10 text-primary animate-spin opacity-40" />
+           <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary animate-pulse italic">Synchronizing Arena Intelligence...</span>
         </div>
-        <Link href="/turfs" className="btn-sports px-8">Return to Discovery</Link>
+     </div>
+  );
+
+  if (error || !data) return (
+    <div className="container-compact py-32 text-center flex flex-col items-center gap-6">
+      <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center text-3xl shadow-sm">Plug</div>
+      <div className="space-y-2">
+         <h1 className="text-3xl font-extrabold tracking-tight">System Offline</h1>
+         <p className="text-sm font-medium text-gray-500 max-w-sm">{error || "Unable to fetch arena details."}</p>
       </div>
-    );
-  }
+      <Link href="/turfs" className="btn-sports px-8">Return to Discovery</Link>
+    </div>
+  );
 
-  if (!json.ok) return <div className="container-compact py-20 text-red-500 font-bold">{json.error.message}</div>;
-
-  const { turf, slots } = json.data;
+  const { turf, slots } = data;
   const meta = SPORT_META[turf.sport_type?.toLowerCase()] ?? { icon: "🏟️", accent: "bg-gray-600" };
 
   return (
