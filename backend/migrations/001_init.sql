@@ -34,6 +34,10 @@ create table users (
   phone text,
   password text not null,
   role user_role not null default 'user',
+  profile_image text,
+  is_verified boolean not null default false,
+  is_active boolean not null default true,
+  last_login timestamptz,
   earnings_total numeric(12,2) default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
