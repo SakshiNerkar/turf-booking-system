@@ -17,11 +17,8 @@ export interface DbPool {
 }
 
 // Detect whether to use PostgreSQL or SQLite
-const USE_SQLITE =
-  !env.DATABASE_URL ||
-  env.DATABASE_URL.startsWith("postgresql://postgres:postgres@localhost") ||
-  env.DATABASE_URL.startsWith("postgresql://localhost") ||
-  env.DATABASE_URL === "postgresql://postgres:postgres@localhost:5432/turf_booking";
+// Explicitly use SQLite only if the env is missing
+const USE_SQLITE = !env.DATABASE_URL;
 
 let _pool: DbPool;
 
