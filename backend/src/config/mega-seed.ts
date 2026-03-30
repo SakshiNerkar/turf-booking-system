@@ -40,11 +40,16 @@ export async function megaSeed() {
   console.log("🚀 Initializing Mega-Induction Sequence...");
 
   // 1. Flush Existing Registry
-  await pool.query("DELETE FROM bookings");
-  await pool.query("DELETE FROM turfs");
-  await pool.query("DELETE FROM users WHERE role IN ('owner', 'user')");
+  await pool.query("DELETE FROM users"); // Full wipe
 
+  const adminPassword = await hash("admin123");
   const ownerPassword = await hash("Owner@123");
+
+  // 2. Induct Primary Administrative Node
+  await pool.query(`
+    INSERT INTO users (id, name, email, phone, password, role, is_active, is_verified)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+  `, [randomUUID(), "System Administrator", "admin@turff.com", "+91-00000-00000", adminPassword, "admin", true, true]);
 
   // 2. Initializing Management Nodes (Owners)
   const owners: string[] = [];
