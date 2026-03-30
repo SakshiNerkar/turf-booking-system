@@ -300,7 +300,7 @@ function AdminDashboardContent() {
                </motion.div>
             )}
 
-            {/* TAB: USERS */}
+            {/* TAB: USERS (ATHLETE GOVERNANCE) */}
             {activeTab === 'users' && (
                <motion.div key="users" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} className="space-y-10">
                   <div className="flex items-center justify-between">
@@ -319,7 +319,7 @@ function AdminDashboardContent() {
                               </tr>
                            </thead>
                            <tbody className="divide-y divide-border/50">
-                              {data.users.map((u: any, i: number) => (
+                              {(data.users || []).map((u: any, i: number) => (
                                  <motion.tr 
                                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i*0.05 }}
                                    key={u.id} className="tr-premium group"
@@ -348,7 +348,7 @@ function AdminDashboardContent() {
                                     <td className="td-premium text-right">
                                        <div className="flex items-center justify-end gap-2 pr-4">
                                           <button onClick={() => handleAction(u.id, 'restrict')} className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 dark:bg-white/5 text-amber-500 hover:bg-amber-500 hover:text-white transition-all shadow-sm"><ShieldAlert className="w-4 h-4" /></button>
-                                          <button onClick={() => handleAction(u.id, 'term')} className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 dark:bg-white/5 text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-sm"><XCircle className="w-4 h-4" /></button>
+                                          <button onClick={() => handleAction(u.id, 'ban')} className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 dark:bg-white/5 text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-sm"><XCircle className="w-4 h-4" /></button>
                                        </div>
                                     </td>
                                  </motion.tr>
@@ -360,36 +360,38 @@ function AdminDashboardContent() {
                </motion.div>
             )}
 
-            {/* TAB: ARENAS */}
+            {/* TAB: ARENAS (SECTORS) */}
             {activeTab === 'turfs' && (
                <motion.div key="turfs" initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-10">
                   <SectionHeader title="Arena Verification Grid" icon={Map} actionLabel="Global Audit" />
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                      {(data.turfs || []).map((t: any, i: number) => {
-                        const imageArray = t.images ? JSON.parse(t.images) : [];
+                        const imageArray = t.images ? JSON.parse(t.images || '[]') : [];
                         const mainImage = imageArray[0] || "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800";
                         return (
                         <motion.div 
-                          initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i*0.05 }}
+                          initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: (i % 6) * 0.05 }}
                           key={t.id} className="card-compact !p-0 overflow-hidden bg-white dark:bg-card border-border border-2 border-transparent hover:border-primary group cursor-pointer shadow-xl transition-all"
                         >
-                           <div className="h-44 bg-gray-100 dark:bg-black relative overflow-hidden">
-                              <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
-                              <div className="absolute inset-0 opacity-80 group-hover:opacity-100 transition-opacity duration-1000">
-                                 <img src={mainImage} className="w-full h-full object-cover" alt={t.name} />
-                              </div>
-                              <div className="p-6 relative z-20 flex flex-col h-full justify-between">
-                                 <div className="flex justify-between items-start">
-                                    <span className="px-3 py-1.5 bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest rounded-xl shadow-[0_5px_20px_rgba(16,185,129,0.5)]">Node Verified</span>
-                                    <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white"><MapPin className="w-4 h-4" /></div>
+                           <Link href={`/turfs/${t.id}`} className="block">
+                              <div className="h-44 bg-gray-100 dark:bg-black relative overflow-hidden">
+                                 <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity z-30" />
+                                 <div className="absolute inset-0 opacity-80 group-hover:opacity-100 transition-opacity duration-1000 z-10">
+                                    <img src={mainImage} className="w-full h-full object-cover" alt={t.name} />
                                  </div>
-                                 <div className="space-y-1">
-                                    <h4 className="font-black text-white text-lg uppercase tracking-tight italic drop-shadow-md">{t.name}</h4>
-                                    <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest">{t.location_city} Node</p>
+                                 <div className="p-6 relative z-40 flex flex-col h-full justify-between">
+                                    <div className="flex justify-between items-start">
+                                       <span className="px-3 py-1.5 bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest rounded-xl shadow-[0_5px_20px_rgba(16,185,129,0.5)]">Node Verified</span>
+                                       <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white"><MapPin className="w-4 h-4" /></div>
+                                    </div>
+                                    <div className="space-y-1">
+                                       <h4 className="font-black text-white text-lg uppercase tracking-tight italic drop-shadow-md">{t.name}</h4>
+                                       <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest">{t.location_city} Node</p>
+                                    </div>
                                  </div>
                               </div>
-                           </div>
-                           <div className="p-6 flex items-center justify-between border-t border-border bg-white dark:bg-card">
+                           </Link>
+                           <div className="p-6 flex items-center justify-between border-t border-border bg-white dark:bg-card relative z-30">
                               <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest italic flex items-center gap-2"><Trophy className="w-3 h-3" /> {t.sports_available}</span>
                               <div className="flex gap-3">
                                  <button onClick={() => notify.success("Node Status Optimized")} className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all shadow-lg active:scale-90"><CheckCircle2 className="w-5 h-5" /></button>
