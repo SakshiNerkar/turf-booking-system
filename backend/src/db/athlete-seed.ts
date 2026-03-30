@@ -3,26 +3,26 @@ import { hash } from "bcrypt";
 import { randomUUID } from "crypto";
 
 const INDIAN_NAMES = [
-  "Aarav Sharma", "Vihaan Gupta", "Arjun Patel", "Sai Reddy", "Advik Singh", 
-  "Reyansh Mehta", "Aryan Verma", "Ishan Iyer", "Shaurya Kapoor", "Atharv Rao",
-  "Aavya Nair", "Diya Malhotra", "Ishani Chatterjee", "Myra Saxena", "Saanvi Joshi",
-  "Anaya Deshmukh", "Aarya Kulkarni", "Prisha Das", "Ananya Bhat", "Kiara Ghosh",
-  "Vivaan Shah", "Aditya Misra", "Kabir Ahuja", "Zoya Khan", "Aaryan Chauhan",
-  "Sia Gandhi", "Kyra Pillai", "Ira Jain", "Advika Agarwal", "Amaira Bansal",
-  "Rohan Varma", "Siddharth Hegde", "Varun Chawla", "Karan Singhania", "Ishaan Rathore",
-  "Rahul Bajaj", "Vijay Mallya", "Sachin Tendli", "Virat Kohli", "MS Dhoni",
-  "Rohit Sharma", "Shubman Gill", "Hardik Pandya", "KL Rahul", "Surya Yadav",
-  "Rishabh Pant", "Shreyas Iyer", "Axar Patel", "Yuzi Chahal", "Kuldeep Yadav",
-  "Mohammed Shami", "Bhuvi Kumar", "Jasprit Bumrah", "Arshdeep Singh", "Sanju Samson",
-  "Ishan Kishan", "Prithvi Shaw", "Umesh Yadav", "Deepak Chahar", "Shardul Thakur",
-  "Smriti Mandhana", "Harmanpreet Kaur", "Jemimah Rodrigues", "Shafali Verma", "Deepti Sharma",
-  "Pooja Vastrakar", "Richa Ghosh", "Renuka Singh", "Radha Yadav", "Sneh Rana",
-  "Rajesh Kumar", "Suresh Raina", "Amit Shah", "Narendra Modi", "Arvind Kejriwal",
-  "Rahul Gandhi", "Mamata Banerjee", "Nitish Kumar", "Yogi Adityanath", "M K Stalin",
-  "Pinarayi Vijayan", "Hemant Soren", "Bhagwant Mann", "Shivraj Singh", "Ashok Gehlot",
-  "Manohar Lal", "Pushkar Dhami", "Sukhvinder Sukhu", "Eknath Shinde", "Siddaramaiah",
-  "Revanth Reddy", "YS Jagan", "Naveen Patnaik", "Biren Singh", "Neiphiu Rio",
-  "Conrad Sangma", "Prem Singh", "Manik Saha", "Lalduhoma", "Soren Patnaik"
+  "Rahul Verma", "Sneha Gupta", "Amit Patel", "Priya Reddy", "Vikram Singh", 
+  "Anjali Mehta", "Karan Sharma", "Divya Iyer", "Sanjay Kapoor", "Meera Rao",
+  "Ravi Nair", "Shweta Malhotra", "Manish Chatterjee", "Pallavi Saxena", "Alok Joshi",
+  "Ritu Deshmukh", "Sameer Kulkarni", "Pooja Das", "Deepak Bhat", "Neha Ghosh",
+  "Arun Shah", "Kavita Misra", "Sunil Ahuja", "Farhan Khan", "Rajesh Chauhan",
+  "Gita Gandhi", "Preeti Pillai", "Abhay Jain", "Rekha Agarwal", "Sandeep Bansal",
+  "Madhav Varma", "Rashmi Hegde", "Ashok Chawla", "Lata Singhania", "Vijay Rathore",
+  "Suman Bajaj", "Nitin Kamat", "Prakash Jha", "Usha Menon", "Gopal Krishnan",
+  "Savitri Devi", "Harish Rawat", "Pratibha Singh", "Yogesh Bhardwaj", "Kiran Mazumdar",
+  "Naveen Jindal", "Shobhana Bhartia", "Anand Mahindra", "Ratan Tata", "Azim Premji",
+  "Mukesh Ambani", "Gautam Adani", "Kumar Birla", "Shiv Nadar", "Uday Kotak",
+  "Radhakishan Damani", "Dilip Shanghvi", "Cyrus Poonawalla", "Savitri Jindal", "Sunil Mittal",
+  "Madhu Pandit", "Vinod Khosla", "Romesh Wadhwani", "Jayshree Ullal", "Bharat Desai",
+  "Neerja Sethi", "Indra Nooyi", "Satya Nadella", "Sundar Pichai", "Shantanu Narayen",
+  "Parag Agrawal", "Nikesh Arora", "George Kurian", "Thomas Kurian", "Anjali Sud",
+  "Amrapali Gan", "Leena Nair", "Vikas Khanna", "Gaggan Anand", "Pooja Dhingra",
+  "Garima Arora", "Sanjeev Kapoor", "Tarla Dalal", "Kunala Kapur", "Ranveer Brar",
+  "Vicky Ratnani", "Shipra Khanna", "Nita Mehta", "Hari Nayak", "Vineet Bhatia",
+  "Manish Mehrotra", "Sriram Aylur", "Alfred Prasad", "Atul Kochhar", "Vivek Singh",
+  "Roopa Gulati", "Monisha Bharadwaj", "Anjum Anand", "Maunika Gowardhan", "Mallika Basu"
 ];
 
 const CITIES = ["Mumbai", "Pune", "Bangalore", "Delhi", "Hyderabad", "Chennai", "Kolkata", "Ahmedabad"];
