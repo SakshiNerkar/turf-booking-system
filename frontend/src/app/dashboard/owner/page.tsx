@@ -141,7 +141,13 @@ function OwnerDashboardContent() {
                               <button type="submit" className="btn-premium-primary !w-full !py-5 !text-sm !italic shadow-[0_30px_60px_rgba(34,197,94,0.3)]">
                                  Authorize & Launch Arena Node
                               </button>
-                              <button onClick={() => logout()} type="button" className="w-full mt-6 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-rose-500 transition-all italic">Abort Identification & Sign Out</button>
+                              <button 
+                                onClick={() => { logout(); router.push('/'); }} 
+                                type="button" 
+                                className="w-full mt-6 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-rose-500 transition-all italic"
+                              >
+                                Abort Identification & Sign Out
+                              </button>
                            </div>
                         </form>
                      </div>

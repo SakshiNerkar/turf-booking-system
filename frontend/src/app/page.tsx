@@ -30,11 +30,14 @@ import { useAuth } from "@/components/AuthProvider";
 
 export default function LandingPage() {
   const { user } = useAuth();
+  const [mounted, setMounted] = useState(false);
   const [featuredTurfs, setFeaturedTurfs] = useState<TurfItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [heroIndex, setHeroIndex] = useState(0);
 
+  // UseEffect strictly for hydration and carousel
   useEffect(() => {
+    setMounted(true);
     const timer = setInterval(() => {
       setHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length);
     }, 5000);
@@ -114,27 +117,22 @@ export default function LandingPage() {
               Elite arenas, real-time availability, and seamless payments. Join the community of 10,000+ athletes.
             </p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
-              {user ? (
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8 h-20">
+              {mounted && user ? (
                 <Link href={`/dashboard/${user.role}`} className="btn-premium-primary w-full sm:w-auto min-w-[240px] !py-5 bg-gradient-to-r from-primary to-green-400">
                   Continue to Dashboard <LayoutDashboard className="w-5 h-5" />
                 </Link>
+              ) : mounted && !user ? (
+                <>
+                  <Link href="/turfs" className="btn-premium-primary w-full sm:w-auto min-w-[200px]">
+                    Book Now <ChevronRight className="w-5 h-5" />
+                  </Link>
+                  <Link href="/login" className="btn-premium-outline !text-white !border-white/30 hover:!border-white w-full sm:w-auto min-w-[200px] backdrop-blur-sm">
+                    Partner Sign In
+                  </Link>
+                </>
               ) : (
-                <Link href="/turfs" className="btn-premium-primary w-full sm:w-auto min-w-[200px]">
-                  Book Now <ChevronRight className="w-5 h-5" />
-                </Link>
-              )}
-              
-              {!user && (
-                <Link href="/login" className="btn-premium-outline !text-white !border-white/30 hover:!border-white w-full sm:w-auto min-w-[200px] backdrop-blur-sm">
-                  Partner Sign In
-                </Link>
-              )}
-
-              {user && (
-                <Link href="/turfs" className="btn-premium-outline !text-white !border-white/30 hover:!border-white w-full sm:w-auto min-w-[200px] backdrop-blur-sm">
-                  Explore Turfs
-                </Link>
+                <div className="h-12 w-48 bg-white/5 animate-pulse rounded-2xl" />
               )}
             </div>
           </motion.div>
