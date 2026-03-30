@@ -119,7 +119,7 @@ export default function LandingPage() {
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8 h-20">
               {mounted && user ? (
-                <Link href={`/dashboard/${user.role}`} className="btn-premium-primary w-full sm:w-auto min-w-[240px] !py-5 bg-gradient-to-r from-primary to-green-400">
+                <Link href={`/dashboard/${user.role === 'user' ? 'customer' : user.role}`} className="btn-premium-primary w-full sm:w-auto min-w-[240px] !py-5 bg-gradient-to-r from-primary to-green-400">
                   Continue to Dashboard <LayoutDashboard className="w-5 h-5" />
                 </Link>
               ) : mounted && !user ? (

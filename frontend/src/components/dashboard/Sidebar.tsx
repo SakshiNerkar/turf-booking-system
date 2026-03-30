@@ -50,7 +50,7 @@ export function Sidebar() {
     ]
   };
 
-  const items = user ? menuItems[user.role as keyof typeof menuItems] : [];
+  const items = user ? menuItems[(user.role === 'user' ? 'customer' : user.role) as keyof typeof menuItems] : [];
 
   return (
     <div className="flex flex-col h-full justify-between pb-10">

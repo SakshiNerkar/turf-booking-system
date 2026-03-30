@@ -20,7 +20,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   // Bottom Navigation Config (Mobile-First)
   const navItems = useMemo(() => {
     if (!user) return [];
-    if (user.role === 'customer') return [
+    if (user.role === 'customer' || user.role === 'user') return [
       { path: '/dashboard/customer', icon: LayoutDashboard, label: 'Home' },
       { path: '/turfs', icon: Search, label: 'Explore' },
       { path: '/dashboard/customer/history', icon: History, label: 'History' },

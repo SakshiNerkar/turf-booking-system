@@ -53,7 +53,7 @@ export function Navbar() {
              <NavLink href="/turfs" label="Discover" icon={Search} active={pathname.startsWith("/turfs")} />
              {user && (
                <NavLink 
-                 href={`/dashboard/${user.role}`} 
+                 href={`/dashboard/${user.role === 'user' ? 'customer' : user.role}`} 
                  label="Dashboard" 
                  icon={LayoutDashboard} 
                  active={pathname.startsWith("/dashboard")} 
@@ -138,7 +138,7 @@ export function Navbar() {
           <BottomNavIcon href="/turfs" label="Discover" icon={Search} active={pathname.startsWith("/turfs")} />
           {user && (
             <BottomNavIcon 
-              href={`/dashboard/${user.role}`} 
+              href={`/dashboard/${user.role === 'user' ? 'customer' : user.role}`} 
               label="Dashboard" 
               icon={LayoutDashboard} 
               active={pathname.startsWith("/dashboard")} 
@@ -146,7 +146,7 @@ export function Navbar() {
           )}
           {user && (
             <BottomNavIcon 
-              href={`/dashboard/${user.role}/history`} 
+              href={`/dashboard/${user.role === 'user' ? 'customer' : user.role}/history`} 
               label="Activity" 
               icon={History} 
               active={pathname.includes("history")} 
