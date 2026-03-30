@@ -10,7 +10,7 @@ import {
   AlertCircle, Database, LayoutDashboard, Globe, Settings, Map,
   Bell, LogOut, User as UserIcon, RefreshCw, MoreVertical,
   XCircle, Power, ShieldAlert, ChevronRight, Menu, Download, Save,
-  Terminal, Command, Hash
+  Terminal, Command, Hash, X, PlusCircle
 } from "lucide-react";
 import { useAuth } from "../../../components/AuthProvider";
 import { apiFetch } from "../../../lib/api";
