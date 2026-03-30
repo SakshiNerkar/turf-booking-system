@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   MapPin, Search, Star, ArrowRight, CheckCircle2, 
   Calendar, ShieldCheck, Clock, Users, Trophy, Target,
-  Zap, CreditCard, Activity, ChevronRight
+  Zap, CreditCard, Activity, ChevronRight, LayoutDashboard
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 
@@ -26,7 +26,10 @@ const HERO_IMAGES = [
   "https://images.unsplash.com/photo-1626225967045-9c76db7b62fe?q=80&w=2000&auto=format&fit=crop", // Padel/Court
 ];
 
+import { useAuth } from "@/components/AuthProvider";
+
 export default function LandingPage() {
+  const { user } = useAuth();
   const [featuredTurfs, setFeaturedTurfs] = useState<TurfItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [heroIndex, setHeroIndex] = useState(0);
@@ -112,12 +115,27 @@ export default function LandingPage() {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
-              <Link href="/turfs" className="btn-premium-primary w-full sm:w-auto min-w-[200px]">
-                Book Now <ChevronRight className="w-5 h-5" />
-              </Link>
-              <Link href="/turfs" className="btn-premium-outline !text-white !border-white/30 hover:!border-white w-full sm:w-auto min-w-[200px] backdrop-blur-sm">
-                Explore Turfs
-              </Link>
+              {user ? (
+                <Link href={`/dashboard/${user.role}`} className="btn-premium-primary w-full sm:w-auto min-w-[240px] !py-5 bg-gradient-to-r from-primary to-green-400">
+                  Continue to Dashboard <LayoutDashboard className="w-5 h-5" />
+                </Link>
+              ) : (
+                <Link href="/turfs" className="btn-premium-primary w-full sm:w-auto min-w-[200px]">
+                  Book Now <ChevronRight className="w-5 h-5" />
+                </Link>
+              )}
+              
+              {!user && (
+                <Link href="/login" className="btn-premium-outline !text-white !border-white/30 hover:!border-white w-full sm:w-auto min-w-[200px] backdrop-blur-sm">
+                  Partner Sign In
+                </Link>
+              )}
+
+              {user && (
+                <Link href="/turfs" className="btn-premium-outline !text-white !border-white/30 hover:!border-white w-full sm:w-auto min-w-[200px] backdrop-blur-sm">
+                  Explore Turfs
+                </Link>
+              )}
             </div>
           </motion.div>
         </div>
