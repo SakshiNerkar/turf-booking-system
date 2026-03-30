@@ -77,16 +77,19 @@ create table time_slots (
   updated_at timestamptz not null default now()
 );
 
--- 6. Booking Transactions
+-- 6. Booking Transactions (High-Fidelity Model)
 create table bookings (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references users(id) on delete cascade,
   turf_id uuid not null references turfs(id) on delete cascade,
-  slot_id uuid not null references time_slots(id) on delete cascade,
-  players integer not null default 1,
+  owner_id uuid not null references users(id) on delete cascade,
+  booking_date text not null, -- YYYY-MM-DD
+  start_time text not null,   -- HH:MM
+  end_time text not null,     -- HH:MM
   total_price numeric(10,2) not null,
-  payment_status payment_status not null default 'pending',
-  booking_date timestamptz not null default now(),
+  status text not null default 'confirmed',
+  payment_status text not null default 'pending',
+  booking_reference text unique,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
