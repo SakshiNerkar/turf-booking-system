@@ -11,9 +11,9 @@ import { BookingModal } from "./BookingModal";
 type Slot = { id: string; start_time: string; end_time: string; status: "available" | "booked" | "blocked"; };
 
 export function CalendarBooking({ 
-  slots, turfId, turfName, turfOwnerId, pricePerSlot, location 
+  slots, turfId, turfName, turfOwnerId, pricePerSlot, location, selectedDate, loading
 }: { 
-  slots: Slot[], turfId: string, turfName: string, turfOwnerId: string, pricePerSlot: number, location: string 
+  slots: Slot[], turfId: string, turfName: string, turfOwnerId: string, pricePerSlot: number, location: string, selectedDate: string, loading: boolean
 }) {
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -24,18 +24,34 @@ export function CalendarBooking({
     }
   };
 
+  // Reset selected slot when date changes
+  useState(() => {
+    setSelectedSlot(null);
+  });
+
   const availableCount = slots.filter(s => s.status === 'available').length;
-  const isHighDemand = availableCount < 5;
+  const isHighDemand = availableCount < 5 && availableCount > 0;
+
+  const formatTime = (time: string) => {
+    if (!time) return "---";
+    if (time.includes(':')) {
+       const [h, m] = time.split(':').map(Number);
+       const ampm = h! >= 12 ? 'PM' : 'AM';
+       const hh = h! % 12 || 12;
+       return `${hh}:${String(m).padStart(2, '0')} ${ampm}`;
+    }
+    return time;
+  };
 
   return (
-    <div className="card-compact p-8 space-y-10 bg-white dark:bg-[#121A14] relative">
+    <div className={`card-compact p-8 space-y-10 bg-white dark:bg-[#121A14] relative transition-opacity ${loading ? 'opacity-50 pointer-events-none' : ''}`}>
       
       {/* 1. SECTOR HEADER & URGENCY CRITICAL */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
          <div className="space-y-2">
             <h3 className="text-2xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight leading-none uppercase italic italic-black">Arena Slots</h3>
             <div className="flex items-center flex-wrap gap-2.5">
-               <span className="px-2 py-1 bg-primary/10 text-primary text-[9px] font-black rounded-lg border border-primary/20 flex items-center gap-1.5 uppercase tracking-widest"><Calendar className="w-3.5 h-3.5" /> TODAY · {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</span>
+               <span className="px-2 py-1 bg-primary/10 text-primary text-[9px] font-black rounded-lg border border-primary/20 flex items-center gap-1.5 uppercase tracking-widest"><Calendar className="w-3.5 h-3.5" /> {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
                {isHighDemand && <span className="px-2 py-1 bg-rose-500/10 text-rose-600 dark:text-rose-400 text-[9px] font-black rounded-lg border border-rose-500/20 flex items-center gap-1.5 uppercase tracking-widest animate-pulse"><Zap className="w-3.5 h-3.5 fill-rose-500/40" /> HIGH DEMAND</span>}
                <span className="px-2 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[9px] font-black rounded-lg border border-blue-500/20 flex items-center gap-1.5 uppercase tracking-widest"><Activity className="w-3.5 h-3.5" /> 84% OCCUPANCY</span>
             </div>
@@ -57,10 +73,10 @@ export function CalendarBooking({
       <section className="space-y-6">
           <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
              {slots.map((s, idx) => {
-                const isSelected = selectedSlot?.id === s.id;
+                const isSelected = selectedSlot?.id === s.id || (selectedSlot?.start_time === s.start_time);
                 const isBooked = s.status === 'booked';
                 const isBlocked = s.status === 'blocked';
-                const start = new Date(s.start_time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+                const displayText = formatTime(s.start_time);
                 
                 // Urgency logic: Label 1st few available slots as "Hot"
                 const firstAvailableIdx = slots.findIndex(slot => slot.status === 'available');
@@ -68,7 +84,7 @@ export function CalendarBooking({
 
                 return (
                   <button 
-                    key={s.id}
+                    key={idx}
                     onClick={() => handleSlotClick(s)}
                     disabled={isBooked || isBlocked}
                     className={`relative h-20 rounded-xl border-2 flex flex-col items-center justify-center gap-1.5 transition-all group overflow-hidden ${
@@ -80,7 +96,7 @@ export function CalendarBooking({
                   >
                      {showUrgency && <div className="absolute top-0 right-0 px-2 py-0.5 bg-rose-500 text-white text-[7px] font-black uppercase italic tracking-tighter">HOT</div>}
                      <div className={`text-[11px] font-black uppercase tracking-tight italic ${isSelected ? 'text-white' : isBooked ? 'text-gray-400' : 'text-gray-900 dark:text-white'}`}>
-                        {start}
+                        {displayText}
                      </div>
                      {!isBooked && !isBlocked && <div className={`text-[9px] font-black uppercase tracking-widest italic leading-none ${isSelected ? 'text-white opacity-80' : 'text-primary'}`}>₹{pricePerSlot}</div>}
                      {isBooked && <XCircle className="w-4 h-4 opacity-30" />}
@@ -88,6 +104,9 @@ export function CalendarBooking({
                 );
              })}
           </div>
+          {slots.length === 0 && (
+             <div className="text-center py-10 text-gray-400 uppercase font-black text-xs tracking-widest bg-gray-50 dark:bg-white/5 rounded-2xl border-2 border-dashed border-border/50">No Slots Available for this Date</div>
+          )}
       </section>
 
       {/* 3. PLATFORM PROTECTIONS (Trust Strip) */}
@@ -120,7 +139,7 @@ export function CalendarBooking({
                : 'bg-gray-100 dark:bg-white/5 text-gray-400 cursor-not-allowed'
            }`}
          >
-            {selectedSlot ? `RESERVE ${new Date(selectedSlot.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} SESSION` : 'SELECT A SPECTRAL SLOT'}
+            {selectedSlot ? `RESERVE ${formatTime(selectedSlot.start_time)} SESSION` : 'SELECT A SPECTRAL SLOT'}
             <ArrowRight className="w-4 h-4" />
          </button>
       </div>

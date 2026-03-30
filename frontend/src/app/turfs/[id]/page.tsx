@@ -39,21 +39,24 @@ export default function TurfDetailsPage({ params }: { params: Promise<{ id: stri
   const [data, setData] = useState<TurfDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split("T")[0]!);
+
+  const loadArenaData = async (date: string) => {
+    setLoading(true);
+    const res = await apiFetch<TurfDetails>(`/api/turfs/${id}?date=${date}`);
+    setLoading(false);
+    if (res.ok) {
+      setData(res.data);
+    } else {
+      setError(res.error.message);
+    }
+  };
 
   useEffect(() => {
-    (async () => {
-      setLoading(true);
-      const res = await apiFetch<TurfDetails>(`/api/turfs/${id}`);
-      setLoading(false);
-      if (res.ok) {
-        setData(res.data);
-      } else {
-        setError(res.error.message);
-      }
-    })();
-  }, [id]);
+    loadArenaData(selectedDate);
+  }, [id, selectedDate]);
 
-  if (loading) return (
+  if (loading && !data) return (
      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#060806]">
         <div className="flex flex-col items-center gap-6">
            <RefreshCw className="w-10 h-10 text-primary animate-spin opacity-40" />
@@ -93,7 +96,7 @@ export default function TurfDetailsPage({ params }: { params: Promise<{ id: stri
         {/* 1. PREMIUM HERO SHOWCASE */}
         <section className="relative h-72 md:h-96 rounded-2xl md:rounded-[2rem] overflow-hidden shadow-premium border border-border bg-white dark:bg-card">
            <img 
-              src={turf.images ? JSON.parse(turf.images)[0] : "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop"} 
+              src={turf.images ? (turf.images.startsWith('[') ? JSON.parse(turf.images)[0] : turf.images) : "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop"} 
               className="absolute inset-0 w-full h-full object-cover"
               alt={turf.name}
            />
@@ -144,14 +147,32 @@ export default function TurfDetailsPage({ params }: { params: Promise<{ id: stri
                  <div className="px-4 py-2 text-gray-500 flex gap-2 items-center flex-shrink-0"><span className="w-4 h-4 rounded-full bg-gray-200 dark:bg-white/10 text-gray-500 flex items-center justify-center text-[10px]">3</span> Confirm Pay</div>
               </div>
 
-              <CalendarBooking
-                 turfId={turf.id}
-                 turfName={turf.name}
-                 turfOwnerId={turf.owner_id}
-                 pricePerSlot={turf.price_weekday}
-                 slots={slots}
-                 location={turf.location_city}
-              />
+              <div className="flex flex-col gap-8">
+                <div className="flex items-center gap-4 bg-white dark:bg-card p-6 rounded-3xl border border-border shadow-sm">
+                   <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0"><Clock className="w-6 h-6" /></div>
+                   <div className="flex-1">
+                      <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Temporal Select</div>
+                      <input 
+                         type="date" 
+                         value={selectedDate}
+                         onChange={(e) => setSelectedDate(e.target.value)}
+                         min={new Date().toISOString().split("T")[0]}
+                         className="bg-transparent border-none outline-none w-full font-black text-lg text-gray-900 dark:text-white uppercase tracking-tight cursor-pointer"
+                      />
+                   </div>
+                </div>
+
+                <CalendarBooking
+                   turfId={turf.id}
+                   turfName={turf.name}
+                   turfOwnerId={turf.owner_id}
+                   pricePerSlot={turf.price_weekday}
+                   slots={slots}
+                   location={turf.location_city}
+                   selectedDate={selectedDate}
+                   loading={loading}
+                />
+              </div>
               
               <div className="space-y-6">
                  <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Verified Reviews</h3>
