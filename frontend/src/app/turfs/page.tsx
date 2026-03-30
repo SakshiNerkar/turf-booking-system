@@ -12,7 +12,7 @@ import { apiFetch } from "../../lib/api";
 import { SkeletonCard, EmptyState } from "../../components/Skeletons";
 import { MultiTurfMap } from "../../components/MultiTurfMap";
 
-type Turf = { id: string; name: string; location: string; sport_type: string; price_per_slot: string; rating?: number; is_featured?: boolean; };
+type Turf = { id: string; name: string; location: string; sport_type: string; price_per_slot: string; rating?: number; is_featured?: boolean; images?: string; };
 
 export default function TurfsPage() {
   const [turfs, setTurfs] = useState<Turf[] | null>(null);
@@ -131,7 +131,11 @@ export default function TurfsPage() {
                   {filtered.map(t => (
                     <Link key={t.id} href={`/turfs/${t.id}`} className="card-compact p-0 group flex flex-col h-[420px] shadow-sm hover:shadow-premium border-border bg-white dark:bg-[#121A14]">
                        <div className="h-48 relative overflow-hidden bg-gray-100 dark:bg-[#0B0F0C]">
-                          <img src="https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=400&auto=format&fit=crop" className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-105" alt={t.name} />
+                          <img 
+                             src={t.images ? JSON.parse(t.images)[0] : "https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=400&auto=format&fit=crop"} 
+                             className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-105" 
+                             alt={t.name} 
+                           />
                           <div className="absolute top-4 left-4 flex flex-col gap-2">
                              <span className="px-3 py-1.5 bg-white/95 dark:bg-[#121A14]/95 backdrop-blur-md rounded-lg font-black text-gray-900 dark:text-gray-100 text-[10px] uppercase shadow-sm flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-primary" /> Verified</span>
                              {Number(t.price_per_slot) < 1000 && <span className="px-3 py-1.5 bg-primary/10 text-primary backdrop-blur-md rounded-lg font-black text-[9px] uppercase shadow-sm border border-primary/20 flex items-center gap-1.5">Best Value</span>}

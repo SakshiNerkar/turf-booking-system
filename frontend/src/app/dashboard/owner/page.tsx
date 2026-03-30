@@ -37,6 +37,33 @@ function OwnerDashboardContent() {
   
   // Modal States
   const [modalType, setModalType] = useState<string | null>(null);
+  const [turfForm, setTurfForm] = useState({
+    name: '', location_city: '', location_address: 'Hinjewadi, Pune', 
+    sports_available: 'Football', price_weekday: 1500, price_weekend: 1800,
+    opening_time: '06:00', closing_time: '23:00', slot_duration: 60
+  });
+
+  const handleCreateTurf = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setActionLoading('Initializing Arena Node...');
+    try {
+      const res = await apiFetch('/api/turfs', {
+        method: 'POST',
+        body: turfForm
+      });
+      if (res.ok) {
+        notify.success('Arena Synched Successfully!');
+        setModalType(null);
+        loadData();
+      } else {
+        notify.error(res.error.message || 'Node Induction Failed');
+      }
+    } catch (err) {
+      notify.error('Communication error with registry');
+    } finally {
+      setActionLoading(null);
+    }
+  };
   const [exitModalOpen, setExitModalOpen] = useState(false);
 
   // Sync state with URL
@@ -123,30 +150,42 @@ function OwnerDashboardContent() {
                               <ShieldCheck className="w-4 h-4" /> Operational Initiation
                            </div>
                            <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter dark:text-white leading-none">
-                              Initialize Your <span className="text-primary italic">First Arena</span>
+                              Create Your <span className="text-primary italic">First Turf</span>
                            </h2>
-                           <p className="text-[11px] font-black text-gray-500 uppercase tracking-widest italic max-w-md">Our global network requires at least one active node to synchronize your command credentials.</p>
+                           <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest italic max-w-md">Add your first facility to start managing bookings and revenue.</p>
                         </div>
 
-                        <form className="space-y-8" onSubmit={(e) => { e.preventDefault(); notify.success('Arena Synched Successfully!'); loadData(); }}>
+                        <form className="space-y-8" onSubmit={handleCreateTurf}>
                            <div className="grid md:grid-cols-2 gap-6">
-                              <Input label="Facility Designation*" placeholder="Ex: Camp Nou Arena" required />
-                              <Input label="Operational City*" placeholder="Ex: Pune / Mumbai" required />
+                              <Input 
+                                label="Facility Designation*" placeholder="Ex: Camp Nou Arena" required 
+                                value={turfForm.name} onChange={(v: string) => setTurfForm({...turfForm, name: v})}
+                              />
+                              <Input 
+                                label="Operational City*" placeholder="Ex: Pune / Mumbai" required 
+                                value={turfForm.location_city} onChange={(v: string) => setTurfForm({...turfForm, location_city: v})}
+                              />
                            </div>
                            <div className="grid md:grid-cols-2 gap-6">
-                              <Input label="Primary Discipline*" placeholder="Ex: Football, Cricket" required />
-                              <Input label="Hourly Yield (₹)*" placeholder="Ex: 1800" type="number" required />
+                              <Input 
+                                label="Primary Discipline*" placeholder="Ex: Football, Cricket" required 
+                                value={turfForm.sports_available} onChange={(v: string) => setTurfForm({...turfForm, sports_available: v})}
+                              />
+                              <Input 
+                                label="Hourly Yield (₹)*" placeholder="Ex: 1800" type="number" required 
+                                value={turfForm.price_weekday} onChange={(v: string) => setTurfForm({...turfForm, price_weekday: Number(v), price_weekend: Number(v)})}
+                              />
                            </div>
                            <div className="pt-6">
-                              <button type="submit" className="btn-premium-primary !w-full !py-5 !text-sm !italic shadow-[0_30px_60px_rgba(34,197,94,0.3)]">
-                                 Authorize & Launch Arena Node
+                              <button type="submit" disabled={!!actionLoading} className="btn-premium-primary w-full !py-4 !text-sm !italic shadow-xl flex items-center justify-center gap-3">
+                                 {actionLoading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <><PlusCircle className="w-5 h-5" /> Register My Turf</>}
                               </button>
                               <button 
-                                onClick={() => { logout(); router.push('/'); }} 
+                                onClick={() => { logout(); window.location.href = "/"; }} 
                                 type="button" 
-                                className="w-full mt-6 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-rose-500 transition-all italic"
+                                className="w-full mt-4 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-rose-500 transition-all italic"
                               >
-                                Abort Identification & Sign Out
+                                Logout & Return to Home
                               </button>
                            </div>
                         </form>
@@ -445,20 +484,34 @@ function OwnerDashboardContent() {
                         
                         <div className="space-y-8">
                            {modalType === 'Initialize Arena' && (
-                              <div className="grid gap-6">
+                              <form className="grid gap-6" onSubmit={handleCreateTurf}>
                                  <div className="grid sm:grid-cols-2 gap-4">
-                                    <Input label="Arena Name" placeholder="Ex: Elite Stadium X" />
-                                    <Input label="Sector Coordinates" placeholder="City / Region" />
+                                    <Input 
+                                      label="Arena Name" placeholder="Ex: Elite Stadium X" required
+                                      value={turfForm.name} onChange={(v: string) => setTurfForm({...turfForm, name: v})}
+                                    />
+                                    <Input 
+                                      label="Operational City" placeholder="City / Region" required
+                                      value={turfForm.location_city} onChange={(v: string) => setTurfForm({...turfForm, location_city: v})}
+                                    />
                                  </div>
                                  <div className="grid sm:grid-cols-2 gap-4">
-                                    <Input label="Hourly Yield (₹)" placeholder="2000" />
-                                    <Input label="Arena Dimensions" placeholder="5-a-side" />
+                                    <Input 
+                                      label="Hourly Yield (₹)" placeholder="2000" type="number" required
+                                      value={turfForm.price_weekday} onChange={(v: string) => setTurfForm({...turfForm, price_weekday: Number(v), price_weekend: Number(v)})}
+                                    />
+                                    <Input 
+                                      label="Arena Dimensions" placeholder="5-a-side" required
+                                      value={turfForm.sports_available} onChange={(v: string) => setTurfForm({...turfForm, sports_available: v})}
+                                    />
                                  </div>
                                  <div className="flex justify-end gap-3 pt-4">
-                                    <button onClick={() => { logout(); window.location.href = "/"; }} className="flex items-center gap-5 px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 dark:hover:bg-red-500/5 transition-all italic">Abort Sequence</button>
-                                    <button onClick={() => { notify.success('Arena Node Created'); setModalType(null); }} className="btn-premium-primary !px-12 !italic">Initialize Site</button>
+                                    <button type="button" onClick={() => setModalType(null)} className="px-8 py-3 text-[10px] font-black uppercase text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all italic">Cancel</button>
+                                    <button type="submit" disabled={!!actionLoading} className="btn-premium-primary !px-12 !italic flex items-center gap-2">
+                                       {actionLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><PlusCircle className="w-4 h-4" /> Create Turf</>}
+                                    </button>
                                  </div>
-                              </div>
+                              </form>
                            )}
                            {modalType === 'Audit Logs' && (
                               <div className="space-y-4 max-h-[400px] overflow-y-auto pr-4 no-scrollbar">
@@ -638,11 +691,15 @@ function ActionButton({ label, desc, icon: Icon, onClick, color }: any) {
   );
 }
 
-function Input({ label, placeholder, type = "text" }: any) {
+function Input({ label, placeholder, type = "text", value, onChange, required }: any) {
   return (
-    <div className="space-y-2">
-       <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest italic">{label}</label>
-       <input type={type} placeholder={placeholder} className="w-full px-5 py-4 bg-gray-50 dark:bg-white/5 border border-border rounded-xl text-xs font-black uppercase italic outline-none focus:border-primary transition-all shadow-sm" />
+    <div className="space-y-2 text-left">
+       <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest italic">{label}</label>
+       <input 
+         type={type} placeholder={placeholder} value={value} required={required}
+         onChange={(e) => onChange?.(e.target.value)}
+         className="w-full px-5 py-4 bg-gray-50 dark:bg-white/5 border border-border rounded-xl text-xs font-black uppercase italic outline-none focus:border-primary transition-all shadow-sm dark:text-white" 
+       />
     </div>
   );
 }

@@ -15,7 +15,7 @@ import { apiFetch, type ApiResponse } from "@/lib/api";
 type Turf = {
   id: string; owner_id: string; name: string; location: string;
   sport_type: string; price_per_slot: string; description: string | null;
-  rating?: number;
+  rating?: number; images?: string;
 };
 
 type Slot = { id: string; start_time: string; end_time: string; status: "available" | "booked" | "blocked"; };
@@ -93,7 +93,7 @@ export default function TurfDetailsPage({ params }: { params: Promise<{ id: stri
         {/* 1. PREMIUM HERO SHOWCASE */}
         <section className="relative h-72 md:h-96 rounded-2xl md:rounded-[2rem] overflow-hidden shadow-premium border border-border bg-white dark:bg-card">
            <img 
-              src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop" 
+              src={turf.images ? JSON.parse(turf.images)[0] : "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop"} 
               className="absolute inset-0 w-full h-full object-cover"
               alt={turf.name}
            />

@@ -43,8 +43,30 @@ function AdminDashboardContent() {
   };
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [hudOpen, setHudOpen] = useState(false);
-  const [exitModalOpen, setExitModalOpen] = useState(false);
   const [hudSearch, setHudSearch] = useState("");
+  const [exitModalOpen, setExitModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<string | null>(null);
+  const [assetForm, setAssetForm] = useState({ name: '', email: '', password: 'User@123', role: 'owner' as 'user' | 'owner' });
+
+  const handleOnboardAsset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setActionLoading('onboarding');
+    try {
+      const res = await apiFetch('/api/auth/register', {
+        method: 'POST',
+        body: assetForm
+      });
+      if (res.ok) {
+        notify.success('Security Asset Node Onboarded Successfully');
+        setModalType(null);
+        loadData();
+      } else {
+        notify.error(res.error.message);
+      }
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const loadData = async () => {
     if (!token) return;
@@ -255,7 +277,7 @@ function AdminDashboardContent() {
                <motion.div key="users" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} className="space-y-10">
                   <div className="flex items-center justify-between">
                      <SectionHeader title="Athlete Governance" icon={Users} />
-                     <button className="btn-premium-primary !py-3 !px-8 !text-[11px] shadow-lg">Onboard Asset</button>
+                     <button onClick={() => setModalType('Onboard Asset')} className="btn-premium-primary !py-3 !px-8 !text-[11px] shadow-lg">Onboard Asset</button>
                   </div>
                   <div className="card-compact p-0 overflow-hidden bg-white dark:bg-card border-border shadow-2xl relative">
                      <div className="overflow-x-auto">
@@ -397,18 +419,69 @@ function AdminDashboardContent() {
             )}
          </AnimatePresence>
 
-          {/* TERMINATION MODAL */}
+          {/* MODAL ENGINE */}
           <AnimatePresence>
+             {modalType && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setModalType(null)} className="fixed inset-0 bg-black/95 backdrop-blur-xl" />
+                   <motion.div initial={{ scale: 0.9, opacity: 0, y: 50 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 50 }} className="w-full max-w-xl bg-white dark:bg-[#0B0F0C] border border-white/5 rounded-[3rem] shadow-3xl p-12 relative overflow-hidden">
+                         <div className="absolute top-0 right-0 p-12 opacity-[0.02] text-9xl font-black italic pointer-events-none tracking-tighter uppercase">{modalType.split(' ')[0]}</div>
+                         <div className="flex items-center justify-between mb-12">
+                            <div className="space-y-1">
+                               <h2 className="text-3xl font-black uppercase italic tracking-tighter dark:text-white">{modalType}</h2>
+                               <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest italic">Management Portal</p>
+                            </div>
+                            <button onClick={() => setModalType(null)} className="p-4 rounded-2xl bg-gray-50 dark:bg-white/5 hover:bg-rose-500/10 hover:text-rose-500 transition-all border border-border"><X className="w-5 h-5" /></button>
+                         </div>
+                         
+                         <form className="space-y-8" onSubmit={handleOnboardAsset}>
+                            {modalType === 'Onboard Asset' && (
+                               <div className="grid gap-6">
+                                  <Input 
+                                    label="Entity Legal name" placeholder="Rajesh Kumar" required 
+                                    value={assetForm.name} onChange={(v: string) => setAssetForm({...assetForm, name: v})}
+                                  />
+                                  <Input 
+                                    label="Credential Email" placeholder="owner@turff.local" type="email" required 
+                                    value={assetForm.email} onChange={(v: string) => setAssetForm({...assetForm, email: v})}
+                                  />
+                                  <div className="grid grid-cols-2 gap-4">
+                                     <Input 
+                                       label="Access Cipher" placeholder="••••••••" type="password" required 
+                                       value={assetForm.password} onChange={(v: string) => setAssetForm({...assetForm, password: v})}
+                                     />
+                                     <div className="space-y-2 text-left">
+                                        <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest italic">Operational Clearance</label>
+                                        <select 
+                                          value={assetForm.role} onChange={(e: any) => setAssetForm({...assetForm, role: e.target.value})}
+                                          className="w-full px-5 py-4 bg-gray-50 dark:bg-white/5 border border-border rounded-xl text-xs font-black uppercase italic outline-none focus:border-primary transition-all shadow-sm dark:text-white outline-none"
+                                        >
+                                           <option value="owner">Owner Node</option>
+                                           <option value="user">Athlete Node</option>
+                                        </select>
+                                     </div>
+                                  </div>
+                                  <div className="flex justify-end pt-4">
+                                     <button type="submit" disabled={!!actionLoading} className="btn-premium-primary !px-12 !italic flex items-center gap-2">
+                                        {actionLoading === 'onboarding' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><PlusCircle className="w-4 h-4" /> Add New User</>}
+                                     </button>
+                                  </div>
+                               </div>
+                            )}
+                         </form>
+                   </motion.div>
+                </div>
+             )}
              {exitModalOpen && (
-                <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
-                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setExitModalOpen(false)} className="fixed inset-0 bg-black/80 backdrop-blur-md" />
-                   <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="w-full max-w-md bg-white dark:bg-[#0B0F0C] border border-white/5 rounded-[2.5rem] shadow-2xl p-10 text-center space-y-8 relative overflow-hidden">
-                      <div className="absolute top-0 right-0 p-8 opacity-[0.02] text-8xl font-black italic pointer-events-none">EXIT</div>
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setExitModalOpen(false)} className="fixed inset-0 bg-black/95 backdrop-blur-xl" />
+                   <motion.div initial={{ scale: 0.9, opacity: 0, y: 50 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 50 }} className="w-full max-w-sm bg-white dark:bg-[#0B0F0C] border border-white/5 rounded-[3rem] shadow-3xl p-12 text-center relative overflow-hidden">
+                      <div className="absolute top-0 right-0 p-12 opacity-[0.02] text-9xl font-black italic pointer-events-none tracking-tighter uppercase">EXIT</div>
                       <div className="w-20 h-20 bg-rose-500/10 rounded-3xl mx-auto flex items-center justify-center text-rose-500 shadow-xl shadow-rose-500/10 border border-rose-500/20"><LogOut className="w-10 h-10" /></div>
-                      <div className="space-y-2"><h2 className="text-2xl font-black tracking-tighter uppercase italic dark:text-white leading-none">Terminate Session?</h2><p className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest px-8 mt-2">Operational credentials will be cleared and you will be returned to base station.</p></div>
+                      <div className="space-y-2"><h2 className="text-2xl font-black tracking-tighter uppercase italic dark:text-white leading-none">Logout?</h2><p className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest px-8 mt-2">You will be securely logged out and returned to the main page.</p></div>
                       <div className="flex flex-col gap-3">
-                         <button onClick={() => { logout(); window.location.href = "/"; }} className="btn-premium-primary !bg-rose-500 !shadow-rose-500/20 w-full !italic text-[11px] py-4">Return to Base Station</button>
-                         <button onClick={() => setExitModalOpen(false)} className="px-8 py-3 text-[10px] font-black uppercase text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all italic">Stay Operational</button>
+                         <button onClick={() => { logout(); window.location.href = "/"; }} className="btn-premium-primary !bg-rose-500 !shadow-rose-500/20 w-full !italic text-[11px] py-4">Logout</button>
+                         <button onClick={() => setExitModalOpen(false)} className="px-8 py-3 text-[10px] font-black uppercase text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all italic">Stay Logged In</button>
                       </div>
                    </motion.div>
                 </div>
@@ -573,4 +646,17 @@ function SystemNode({ label, value, status }: any) {
          <span className="text-[10px] font-black text-gray-900 dark:text-white group-hover:scale-110 transition-transform">{value}</span>
       </div>
    );
+}
+
+function Input({ label, placeholder, type = "text", value, onChange, required }: any) {
+  return (
+    <div className="space-y-2 text-left">
+       <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest italic">{label}</label>
+       <input 
+         type={type} placeholder={placeholder} value={value} required={required}
+         onChange={(e) => onChange?.(e.target.value)}
+         className="w-full px-5 py-4 bg-gray-50 dark:bg-white/5 border border-border rounded-xl text-xs font-black uppercase italic outline-none focus:border-primary transition-all shadow-sm dark:text-white" 
+       />
+    </div>
+  );
 }
