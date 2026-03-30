@@ -75,7 +75,7 @@ export function Navbar() {
                   </button>
                   <div 
                     className="flex items-center gap-3 cursor-pointer group"
-                    onClick={() => router.push(`/dashboard/${user.role}`)}
+                    onClick={() => router.push(`/dashboard/${user.role === 'user' ? 'customer' : user.role}`)}
                   >
                      <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-card border border-border flex items-center justify-center font-black text-sm text-gray-500 group-hover:bg-primary group-hover:border-primary group-hover:text-white transition-all shadow-sm">
                         {initials(user.name)}
