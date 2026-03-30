@@ -407,7 +407,7 @@ function AdminDashboardContent() {
                       <div className="w-20 h-20 bg-rose-500/10 rounded-3xl mx-auto flex items-center justify-center text-rose-500 shadow-xl shadow-rose-500/10 border border-rose-500/20"><LogOut className="w-10 h-10" /></div>
                       <div className="space-y-2"><h2 className="text-2xl font-black tracking-tighter uppercase italic dark:text-white leading-none">Terminate Session?</h2><p className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest px-8 mt-2">Operational credentials will be cleared and you will be returned to base station.</p></div>
                       <div className="flex flex-col gap-3">
-                         <button onClick={() => { logout(); router.push('/'); }} className="btn-premium-primary !bg-rose-500 !shadow-rose-500/20 w-full !italic text-[11px] py-4">Return to Base Station</button>
+                         <button onClick={() => { logout(); window.location.href = "/"; }} className="btn-premium-primary !bg-rose-500 !shadow-rose-500/20 w-full !italic text-[11px] py-4">Return to Base Station</button>
                          <button onClick={() => setExitModalOpen(false)} className="px-8 py-3 text-[10px] font-black uppercase text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all italic">Stay Operational</button>
                       </div>
                    </motion.div>

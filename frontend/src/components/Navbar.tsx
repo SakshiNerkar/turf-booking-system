@@ -114,7 +114,7 @@ export function Navbar() {
               <div className="p-4 space-y-4">
                 {user ? (
                   <button
-                    onClick={() => { logout(); router.push("/"); setMenuOpen(false); }}
+                    onClick={() => { logout(); window.location.href = "/"; }}
                     className="w-full flex items-center justify-center gap-2 py-3 bg-red-50 dark:bg-red-500/10 text-red-600 rounded-xl font-bold text-sm"
                   >
                     <LogOut className="w-4 h-4" /> Sign Out

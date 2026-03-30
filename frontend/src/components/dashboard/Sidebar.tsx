@@ -105,7 +105,7 @@ export function Sidebar() {
                  <Globe className="w-4 h-4 opacity-40" /> Public Site
               </Link>
               <button 
-                onClick={() => { logout(); router.push('/'); }}
+                onClick={() => { logout(); window.location.href = "/"; }}
                 className="flex items-center gap-5 px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 dark:hover:bg-red-500/5 transition-all italic"
               >
                  <LogOut className="w-4 h-4" /> Terminate
