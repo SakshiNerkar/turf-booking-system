@@ -2,10 +2,21 @@ begin;
 
 create extension if not exists pgcrypto;
 
+-- 1. Create Enumerations for Role Consistency
+-- 1. Force-Flush Entire Public Schema (Clear all legacy/stale tables/types)
+drop schema public cascade;
+create schema public;
+grant all on schema public to postgres;
+grant all on schema public to public;
+
+-- 2. Re-declare Search Path for safety
+set search_path to public;
+
+-- 3. Create High-Performance Custom Types
 do $$
 begin
   if not exists (select 1 from pg_type where typname = 'user_role') then
-    create type user_role as enum ('admin', 'owner', 'customer');
+    create type user_role as enum ('admin', 'owner', 'user', 'customer');
   end if;
   if not exists (select 1 from pg_type where typname = 'timeslot_status') then
     create type timeslot_status as enum ('available', 'booked', 'blocked');
@@ -13,95 +24,73 @@ begin
   if not exists (select 1 from pg_type where typname = 'payment_status') then
     create type payment_status as enum ('pending', 'success', 'failed');
   end if;
-  if not exists (select 1 from pg_type where typname = 'payment_type') then
-    create type payment_type as enum ('online', 'offline');
-  end if;
 end $$;
 
-create table if not exists users (
+-- 3. High-Fidelity Management Registry (Users)
+create table users (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   email text not null unique,
   phone text,
   password text not null,
-  role user_role not null default 'customer',
+  role user_role not null default 'user',
+  earnings_total numeric(12,2) default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
-create table if not exists turfs (
+-- 4. Global Arena Registry (Turfs)
+create table turfs (
   id uuid primary key default gen_random_uuid(),
   owner_id uuid not null references users(id) on delete cascade,
   name text not null,
-  location text not null,
-  sport_type text not null,
-  price_per_slot numeric(10,2) not null,
   description text,
+  location_city text not null,
+  location_address text not null,
+  images text, -- JSON array string
+  sports_available text not null, -- Primary sport
+  amenities text, -- JSON array string
+  price_weekday numeric(10,2) not null,
+  price_weekend numeric(10,2) not null,
+  rating numeric(2,1) default 5.0,
+  total_reviews integer default 0,
+  opening_time text default '06:00',
+  closing_time text default '23:00',
+  slot_duration integer default 60,
   is_active boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
-create table if not exists time_slots (
+-- 5. Operational Synchronization (Time Slots)
+create table time_slots (
   id uuid primary key default gen_random_uuid(),
   turf_id uuid not null references turfs(id) on delete cascade,
   start_time timestamptz not null,
   end_time timestamptz not null,
   status timeslot_status not null default 'available',
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  constraint time_slots_time_check check (end_time > start_time),
-  constraint time_slots_unique_range unique (turf_id, start_time, end_time)
+  updated_at timestamptz not null default now()
 );
 
-create table if not exists bookings (
+-- 6. Booking Transactions
+create table bookings (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references users(id) on delete cascade,
   turf_id uuid not null references turfs(id) on delete cascade,
   slot_id uuid not null references time_slots(id) on delete cascade,
-  players int not null,
+  players integer not null default 1,
   total_price numeric(10,2) not null,
   payment_status payment_status not null default 'pending',
   booking_date timestamptz not null default now(),
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  constraint bookings_players_check check (players > 0),
-  constraint bookings_unique_slot unique (slot_id)
-);
-
-create table if not exists payments (
-  id uuid primary key default gen_random_uuid(),
-  booking_id uuid not null references bookings(id) on delete cascade,
-  payment_type payment_type not null,
-  payment_status payment_status not null,
-  created_at timestamptz not null default now(),
-  constraint payments_unique_booking unique (booking_id)
-);
-
-create table if not exists revenue (
-  id uuid primary key default gen_random_uuid(),
-  owner_id uuid not null references users(id) on delete cascade,
-  turf_id uuid not null references turfs(id) on delete cascade,
-  amount numeric(10,2) not null,
-  date date not null default current_date,
-  created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
-create index if not exists idx_turfs_owner on turfs(owner_id);
-create index if not exists idx_turfs_location on turfs(location);
-create index if not exists idx_turfs_sport_type on turfs(sport_type);
-
-create index if not exists idx_time_slots_turf on time_slots(turf_id);
-create index if not exists idx_time_slots_start on time_slots(start_time);
-
-create index if not exists idx_bookings_user on bookings(user_id);
-create index if not exists idx_bookings_turf on bookings(turf_id);
-create index if not exists idx_bookings_date on bookings(booking_date);
-
-create index if not exists idx_revenue_owner on revenue(owner_id);
-create index if not exists idx_revenue_turf on revenue(turf_id);
-create index if not exists idx_revenue_date on revenue(date);
+-- Indices for Regional Performance
+create index idx_turfs_city on turfs(location_city);
+create index idx_turfs_owner on turfs(owner_id);
+create index idx_bookings_user on bookings(user_id);
+create index idx_time_slots_range on time_slots(turf_id, start_time);
 
 commit;
-

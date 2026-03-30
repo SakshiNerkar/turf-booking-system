@@ -31,15 +31,10 @@ if (USE_SQLITE) {
   const { Pool } = require("pg");
   _pool = new Pool({
     connectionString: env.DATABASE_URL,
-    max: 10,
+    max: 20,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 5000,
-    ssl:
-      env.DATABASE_URL.includes("sslmode=require") ||
-      env.DATABASE_URL.includes("neon.tech") ||
-      env.DATABASE_URL.includes("supabase")
-        ? { rejectUnauthorized: false }
-        : false,
+    connectionTimeoutMillis: 30000,
+    ssl: { rejectUnauthorized: false }
   }) as DbPool;
 }
 
