@@ -17,6 +17,13 @@ export type BookingRow = {
   booking_reference: string;
   created_at: string;
   updated_at: string;
+  // Extra fields from joins used in dashboards
+  turf_name?: string;
+  turf_image?: string;
+  user_name?: string;
+  user_phone?: string;
+  location_city?: string;
+  location_address?: string;
 };
 
 export async function createBooking(input: {
