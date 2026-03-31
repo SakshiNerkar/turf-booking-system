@@ -49,7 +49,9 @@ function UserDashboardContent() {
   );
 
   const renderContent = () => {
-    if (!data) return null;
+    const stats = data?.stats || {};
+    const bookings = data?.bookings || [];
+    const quickBookAgain = data?.quickBookAgain || [];
 
     return (
       <div className="w-full relative z-10">
@@ -58,10 +60,10 @@ function UserDashboardContent() {
             <motion.div key="overview" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.02 }} className="space-y-12 pb-20">
               {/* STATS DECK */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatBox label="Confirmed Matches" value={data.stats.upcomingMatches} sub="Next confirmed entry" icon={Calendar} color="cyan" />
-                <StatBox label="Total Playing Time" value={`${data.stats.totalPlayingHours}H`} sub="Authentic Gear Data" icon={Clock} color="teal" />
-                <StatBox label="My Wallet Balance" value={`₹${data.stats.walletBalance.toLocaleString()}`} sub="Current Liquid Credit" icon={Wallet} color="emerald" />
-                <StatBox label="Membership Status" value={data.stats.membership} sub={user.name[0] + " Node Tier"} icon={Trophy} color="indigo" />
+                <StatBox label="Confirmed Matches" value={stats.upcomingMatches || 0} sub="Next confirmed entry" icon={Calendar} color="cyan" />
+                <StatBox label="Total Playing Time" value={`${stats.totalPlayingHours || 0}H`} sub="Authentic Gear Data" icon={Clock} color="teal" />
+                <StatBox label="My Wallet Balance" value={`₹${(stats.walletBalance || 0).toLocaleString()}`} sub="Current Liquid Credit" icon={Wallet} color="emerald" />
+                <StatBox label="Membership Status" value={stats.membership || 'Standard'} sub={(user?.name || 'Authorized')[0] + " Node Tier"} icon={Trophy} color="indigo" />
               </div>
 
               {/* CALENDAR & QUICK BOOK GRID */}
@@ -83,14 +85,14 @@ function UserDashboardContent() {
                 <div className="lg:col-span-5 flex flex-col justify-between">
                    <h3 className="text-[12px] font-black text-white uppercase tracking-[0.3em] italic mb-10 px-4">Direct Re-Entry Nodes</h3>
                    <div className="grid grid-cols-3 gap-6 h-full px-2">
-                      {data.quickBookAgain.map((q: any) => (
+                      {quickBookAgain.map((q: any) => (
                          <motion.div key={q.id} whileHover={{ y: -10 }} onClick={() => router.push(`/turfs?id=${q.id}`)} className="bg-white/5 border border-white/5 rounded-[2.5rem] overflow-hidden flex flex-col group cursor-pointer hover:border-cyan-500/30 transition-all shadow-xl">
                             <div className="h-24 bg-gray-900 overflow-hidden relative">
-                               <img src={q.image} className="w-full h-full object-cover group-hover:scale-125 transition-transform duration-1000" />
+                               <img src={q.image || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80'} className="w-full h-full object-cover group-hover:scale-125 transition-transform duration-1000" />
                                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60" />
                             </div>
                             <div className="p-4 flex flex-col gap-4">
-                               <h4 className="text-[10px] font-black text-white uppercase truncate italic">{q.name}</h4>
+                               <h4 className="text-[10px] font-black text-white uppercase truncate italic">{q.name || 'Arena Node'}</h4>
                                <button className="w-full py-2.5 bg-cyan-600/10 border border-cyan-500/20 text-cyan-400 text-[8px] font-black uppercase tracking-widest rounded-xl group-hover:bg-cyan-600 group-hover:text-white transition-all shadow-lg active:scale-95">Initiate</button>
                             </div>
                          </motion.div>
@@ -122,20 +124,20 @@ function UserDashboardContent() {
                           </tr>
                        </thead>
                        <tbody>
-                          {data.bookings.map((b: any, i: number) => (
+                          {bookings.map((b: any, i: number) => (
                              <motion.tr 
                                 initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
                                 key={b.id} className="group/row bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all rounded-[2.5rem] overflow-hidden shadow-xl"
                              >
-                                <td className="px-8 py-8 text-[13px] font-black text-gray-200 uppercase italic opacity-90">{new Date(b.booking_date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                                <td className="px-8 py-8 text-[14px] font-black text-white uppercase tracking-tight italic drop-shadow-lg">{b.turf_name}</td>
+                                <td className="px-8 py-8 text-[13px] font-black text-gray-200 uppercase italic opacity-90">{b.booking_date ? new Date(b.booking_date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}</td>
+                                <td className="px-8 py-8 text-[14px] font-black text-white uppercase tracking-tight italic drop-shadow-lg">{b.turf_name || 'Venue'}</td>
                                 <td className="px-8 py-8">
                                    <div className="px-4 py-1.5 bg-white/5 border border-white/5 rounded-xl text-[9px] font-black uppercase text-gray-500 tracking-widest inline-block group-hover/row:border-cyan-500/20 group-hover/row:text-cyan-400 transition-all">{b.sport_type || 'Football'} (Matrix Node)</div>
                                 </td>
-                                <td className="px-8 py-8 text-[16px] font-black text-white tracking-tighter italic">₹{Number(b.total_price).toLocaleString()}</td>
+                                <td className="px-8 py-8 text-[16px] font-black text-white tracking-tighter italic">₹{(Number(b.total_price) || 0).toLocaleString()}</td>
                                 <td className="px-8 py-8">
                                    <span className={`px-5 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest border transition-all shadow-lg ${b.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-emerald-500/5' : 'bg-gray-500/10 text-gray-500 border-gray-500/20'}`}>
-                                      {b.status}
+                                      {b.status || 'Pending'}
                                    </span>
                                 </td>
                                 <td className="px-8 py-8 text-right">

@@ -85,7 +85,13 @@ function OwnerDashboardContent() {
   if (!user) return null;
 
   const renderOverview = () => {
-    if (!data) return null;
+    const stats = data?.stats || {};
+    const trends = data?.trends || [];
+    const recentBookings = data?.recentBookings || [];
+    const pendingRequests = data?.pendingRequests || [];
+    const revenueSplit = data?.revenueSplit || [];
+    const topVenues = data?.topVenues || [];
+
     return (
       <motion.div 
         initial={{ opacity: 0, y: 20 }} 
@@ -94,10 +100,10 @@ function OwnerDashboardContent() {
       >
         {/* TOP STATS CLUSTER */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-           <StatNode label="This Month Gross Revenue" value={`₹${data.stats.grossRevenue.toLocaleString()}`} change="+18% vs last month" icon={TrendingUp} color="cyan" />
-           <StatNode label="Total Active Turfs" value={data.stats.activeTurfs + " Turfs"} sub={`(${data.stats.venues} Venues)`} icon={MapPin} color="teal" />
-           <StatNode label="Average Occupancy Rate" value={data.stats.occupancyRate + "%"} sub="16:00-22:00" info icon={Activity} color="indigo" />
-           <StatNode label="Top Rated Turf" value={data.stats.topTurf} sub={`(${data.stats.topRating} Stars)`} icon={Star} color="amber" isStar />
+           <StatNode label="This Month Gross Revenue" value={`₹${(stats.grossRevenue || 0).toLocaleString()}`} change="+18% vs last month" icon={TrendingUp} color="cyan" />
+           <StatNode label="Total Active Turfs" value={(stats.activeTurfs || 0) + " Turfs"} sub={`(${(stats.venues || 0)} Venues)`} icon={MapPin} color="teal" />
+           <StatNode label="Average Occupancy Rate" value={(stats.occupancyRate || 0) + "%"} sub="16:00-22:00" info icon={Activity} color="indigo" />
+           <StatNode label="Top Rated Turf" value={stats.topTurf || 'N/A'} sub={`(${(stats.topRating || 0)} Stars)`} icon={Star} color="amber" isStar />
         </div>
 
         {/* PERFORMANCE & ANALYTICS GRID */}
@@ -113,18 +119,17 @@ function OwnerDashboardContent() {
                  </div>
               </div>
               <div className="h-[300px] flex items-end gap-3 px-4 relative">
-                 {/* GRID LINES */}
                  <div className="absolute inset-0 flex flex-col justify-between py-2 pointer-events-none opacity-5">
                     {[1,2,3,4,5].map(i => <div key={i} className="w-full border-t border-white" />)}
                  </div>
-                 {data.trends.map((t: any, i: number) => (
+                 {trends.map((t: any, i: number) => (
                     <div key={i} className="flex-1 flex flex-col items-center gap-4 group cursor-help">
                        <div className="w-full h-full flex items-end gap-1 px-1">
-                          <motion.div initial={{ height: 0 }} animate={{ height: `${(t.revenue/1200)*100}%` }} className="flex-1 bg-cyan-600/40 rounded-t-lg group-hover:bg-cyan-500 transition-all" />
-                          <motion.div initial={{ height: 0 }} animate={{ height: `${(t.bookings/600)*100}%` }} className="flex-1 bg-emerald-600/40 rounded-t-lg group-hover:bg-emerald-500 transition-all" />
-                          <motion.div initial={{ height: 0 }} animate={{ height: `${(t.occupancy/100)*100}%` }} className="flex-1 bg-amber-600/40 rounded-t-lg group-hover:bg-amber-500 transition-all" />
+                          <motion.div initial={{ height: 0 }} animate={{ height: `${((t.revenue || 0)/1200)*100}%` }} className="flex-1 bg-cyan-600/40 rounded-t-lg group-hover:bg-cyan-500 transition-all" />
+                          <motion.div initial={{ height: 0 }} animate={{ height: `${((t.bookings || 0)/600)*100}%` }} className="flex-1 bg-emerald-600/40 rounded-t-lg group-hover:bg-emerald-500 transition-all" />
+                          <motion.div initial={{ height: 0 }} animate={{ height: `${((t.occupancy || 0)/100)*100}%` }} className="flex-1 bg-amber-600/40 rounded-t-lg group-hover:bg-amber-500 transition-all" />
                        </div>
-                       <span className="text-[8px] font-black text-gray-500 uppercase tracking-tighter italic">{t.month}</span>
+                       <span className="text-[8px] font-black text-gray-500 uppercase tracking-tighter italic">{t.month || 'N/A'}</span>
                     </div>
                  ))}
               </div>
@@ -146,7 +151,7 @@ function OwnerDashboardContent() {
                        </div>
                     </div>
                     <div className="space-y-2 flex-1">
-                       {data.revenueSplit.map((s: any) => (
+                       {revenueSplit.map((s: any) => (
                           <div key={s.label} className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest italic">
                              <div className="flex items-center gap-2">
                                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: s.color }} />
@@ -161,14 +166,14 @@ function OwnerDashboardContent() {
               <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 backdrop-blur-md">
                  <h3 className="text-[10px] font-black text-white uppercase tracking-widest italic mb-6">Top Performing Venues by Revenue</h3>
                  <div className="space-y-4">
-                    {data.topVenues.map((v: any) => (
+                    {topVenues.map((v: any) => (
                        <div key={v.name} className="space-y-1.5">
                           <div className="flex items-center justify-between text-[9px] font-black uppercase italic">
                              <span className="text-gray-400">{v.name}</span>
-                             <span className="text-cyan-500">₹{v.revenue.toLocaleString()}</span>
+                             <span className="text-cyan-500">₹{(v.revenue || 0).toLocaleString()}</span>
                           </div>
                           <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                             <motion.div initial={{ width: 0 }} animate={{ width: `${(v.revenue/5500)*100}%` }} className="h-full bg-cyan-500 shadow-[0_0_10px_rgba(8,145,178,0.4)]" />
+                             <motion.div initial={{ width: 0 }} animate={{ width: `${((v.revenue || 0)/5500)*100}%` }} className="h-full bg-cyan-500 shadow-[0_0_10px_rgba(8,145,178,0.4)]" />
                           </div>
                        </div>
                     ))}
@@ -186,12 +191,12 @@ function OwnerDashboardContent() {
                  <HelpCircle className="w-4 h-4 text-gray-600" />
               </div>
               <div className="space-y-4">
-                 {data.pendingRequests.map((r: any) => (
+                 {pendingRequests.map((r: any) => (
                     <div key={r.id} className="p-5 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between group hover:bg-white/[0.08] transition-all">
                        <div className="space-y-1">
                           <span className="text-[11px] font-black text-cyan-500 italic uppercase">TB-{(r.id || '').toString().includes('-') ? r.id.split('-')[1] : (r.id || '').toString().slice(0, 5)}</span>
-                          <div className="text-[10px] font-black text-white italic">{r.user}</div>
-                          <div className="text-[8px] font-black text-gray-500 uppercase tracking-widest">{r.venue}</div>
+                          <div className="text-[10px] font-black text-white italic">{r.user || 'Athlete'}</div>
+                          <div className="text-[8px] font-black text-gray-500 uppercase tracking-widest">{r.venue || 'Venue Node'}</div>
                        </div>
                        <div className="flex items-center gap-3">
                           <button className="px-4 py-2 bg-emerald-500/10 text-emerald-500 text-[8px] font-black uppercase rounded-lg border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all shadow-lg active:scale-90">Approve</button>
@@ -284,7 +289,7 @@ function OwnerDashboardContent() {
                     </tr>
                  </thead>
                  <tbody className="relative z-10">
-                    {data.recentBookings.map((b: any, i: number) => (
+                    {recentBookings.map((b: any, i: number) => (
                        <motion.tr 
                           initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
                           key={b.id} className="group/row bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all rounded-3xl overflow-hidden shadow-lg"
@@ -292,21 +297,21 @@ function OwnerDashboardContent() {
                           <td className="px-6 py-7 text-[11px] font-black text-cyan-500 uppercase italic">TB-{(b.id || '').toString().includes('-') ? b.id.split('-')[1] : (b.id || '').toString().slice(0, 5)}</td>
                           <td className="px-6 py-7">
                              <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-xl bg-gray-800 border border-white/10 flex items-center justify-center text-[9px] font-black italic">{b.user[0]}</div>
-                                <span className="text-[12px] font-black text-white italic truncate max-w-[120px]">{b.user}</span>
+                                <div className="w-8 h-8 rounded-xl bg-gray-800 border border-white/10 flex items-center justify-center text-[9px] font-black italic">{(b.user || 'A')[0]}</div>
+                                <span className="text-[12px] font-black text-white italic truncate max-w-[120px]">{b.user || 'Athlete'}</span>
                              </div>
                           </td>
-                          <td className="px-6 py-7 text-[10px] font-black text-gray-400 uppercase italic opacity-60">{b.venue}</td>
-                          <td className="px-6 py-7 text-[12px] font-black text-white italic">{b.turf}</td>
+                          <td className="px-6 py-7 text-[10px] font-black text-gray-400 uppercase italic opacity-60">{b.venue || 'Venue Node'}</td>
+                          <td className="px-6 py-7 text-[12px] font-black text-white italic">{b.turf || 'Field'}</td>
                           <td className="px-6 py-7">
-                             <span className="px-3 py-1.5 bg-white/5 border border-white/5 rounded-xl text-[8px] font-black uppercase text-gray-500 italic">{b.sport}</span>
+                             <span className="px-3 py-1.5 bg-white/5 border border-white/5 rounded-xl text-[8px] font-black uppercase text-gray-500 italic">{b.sport || 'Sport'}</span>
                           </td>
-                          <td className="px-6 py-7 text-[10px] font-bold text-gray-500 italic uppercase">{b.date}</td>
-                          <td className="px-6 py-7 text-[14px] font-black text-white italic tracking-tighter">₹{b.amount.toLocaleString()}</td>
-                          <td className="px-6 py-7 text-[12px] font-black text-rose-500/80 italic tracking-tighter">₹{b.commission.toLocaleString()}</td>
+                          <td className="px-6 py-7 text-[10px] font-bold text-gray-500 italic uppercase">{b.date || 'N/A'}</td>
+                          <td className="px-6 py-7 text-[14px] font-black text-white italic tracking-tighter">₹{(b.amount || 0).toLocaleString()}</td>
+                          <td className="px-6 py-7 text-[12px] font-black text-rose-500/80 italic tracking-tighter">₹{(b.commission || 0).toLocaleString()}</td>
                           <td className="px-6 py-7">
                              <span className={`px-4 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest border transition-all ${b.status === 'Paid' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-emerald-500/5' : 'bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-amber-500/5'}`}>
-                                {b.status}
+                                {b.status || 'Pending'}
                              </span>
                           </td>
                           <td className="px-6 py-7 text-right">
@@ -330,11 +335,11 @@ function OwnerDashboardContent() {
     );
   };
 
-  const renderPlaceholder = (title: string, desc: string, icon: any) => (
+  const renderPlaceholder = (title: string, desc: string, Icon: any) => (
      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="h-[70vh] flex flex-col items-center justify-center text-center space-y-8">
         <div className="w-32 h-32 rounded-[3.5rem] bg-white/5 border border-white/10 flex items-center justify-center relative overflow-hidden group">
            <div className="absolute inset-0 bg-gradient-to-tr from-cyan-600/10 to-transparent group-hover:scale-150 transition-transform duration-1000" />
-           {icon({ className: "w-16 h-16 text-cyan-600 animate-pulse" })}
+           <Icon className="w-16 h-16 text-cyan-600 animate-pulse" />
         </div>
         <div className="space-y-3">
            <h2 className="text-5xl font-black text-white italic uppercase tracking-tighter">{title}</h2>
@@ -353,7 +358,7 @@ function OwnerDashboardContent() {
                Venue Owner <span className="text-cyan-500">Management Portal</span>
             </h1>
             <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.4em] opacity-60 flex items-center gap-2 italic">
-               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> authorized Ops Center · {user.name[0]} Node Tracking
+               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> authorized Ops Center · {(user?.name || 'Authorized')[0]} Node Tracking
             </p>
          </div>
          

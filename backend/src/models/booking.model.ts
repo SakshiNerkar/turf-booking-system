@@ -24,6 +24,7 @@ export type BookingRow = {
   user_phone?: string;
   location_city?: string;
   location_address?: string;
+  sport_type?: string;
 };
 
 export async function createBooking(input: {
@@ -50,7 +51,7 @@ export async function createBooking(input: {
 export async function getBookingById(id: string) {
   const res = await pool.query<BookingRow>(
     `SELECT b.*, 
-      t.name AS turf_name, t.location_city, t.location_address,
+      t.name AS turf_name, t.sports_available AS sport_type, t.location_city, t.location_address,
       u.name AS user_name, u.phone AS user_phone
      FROM bookings b
      JOIN turfs t ON t.id = b.turf_id
@@ -73,7 +74,7 @@ export async function getBookingsByTurfAndDate(turfId: string, bookingDate: stri
 export async function listBookingsForUser(userId: string) {
   const res = await pool.query<BookingRow>(
     `SELECT b.*, 
-      t.name AS turf_name, t.location_city,
+      t.name AS turf_name, t.sports_available AS sport_type, t.location_city,
       ti.image_url AS turf_image
      FROM bookings b
      JOIN turfs t ON t.id = b.turf_id
@@ -88,7 +89,7 @@ export async function listBookingsForUser(userId: string) {
 export async function listBookingsForOwner(ownerId: string) {
   const res = await pool.query<BookingRow>(
     `SELECT b.*,
-      t.name AS turf_name,
+      t.name AS turf_name, t.sports_available AS sport_type,
       u.name AS user_name, u.phone AS user_phone
      FROM bookings b
      JOIN turfs t ON t.id = b.turf_id
@@ -103,7 +104,7 @@ export async function listBookingsForOwner(ownerId: string) {
 export async function listAllBookings(limit = 50, offset = 0) {
   const res = await pool.query<BookingRow>(
     `SELECT b.*,
-      t.name AS turf_name,
+      t.name AS turf_name, t.sports_available AS sport_type,
       u.name AS user_name
      FROM bookings b
      JOIN turfs t ON t.id = b.turf_id
