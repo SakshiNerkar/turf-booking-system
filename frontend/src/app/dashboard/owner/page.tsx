@@ -6,7 +6,7 @@ import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from
 import { 
   BarChart3, Calendar, Clock, CreditCard, LayoutDashboard, MapPin, 
   PlusCircle, Search, Settings, ShieldCheck, Store, TrendingUp, 
-  Users, Zap, Activity, Database, Star, Bell, Filter, ChevronRight,
+  Users, User, Zap, Activity, Database, Star, Bell, Filter, ChevronRight,
   ChevronLeft, Info, HelpCircle, MoreHorizontal, Download, Trash
 } from "lucide-react";
 import { useAuth } from "../../../components/AuthProvider";
