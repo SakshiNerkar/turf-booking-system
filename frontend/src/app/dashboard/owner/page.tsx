@@ -189,7 +189,7 @@ function OwnerDashboardContent() {
                  {data.pendingRequests.map((r: any) => (
                     <div key={r.id} className="p-5 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between group hover:bg-white/[0.08] transition-all">
                        <div className="space-y-1">
-                          <span className="text-[11px] font-black text-cyan-500 italic uppercase">TB-{r.id.split('-')[1]}</span>
+                          <span className="text-[11px] font-black text-cyan-500 italic uppercase">TB-{(r.id || '').toString().includes('-') ? r.id.split('-')[1] : (r.id || '').toString().slice(0, 5)}</span>
                           <div className="text-[10px] font-black text-white italic">{r.user}</div>
                           <div className="text-[8px] font-black text-gray-500 uppercase tracking-widest">{r.venue}</div>
                        </div>
@@ -289,7 +289,7 @@ function OwnerDashboardContent() {
                           initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
                           key={b.id} className="group/row bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all rounded-3xl overflow-hidden shadow-lg"
                        >
-                          <td className="px-6 py-7 text-[11px] font-black text-cyan-500 uppercase italic">TB-{b.id.split('-')[1]}</td>
+                          <td className="px-6 py-7 text-[11px] font-black text-cyan-500 uppercase italic">TB-{(b.id || '').toString().includes('-') ? b.id.split('-')[1] : (b.id || '').toString().slice(0, 5)}</td>
                           <td className="px-6 py-7">
                              <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-xl bg-gray-800 border border-white/10 flex items-center justify-center text-[9px] font-black italic">{b.user[0]}</div>
