@@ -460,7 +460,7 @@ function OwnerDashboardContent() {
                            <ImageUpload 
                               label="Venue Visual Node (Directorial Feed)" 
                               token={token} 
-                              onUploadSuccess={(url) => setNewTurf(prev => ({...prev, images: [...prev.images, url]}))} 
+                              onUploadSuccess={(url) => setNewTurf((prev: any) => ({...prev, images: [...prev.images, url]}))} 
                            />
                            
                            <div className="flex gap-4 pt-10">
