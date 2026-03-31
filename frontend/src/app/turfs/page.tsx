@@ -12,7 +12,7 @@ import { apiFetch } from "../../lib/api";
 import { SkeletonCard, EmptyState } from "../../components/Skeletons";
 import { MultiTurfMap } from "../../components/MultiTurfMap";
 
-type Turf = { id: string; name: string; location_city: string; sports_available: string; price_weekday: number; rating?: number; images?: string; latitude?: number; longitude?: number; };
+type Turf = { id: string; name: string; location_city: string; sports_available: string; price_weekday: number; rating?: number; images?: string[] | string; primary_image?: string; latitude?: number; longitude?: number; };
 
 export default function TurfsPage() {
   const [turfs, setTurfs] = useState<Turf[] | null>(null);
@@ -132,7 +132,12 @@ export default function TurfsPage() {
                     <Link key={t.id} href={`/turfs/${t.id}`} className="card-compact p-0 group flex flex-col h-[420px] shadow-sm hover:shadow-premium border-border bg-white dark:bg-[#121A14]">
                        <div className="h-48 relative overflow-hidden bg-gray-100 dark:bg-[#0B0F0C]">
                           <img 
-                             src={t.images ? JSON.parse(t.images)[0] : "https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=400&auto=format&fit=crop"} 
+                             src={
+                               t.primary_image || (
+                                 Array.isArray(t.images) ? t.images[0] : 
+                                 (typeof t.images === 'string' && t.images.startsWith('[') ? JSON.parse(t.images)[0] : t.images)
+                               ) || "https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=400&auto=format&fit=crop"
+                             } 
                              className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-105" 
                              alt={t.name} 
                            />

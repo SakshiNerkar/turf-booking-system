@@ -15,7 +15,7 @@ import { apiFetch, type ApiResponse } from "@/lib/api";
 type Turf = {
   id: string; owner_id: string; name: string; location_city: string;
   sports_available: string; price_weekday: number; description: string | null;
-  rating?: number; images?: string;
+  rating?: number; primary_image?: string; images?: string[] | string;
 };
 
 type Slot = { id: string; start_time: string; end_time: string; status: "available" | "booked" | "blocked"; };
@@ -95,11 +95,16 @@ export default function TurfDetailsPage({ params }: { params: Promise<{ id: stri
 
         {/* 1. PREMIUM HERO SHOWCASE */}
         <section className="relative h-72 md:h-96 rounded-2xl md:rounded-[2rem] overflow-hidden shadow-premium border border-border bg-white dark:bg-card">
-           <img 
-              src={turf.images ? (turf.images.startsWith('[') ? JSON.parse(turf.images)[0] : turf.images) : "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop"} 
-              className="absolute inset-0 w-full h-full object-cover"
-              alt={turf.name}
-           />
+            <img 
+               src={
+                 turf.primary_image || (
+                   Array.isArray(turf.images) ? turf.images[0] : 
+                   (typeof turf.images === 'string' && turf.images.startsWith('[') ? JSON.parse(turf.images)[0] : turf.images)
+                 ) || "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop"
+               } 
+               className="absolute inset-0 w-full h-full object-cover"
+               alt={turf.name}
+            />
            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
            
            <div className="absolute top-4 left-4 md:top-8 md:left-8 z-10">

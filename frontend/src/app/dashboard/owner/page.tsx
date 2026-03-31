@@ -7,7 +7,7 @@ import {
   BarChart3, Calendar, Clock, CreditCard, LayoutDashboard, MapPin, 
   PlusCircle, Search, Settings, ShieldCheck, Store, TrendingUp, 
   Users, User, Zap, Activity, Database, Star, Bell, Filter, ChevronRight,
-  ChevronLeft, Info, HelpCircle, MoreHorizontal, Download, Trash
+  ChevronLeft, Info, HelpCircle, MoreHorizontal, Download, Trash, X
 } from "lucide-react";
 import { useAuth } from "../../../components/AuthProvider";
 import { ImageUpload } from "../../../components/ImageUpload";

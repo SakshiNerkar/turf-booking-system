@@ -27,12 +27,20 @@ export type TurfRow = {
 export async function getTurfById(id: string) {
   const res = await pool.query<TurfRow>(
     `SELECT t.*, 
-       (SELECT image_url FROM turf_images WHERE turf_id = t.id AND is_primary = true LIMIT 1) as primary_image,
-       ARRAY(SELECT image_url FROM turf_images WHERE turf_id = t.id) as images
+       (SELECT image_url FROM turf_images WHERE turf_id = t.id AND is_primary = true LIMIT 1) as primary_image
      FROM turfs t WHERE t.id = $1 LIMIT 1`,
     [id]
   );
-  return res.rows[0] ?? null;
+  const turf = res.rows[0];
+  if (!turf) return null;
+
+  const imgRes = await pool.query<{ image_url: string }>(
+    `SELECT image_url FROM turf_images WHERE turf_id = $1 ORDER BY is_primary DESC, created_at ASC`,
+    [id]
+  );
+  turf.images = imgRes.rows.map(r => r.image_url);
+  
+  return turf;
 }
 
 export async function listTurfs(filters: {

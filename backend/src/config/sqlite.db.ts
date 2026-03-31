@@ -40,10 +40,7 @@ function initSchema() {
       phone TEXT, 
       password TEXT NOT NULL,
       profile_image TEXT,
-      favorites TEXT DEFAULT '[]',
-      role TEXT NOT NULL DEFAULT 'user' CHECK(role IN ('admin','owner','user')),
-      earnings_total REAL DEFAULT 0,
-      earnings_monthly REAL DEFAULT 0,
+      role TEXT NOT NULL DEFAULT 'user',
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
@@ -55,7 +52,6 @@ function initSchema() {
       description TEXT,
       location_city TEXT NOT NULL,
       location_address TEXT NOT NULL,
-      images TEXT DEFAULT '[]',
       sports_available TEXT NOT NULL,
       amenities TEXT DEFAULT '[]',
       price_weekday REAL NOT NULL,
@@ -70,16 +66,24 @@ function initSchema() {
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
+    CREATE TABLE IF NOT EXISTS turf_images (
+      id TEXT PRIMARY KEY,
+      turf_id TEXT NOT NULL REFERENCES turfs(id) ON DELETE CASCADE,
+      image_url TEXT NOT NULL,
+      is_primary INTEGER DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
     CREATE TABLE IF NOT EXISTS bookings (
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       turf_id TEXT NOT NULL REFERENCES turfs(id) ON DELETE CASCADE,
       owner_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      date TEXT NOT NULL,
+      booking_date TEXT NOT NULL,
       start_time TEXT NOT NULL,
       end_time TEXT NOT NULL,
       total_price REAL NOT NULL,
-      status TEXT NOT NULL DEFAULT 'confirmed' CHECK(status IN ('pending','confirmed','cancelled','completed')),
+      status TEXT NOT NULL DEFAULT 'confirmed',
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
@@ -88,16 +92,15 @@ function initSchema() {
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       turf_id TEXT NOT NULL REFERENCES turfs(id) ON DELETE CASCADE,
-      rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),
+      rating INTEGER NOT NULL,
       comment TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
-    CREATE INDEX IF NOT EXISTS idx_turfs_owner      ON turfs(owner_id);
     CREATE INDEX IF NOT EXISTS idx_turfs_city       ON turfs(location_city);
+    CREATE INDEX IF NOT EXISTS idx_turf_images_turf ON turf_images(turf_id);
     CREATE INDEX IF NOT EXISTS idx_bookings_user    ON bookings(user_id);
-    CREATE INDEX IF NOT EXISTS idx_bookings_turf    ON bookings(turf_id);
-    CREATE INDEX IF NOT EXISTS idx_reviews_turf     ON reviews(turf_id);
+    CREATE INDEX IF NOT EXISTS idx_bookings_owner   ON bookings(owner_id);
   `);
   console.log("✅ Platform Schema ready.");
 }
