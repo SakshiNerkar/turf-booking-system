@@ -12,7 +12,7 @@ import { apiFetch } from "../../lib/api";
 import { SkeletonCard, EmptyState } from "../../components/Skeletons";
 import { MultiTurfMap } from "../../components/MultiTurfMap";
 
-type Turf = { id: string; name: string; location_city: string; sports_available: string; price_weekday: number; rating?: number; images?: string; };
+type Turf = { id: string; name: string; location_city: string; sports_available: string; price_weekday: number; rating?: number; images?: string; latitude?: number; longitude?: number; };
 
 export default function TurfsPage() {
   const [turfs, setTurfs] = useState<Turf[] | null>(null);

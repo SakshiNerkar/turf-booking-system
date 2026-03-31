@@ -51,6 +51,8 @@ create table turfs (
   description text,
   location_city text not null,
   location_address text not null,
+  latitude numeric(10,8),
+  longitude numeric(11,8),
   images text, -- JSON array string
   sports_available text not null, -- Primary sport
   amenities text, -- JSON array string

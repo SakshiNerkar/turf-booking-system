@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Search, History, User, Settings, 
   Store, PlusCircle, Bell, LogOut, ShieldCheck, Zap,
   TrendingUp, Activity, Database, Globe, Palette,
-  Calendar, Clock, BarChart3, Users
+  Calendar, Clock, BarChart3, Users, UsersRound, Wallet, CreditCard, Heart
 } from "lucide-react";
 import { useAuth } from "../AuthProvider";
 import { useTheme, VIBES } from "../ThemeContext";
@@ -23,30 +23,35 @@ export function Sidebar() {
 
   const menuItems = {
     customer: [
-      { path: '/dashboard/customer', icon: LayoutDashboard, label: 'Overview' },
-      { path: '/turfs', icon: Search, label: 'Discover' },
-      { path: '/dashboard/customer/history', icon: History, label: 'History' },
-      { path: '/dashboard/customer?tab=profile', icon: User, label: 'Identity' },
-      { path: '/dashboard/customer?tab=settings', icon: Settings, label: 'System' },
+      { path: '/dashboard/user', icon: LayoutDashboard, label: 'Athlete Hub' },
+      { path: '/turfs', icon: Search, label: 'Explore Arenas' },
+      { path: '/dashboard/user?tab=matches', icon: Calendar, label: 'My Matches' },
+      { path: '/dashboard/user?tab=favorites', icon: Heart, label: 'Favorite Sectors' },
+      { path: '/dashboard/user?tab=history', icon: History, label: 'Transaction History' },
+      { path: '/dashboard/user?tab=profile', icon: User, label: 'Identity Matrix' },
+      { path: '/dashboard/user?tab=settings', icon: Settings, label: 'System Settings' },
     ],
     owner: [
-      { path: '/dashboard/owner', icon: LayoutDashboard, label: 'Ops center' },
-      { path: '/dashboard/owner?tab=bookings', icon: Calendar, label: 'Bookings' },
-      { path: '/dashboard/owner?tab=slots', icon: Clock, label: 'Slots' },
-      { path: '/dashboard/owner?tab=turfs', icon: Store, label: 'Arenas' },
-      { path: '/dashboard/owner?tab=finance', icon: TrendingUp, label: 'Finance' },
-      { path: '/dashboard/owner?tab=customers', icon: Users, label: 'CRM' },
-      { path: '/dashboard/owner?tab=coupons', icon: Zap, label: 'Coupons' },
-      { path: '/dashboard/owner?tab=staff', icon: ShieldCheck, label: 'Staff' },
-      { path: '/dashboard/owner?tab=reports', icon: BarChart3, label: 'Reports' },
-      { path: '/dashboard/owner?tab=profile', icon: User, label: 'Identity' },
+      { path: '/dashboard/owner', icon: LayoutDashboard, label: 'Dashboard Overview' },
+      { path: '/dashboard/owner?tab=profile', icon: User, label: 'My Profile & Venues' },
+      { path: '/dashboard/owner?tab=customers', icon: Users, label: 'My Customers' },
+      { path: '/dashboard/owner?tab=turfs', icon: Store, label: 'My Turf Management' },
+      { path: '/dashboard/owner?tab=bookings', icon: Calendar, label: 'My Booking Calendar' },
+      { path: '/dashboard/owner?tab=finance', icon: CreditCard, label: 'My Revenue & Payouts' },
+      { path: '/dashboard/owner?tab=staff', icon: ShieldCheck, label: 'Staff Management' },
+      { path: '/dashboard/owner?tab=marketing', icon: Zap, label: 'Promotions & Marketing' },
+      { path: '/dashboard/owner?tab=maintenance', icon: Activity, label: 'Maintenance Hub' },
+      { path: '/dashboard/owner?tab=inventory', icon: Database, label: 'Inventory & Rentals' },
+      { path: '/dashboard/owner?tab=settings', icon: Settings, label: 'Application Settings' },
     ],
     admin: [
-      { path: '/dashboard/admin', icon: LayoutDashboard, label: 'Global' },
-      { path: '/dashboard/admin?tab=users', icon: Globe, label: 'Users' },
-      { path: '/dashboard/admin?tab=turfs', icon: Database, label: 'Sectors' },
-      { path: '/dashboard/admin?tab=history', icon: Bell, label: 'Logs' },
-      { path: '/dashboard/admin?tab=settings', icon: Settings, label: 'Override' },
+      { path: '/dashboard/admin', icon: LayoutDashboard, label: 'Admin Terminal' },
+      { path: '/dashboard/admin?tab=users', icon: UsersRound, label: 'User Governance' },
+      { path: '/dashboard/admin?tab=turfs', icon: Database, label: 'Sectors & Venues' },
+      { path: '/dashboard/admin?tab=payouts', icon: CreditCard, label: 'Payout Control' },
+      { path: '/dashboard/admin?tab=approvals', icon: ShieldCheck, label: 'Owner Reviews' },
+      { path: '/dashboard/admin?tab=history', icon: Bell, label: 'Platform Logs' },
+      { path: '/dashboard/admin?tab=settings', icon: Settings, label: 'System Override' },
     ]
   };
 

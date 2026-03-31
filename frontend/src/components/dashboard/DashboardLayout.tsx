@@ -42,18 +42,28 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] dark:bg-[#060806] transition-colors duration-500 pb-24 lg:pb-0 lg:pl-64 relative">
+    <div className="min-h-screen bg-background dark:bg-[#0B0F0C] transition-colors duration-500 pb-24 lg:pb-0 lg:pl-[260px] relative flex flex-col">
       
       {/* 0. GLOBAL BACKGROUND DECOR (WOW FACTOR) */}
       <div className="fixed inset-0 pointer-events-none opacity-40 dark:opacity-20 bg-stadium-texture" />
-      <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -mr-64 -mt-64" />
-      <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] lg:ml-64 -mb-64" />
+      <div className="fixed top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[160px] -mr-96 -mt-96" />
+      <div className="fixed bottom-0 left-0 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[160px] lg:ml-72 -mb-96" />
 
       {/* 1. DESKTOP SIDEBAR (Static/Fixed) */}
-      <aside className="hidden lg:block fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-[#0B0F0C] border-r border-gray-100 dark:border-white/5 z-40 overflow-y-auto no-scrollbar shadow-sm">
-         <div className="p-8">
-            <Link href="/" className="text-3xl font-black text-primary tracking-tighter italic block mb-12">TURFF</Link>
-            <Sidebar />
+      <aside className="hidden lg:block fixed left-0 top-0 bottom-0 w-[260px] bg-white dark:bg-[#0B0F0C] border-r border-gray-100 dark:border-white/5 z-40 overflow-y-auto no-scrollbar shadow-sm">
+         <div className="px-6 py-10 flex flex-col h-full">
+            <Link href="/" className="flex items-center gap-3 mb-16 px-2 group">
+               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 group-hover:rotate-6 transition-transform">
+                  <Store className="w-6 h-6 text-white" />
+               </div>
+               <div className="flex flex-col">
+                  <span className="text-2xl font-black text-gray-900 dark:text-white tracking-tighter italic leading-none">TURFF</span>
+                  <span className="text-[8px] font-black text-primary uppercase tracking-[0.3em] leading-none mt-1">Platform Console</span>
+               </div>
+            </Link>
+            <div className="flex-1">
+               <Sidebar />
+            </div>
          </div>
       </aside>
 
@@ -63,8 +73,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* 3. MAIN CONTENT ENGINE */}
-      <main className="max-w-7xl mx-auto p-6 md:p-12 relative z-10">
-         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+      <main className="flex-1 w-full p-6 lg:p-8 relative z-10 overflow-hidden">
+         <motion.div 
+           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+           className="w-full h-full"
+         >
             {children}
          </motion.div>
       </main>
