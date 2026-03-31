@@ -8,6 +8,7 @@ node_modules/
 # Backend
 backend/node_modules/
 backend/dist/
+backend/uploads/
 backend/turff.sqlite
 backend/turff.sqlite-wal
 backend/turff.sqlite-shm

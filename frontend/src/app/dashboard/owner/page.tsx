@@ -10,6 +10,7 @@ import {
   ChevronLeft, Info, HelpCircle, MoreHorizontal, Download, Trash
 } from "lucide-react";
 import { useAuth } from "../../../components/AuthProvider";
+import { ImageUpload } from "../../../components/ImageUpload";
 import { apiFetch } from "../../../lib/api";
 
 function OwnerDashboardContent() {
@@ -21,6 +22,12 @@ function OwnerDashboardContent() {
   const [activeTab, setActiveTab] = useState(currentTab);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [newTurf, setNewTurf] = useState<any>({
+    name: '', sports_available: 'Football', price_weekday: '', price_weekend: '',
+    location_city: 'Mumbai', location_address: '', opening_time: '06:00', closing_time: '23:00',
+    slot_duration: 60, images: []
+  });
 
   useEffect(() => {
     setActiveTab(searchParams.get('tab') || 'overview');
@@ -335,6 +342,180 @@ function OwnerDashboardContent() {
     );
   };
 
+  const renderTurfs = () => {
+    const s = data?.stats || {};
+    const turfs = data?.myTurfs || [];
+
+    const handleCreate = async () => {
+       if (!token) return;
+       setLoading(true);
+       try {
+          const res = await apiFetch("/api/turfs", {
+             method: "POST",
+             token,
+             body: newTurf
+          });
+          if (res.ok) {
+             setIsCreating(false);
+             loadData();
+          }
+       } finally {
+          setLoading(false);
+       }
+    };
+
+    return (
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-12">
+         <div className="flex items-center justify-between">
+            <div className="space-y-1">
+               <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter">Arena Sector Control</h3>
+               <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest italic opacity-60">Synchronizing {turfs.length} operational venue nodes</p>
+            </div>
+            <button 
+               onClick={() => setIsCreating(true)}
+               className="px-8 py-4 bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest rounded-2xl hover:bg-emerald-400 hover:shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all flex items-center gap-3 active:scale-95 italic"
+            >
+               <PlusCircle className="w-4 h-4" /> Initialize New Sector
+            </button>
+         </div>
+
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-32">
+            <AnimatePresence>
+               {isCreating && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
+                    className="lg:col-span-2 bg-white/5 border border-white/10 rounded-[3.5rem] p-12 backdrop-blur-3xl shadow-2xl space-y-10 border-cyan-500/30"
+                  >
+                     <div className="flex items-center justify-between border-b border-white/5 pb-8 mb-4">
+                        <h4 className="text-xl font-black text-white italic uppercase tracking-tighter flex items-center gap-4">
+                           <span className="w-4 h-4 rounded-full bg-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.5)] animate-pulse" /> Finalize Venue Protocol
+                        </h4>
+                        <button onClick={() => setIsCreating(false)} className="p-3 bg-white/5 rounded-2xl text-gray-500 hover:text-white transition-all"><X className="w-5 h-5" /></button>
+                     </div>
+
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div className="space-y-8">
+                           <div className="space-y-4">
+                              <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest ml-2 italic">Venue Identity Node</label>
+                              <div className="relative group">
+                                 <Store className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700 group-focus-within:text-cyan-500 transition-colors" />
+                                 <input 
+                                    className="w-full h-16 bg-white/5 border border-white/5 rounded-[1.5rem] pl-16 pr-6 text-[11px] font-black uppercase tracking-widest placeholder-gray-800 focus:bg-white/10 focus:border-cyan-500/50 transition-all outline-none"
+                                    placeholder="Arena Designation..." 
+                                    value={newTurf.name} onChange={(e) => setNewTurf({...newTurf, name: e.target.value})}
+                                 />
+                              </div>
+                           </div>
+
+                           <div className="grid grid-cols-2 gap-6">
+                              <div className="space-y-4 text-start">
+                                 <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest ml-2 italic">Sport Classification</label>
+                                 <select 
+                                    className="w-full h-16 bg-white/5 border border-white/5 rounded-xl px-6 text-[10px] font-black uppercase tracking-widest text-white outline-none focus:border-cyan-500/50 transition-all font-mono"
+                                    value={newTurf.sports_available} onChange={(e) => setNewTurf({...newTurf, sports_available: e.target.value})}
+                                 >
+                                    {['Football','Cricket','Tennis','Badminton','Basketball'].map(s => <option key={s} value={s}>{s}</option>)}
+                                 </select>
+                              </div>
+                              <div className="space-y-4">
+                                 <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest ml-2 italic">Base Payout (₹)</label>
+                                 <input 
+                                    className="w-full h-16 bg-white/5 border border-white/5 rounded-xl px-6 text-[10px] font-black uppercase tracking-widest placeholder-gray-800 focus:bg-white/10 focus:border-cyan-500/50 transition-all outline-none"
+                                    placeholder="1200" 
+                                    type="number"
+                                    value={newTurf.price_weekday} onChange={(e) => setNewTurf({...newTurf, price_weekday: e.target.value})}
+                                 />
+                              </div>
+                           </div>
+
+                           <div className="space-y-4">
+                              <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest ml-2 italic">Physical Vector (Address)</label>
+                              <div className="relative group">
+                                 <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700 group-focus-within:text-cyan-500 transition-colors" />
+                                 <input 
+                                    className="w-full h-16 bg-white/5 border border-white/5 rounded-[1.5rem] pl-16 pr-6 text-[11px] font-black uppercase tracking-widest placeholder-gray-800 focus:bg-white/10 focus:border-cyan-500/50 transition-all outline-none"
+                                    placeholder="Arena Location Nodes..." 
+                                    value={newTurf.location_address} onChange={(e) => setNewTurf({...newTurf, location_address: e.target.value})}
+                                 />
+                              </div>
+                           </div>
+
+                           <div className="grid grid-cols-3 gap-4">
+                              <div className="space-y-2">
+                                 <label className="text-[8px] font-black text-gray-600 uppercase italic">Op Launch</label>
+                                 <input type="time" className="w-full bg-white/5 border border-white/5 p-4 rounded-xl text-white font-black text-[10px]" value={newTurf.opening_time} onChange={(e) => setNewTurf({...newTurf, opening_time: e.target.value})} />
+                              </div>
+                              <div className="space-y-2">
+                                 <label className="text-[8px] font-black text-gray-600 uppercase italic">Op Shutdown</label>
+                                 <input type="time" className="w-full bg-white/5 border border-white/5 p-4 rounded-xl text-white font-black text-[10px]" value={newTurf.closing_time} onChange={(e) => setNewTurf({...newTurf, closing_time: e.target.value})} />
+                              </div>
+                              <div className="space-y-2">
+                                 <label className="text-[8px] font-black text-gray-600 uppercase italic">Slot (Min)</label>
+                                 <input type="number" className="w-full bg-white/5 border border-white/5 p-4 rounded-xl text-white font-black text-[10px]" value={newTurf.slot_duration} onChange={(e) => setNewTurf({...newTurf, slot_duration: e.target.value})} />
+                              </div>
+                           </div>
+                        </div>
+
+                        <div className="space-y-8 flex flex-col justify-end pb-2">
+                           <ImageUpload 
+                              label="Venue Visual Node (Directorial Feed)" 
+                              token={token} 
+                              onUploadSuccess={(url) => setNewTurf(prev => ({...prev, images: [...prev.images, url]}))} 
+                           />
+                           
+                           <div className="flex gap-4 pt-10">
+                              <button onClick={() => setIsCreating(false)} className="flex-1 py-5 bg-white/5 text-gray-500 text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-white/10 transition-all italic">Abort Protocol</button>
+                              <button 
+                                 onClick={handleCreate}
+                                 disabled={!newTurf.name || !newTurf.location_address}
+                                 className="flex-[2] py-5 bg-cyan-600 disabled:opacity-30 disabled:grayscale text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-cyan-500 transition-all shadow-2xl shadow-cyan-600/20 italic"
+                              >
+                                 Finalize Sector Creation
+                              </button>
+                           </div>
+                        </div>
+                     </div>
+                  </motion.div>
+               )}
+            </AnimatePresence>
+
+            {turfs.map((t: any) => (
+               <motion.div key={t.id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="group bg-white/5 border border-white/10 rounded-[3rem] p-8 backdrop-blur-md hover:border-cyan-500 transition-all shadow-xl shadow-cyan-500/2">
+                  <div className="relative h-56 rounded-[2.5rem] overflow-hidden mb-8 group/img shadow-2xl">
+                     <img src={t.primary_image || "https://images.unsplash.com/photo-1551958219-acbc608c6377?auto=format&fit=crop&q=80&w=800"} className="w-full h-full object-cover grayscale opacity-60 group-hover/img:grayscale-0 group-hover/img:opacity-100 group-hover/img:scale-110 transition-all duration-700" alt="Turf" />
+                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
+                     <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
+                        <span className="px-5 py-2 bg-white/10 backdrop-blur-md rounded-xl text-[9px] font-black uppercase text-white shadow-xl italic tracking-widest">{t.sports_available || 'Sport Matrix'}</span>
+                        <div className="flex -space-x-2">
+                           {[1,2,3].map(i => <div key={i} className="w-7 h-7 rounded-full border-2 border-gray-950 bg-gray-900 flex items-center justify-center text-[7px] font-black italic">{i}</div>)}
+                        </div>
+                     </div>
+                  </div>
+                  <div className="space-y-6">
+                     <div>
+                        <h4 className="text-xl font-black text-white uppercase tracking-tighter italic mb-1">{t.name || 'Arena Designation'}</h4>
+                        <div className="flex items-center gap-3 text-gray-500 text-[9px] font-black uppercase tracking-widest italic drop-shadow-xl">
+                           <MapPin className="w-3.5 h-3.5 text-cyan-500" /> {t.location_address || 'Vector Undefined'}
+                        </div>
+                     </div>
+                     <div className="flex items-center justify-between pt-6 border-t border-white/5">
+                        <div className="space-y-1">
+                           <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest italic opacity-60">Revenue Intelligence</p>
+                           <p className="text-xl font-black text-white italic tracking-tighter leading-none">₹{(t.price_weekday || 0).toLocaleString()}</p>
+                        </div>
+                        <div className="flex gap-2">
+                           <button className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center text-gray-500 hover:text-cyan-400 hover:bg-cyan-400/10 transition-all"><Settings className="w-5 h-5" /></button>
+                           <button className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center text-gray-500 hover:text-rose-400 hover:bg-rose-400/10 transition-all"><Trash className="w-5 h-5" /></button>
+                        </div>
+                     </div>
+                  </div>
+               </motion.div>
+            ))}
+         </div>
+      </motion.div>
+    );
+  };
+
   const renderPlaceholder = (title: string, desc: string, Icon: any) => (
      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="h-[70vh] flex flex-col items-center justify-center text-center space-y-8">
         <div className="w-32 h-32 rounded-[3.5rem] bg-white/5 border border-white/10 flex items-center justify-center relative overflow-hidden group">
@@ -385,7 +566,7 @@ function OwnerDashboardContent() {
             {activeTab === 'overview' && renderOverview()}
             {activeTab === 'profile' && renderPlaceholder("Venue Identity Vector", "Synchronizing authorized profile & node data...", User)}
             {activeTab === 'customers' && renderPlaceholder("CRM Identity Matrix", "Mapping customer engagement trajectories...", Users)}
-            {activeTab === 'turfs' && renderPlaceholder("Venue Sector Control", "Optimizing arena operational parameters...", Store)}
+            {activeTab === 'turfs' && renderTurfs()}
             {activeTab === 'bookings' && renderPlaceholder("Temporal Schedule Hub", "Resolving booking session conflicts...", Calendar)}
             {activeTab === 'finance' && renderPlaceholder("Revenue Intelligence Feed", "Authenticating liquid payout transmissions...", CreditCard)}
             {activeTab === 'staff' && renderPlaceholder("Staffing Node Governance", "Synchronizing human resource trajectories...", ShieldCheck)}

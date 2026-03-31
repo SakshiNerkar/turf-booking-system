@@ -121,6 +121,7 @@ export async function getOwnerDashboard(req: Request, res: Response) {
     trends,
     revenueSplit: revenueSplit.length ? revenueSplit : [{ label: 'Football', value: 100, color: '#0891B2' }],
     topVenues,
+    myTurfs: turfsOwned,
     pendingRequests: bookings.filter(b => b.status === 'pending').slice(0, 5).map(b => ({
        id: b.id,
        user: b.user_name || 'Anonymous Athlete',

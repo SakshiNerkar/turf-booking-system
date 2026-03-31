@@ -6,6 +6,7 @@ import { bookingRouter } from "./booking.routes";
 import { dashboardRouter } from "./dashboard.routes";
 import { reviewRouter } from "./review.routes";
 import { turfRouter } from "./turf.routes";
+import { uploadRouter } from "./upload.routes";
 
 export function mountRoutes(app: Express) {
   const router = Router();
@@ -18,6 +19,7 @@ export function mountRoutes(app: Express) {
   router.use("/dashboards", dashboardRouter);
   router.use("/reviews",    reviewRouter);
   router.use("/admin",      adminRouter);
+  router.use("/upload",     uploadRouter);
 
   app.use("/api", router);
 }

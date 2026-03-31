@@ -17,6 +17,7 @@ const CreateTurfSchema = z.object({
   opening_time: z.string().regex(/^\d{2}:\d{2}$/),
   closing_time: z.string().regex(/^\d{2}:\d{2}$/),
   slot_duration: z.coerce.number().int().min(30).max(240),
+  images: z.array(z.string()).optional(),
 });
 
 export async function listTurfs(req: Request, res: Response) {

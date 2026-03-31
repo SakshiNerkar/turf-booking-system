@@ -10,15 +10,26 @@ const AMENITIES = ["Parking", "Changing Room", "Drinking Water", "First Aid", "C
 const SPORT_IMAGES: Record<string, string[]> = {
   "Football": [
     "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1529900748604-07564a03e7a6?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1511067007398-7e4b90cfa4bc?auto=format&fit=crop&q=80&w=800"
+    "https://images.unsplash.com/photo-1551958219-acbc608c6377?auto=format&fit=crop&q=80&w=800",
+    "https://images.unsplash.com/photo-1526232761682-d21e4d929355?auto=format&fit=crop&q=80&w=800",
+    "https://images.unsplash.com/photo-1431324155629-1a6eda1eed2d?auto=format&fit=crop&q=80&w=800",
+    "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=800"
   ],
   "Cricket": [
     "https://images.unsplash.com/photo-1531415080294-467be7262875?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1599474924187-334a493630f8?auto=format&fit=crop&q=80&w=800"
+    "https://images.unsplash.com/photo-1593341646782-e0b495cff86d?auto=format&fit=crop&q=80&w=800",
+    "https://images.unsplash.com/photo-1589485488331-4bc36641e1f7?auto=format&fit=crop&q=80&w=800",
+    "https://images.unsplash.com/photo-1562077772-3bd90403f7f0?auto=format&fit=crop&q=80&w=800"
   ],
   "Badminton": [
-    "https://images.unsplash.com/photo-1626225967045-9c76db7a22e8?auto=format&fit=crop&q=80&w=800"
+    "https://images.unsplash.com/photo-1626225967045-9c76db7a22e8?auto=format&fit=crop&q=80&w=800",
+    "https://images.unsplash.com/photo-1613918108466-292b78a8ef95?auto=format&fit=crop&q=80&w=800"
+  ],
+  "Tennis": [
+    "https://images.unsplash.com/photo-1595435064212-36aa2414cc9a?auto=format&fit=crop&q=80&w=800"
+  ],
+  "Basketball": [
+    "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&q=80&w=800"
   ]
 };
 
@@ -102,12 +113,13 @@ export async function megaSeed() {
     ]);
     const turfId = turfRes.rows[0].id;
 
-    // Primary Image
+    // Primary Image selection logic: pick unique image where possible
     const sportsImgs = SPORT_IMAGES[t.sport] || SPORT_IMAGES["Football"]!;
+    const imgUrl = sportsImgs[i % sportsImgs.length] || sportsImgs[0];
     await pool.query(`
       INSERT INTO turf_images (turf_id, image_url, is_primary)
       VALUES ($1, $2, true)
-    `, [turfId, sportsImgs[0]]);
+    `, [turfId, imgUrl]);
   }
 
   // 5. Test Athlete
@@ -116,6 +128,21 @@ export async function megaSeed() {
     VALUES ($1, $2, $3, $4, 'user') RETURNING id
   `, ["Athlete Anant", "anant12@gmail.com", "+91-1234567890", userPassword]);
   const userId = userRes.rows[0].id;
+
+  // 6. Test Bookings for Athlete Anant (to populate Quick Book Again)
+  const turfsToBook = await pool.query("SELECT id, owner_id FROM turfs LIMIT 3");
+  for (let i = 0; i < turfsToBook.rows.length; i++) {
+    const t = turfsToBook.rows[i];
+    await pool.query(`
+      INSERT INTO bookings (user_id, turf_id, owner_id, booking_date, start_time, end_time, total_price, status, payment_status, booking_reference)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, 'confirmed', 'paid', $8)
+    `, [
+      userId, t.id, t.owner_id, 
+      new Date().toISOString().split('T')[0], 
+      `${16 + i}:00`, `${17 + i}:00`, 1200, 
+      `REF-${Math.random().toString(36).substring(7).toUpperCase()}`
+    ]);
+  }
 
   console.log("✅ Mega-Seed Complete.");
 }

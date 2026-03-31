@@ -43,6 +43,7 @@ export function createApp() {
     }
   });
 
+  app.use("/uploads", express.static("uploads"));
   mountRoutes(app);
 
   app.use(notFoundHandler);
