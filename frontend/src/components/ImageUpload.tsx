@@ -7,7 +7,7 @@ import { apiFetch } from "../lib/api";
 
 type ImageUploadProps = {
   onUploadSuccess: (url: string) => void;
-  token?: string;
+  token?: string | null;
   label?: string;
 };
 
